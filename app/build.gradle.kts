@@ -3,6 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    //Hilt DI
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -58,4 +62,41 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Google Play Services dependency
+    //implementation(libs.play.services.auth)
+    //Firebase dependencies
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging.ktx)
+
+    // Icons and Material
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.compose.material3.material3)
+
+    // Hilt dependencies
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    kapt(libs.hilt.android.compiler)
+
+    // Navigation dependencies
+    implementation(libs.androidx.navigation.compose)
+
+    // For encrypted SharedPreferences
+    implementation(libs.androidx.security.crypto)
+
+    // Retrofit core library for making HTTP requests (GET, POST, etc.)
+    implementation(libs.retrofit)
+
+
+    // OkHttp logging interceptor for debugging network requests/responses in Logcat
+    implementation(libs.logging.interceptor)
+
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
