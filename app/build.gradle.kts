@@ -3,10 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
-    //Hilt DI
+    // Hilt DI
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -45,9 +45,11 @@ android {
 }
 
 dependencies {
-
+    // Core and Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // Compose
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -55,6 +57,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.crashlytics)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -63,8 +69,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Google Play Services dependency
-    //implementation(libs.play.services.auth)
     //Firebase dependencies
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)
@@ -89,7 +93,6 @@ dependencies {
 
     // Retrofit core library for making HTTP requests (GET, POST, etc.)
     implementation(libs.retrofit)
-
 
     // OkHttp logging interceptor for debugging network requests/responses in Logcat
     implementation(libs.logging.interceptor)
