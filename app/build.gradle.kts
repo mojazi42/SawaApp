@@ -59,6 +59,9 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 
     // Testing
     testImplementation(libs.junit)
