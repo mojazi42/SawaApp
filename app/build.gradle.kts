@@ -6,6 +6,7 @@ plugins {
     // Hilt DI
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    // Firebase
     alias(libs.plugins.google.firebase.crashlytics)
 }
 
@@ -99,6 +100,13 @@ dependencies {
 
     // OkHttp logging interceptor for debugging network requests/responses in Logcat
     implementation(libs.logging.interceptor)
+
+    // Google Maps SDK for Android
+    implementation(libs.places)
+    implementation(libs.play.services.maps)
+
+    // Google maps Compose
+    implementation(libs.maps.compose)
 
 }
 
