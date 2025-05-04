@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
         <string name="app_name">تطبيق سوا</string>
 
         <!-- عناوين شاشة البدء -->
@@ -14,6 +15,23 @@
 
         <!-- نص الزر -->
         <string name="get_started">ابدأ الآن</string>
+
+    <string name="Signup">تسجيل</string>
+    <string name="Login">تسجيل الدخول </string>
+
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="confirmPassword">تأكيد كلمة المرور</string>
+    <string name="username">اسم المستخدم</string>
+
+    <string name="already_have_account">لديك حساب بالفعل؟</string>
+    <string name="forgot_password">هل نسيت كلمة المرور؟</string>
+    <string name="dont_have_account">ليس لديك حساب؟</string>
+
+    <string name="forgotPassword">نسيت كلمة المرور</string>
+    <string name="resetPassword">إعادة تعيين كلمة المرور</string>
+    <string name="SentPassword">تم إرسال رسالة لاستعادة كلمة المرور إلى بريدك الإلكتروني.</string>
+    <string name="BackToLogIn">إعادة تسجيل الدخول</string>
 
 
 </resources>

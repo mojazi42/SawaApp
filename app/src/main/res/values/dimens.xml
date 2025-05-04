@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="extraSmallSpace">4</integer>
+    <integer name="smallerSpace">8</integer>
+    <integer name="smallSpace">12</integer>
+    <integer name="mediumSpace">16</integer>
+    <integer name="largeSpace">20</integer>
+    <integer name="largerSpace">24</integer>
+    <integer name="extraLargeSpace">32</integer>
+
+    <!-- space between button and text filed-->
+    <integer name="buttonTextFieldSpace">24</integer>
+
+    <!--card Size-->
+    <integer name="cardHeaderSize">28</integer>
+    <integer name="cardWidth">332</integer>
+    <integer name="cardHeightSignUp">500</integer>
+    <integer name="cardHeightLogin">440</integer>
+    <integer name="roundCardCornerShape">8</integer>
+    <integer name="shadow">16</integer>
+    <integer name="cardHeightResetPass">250</integer>
+    <integer name="cardWidthResetPass">373</integer>
+    <integer name="cardSpacerResetPass">48</integer>
+
+    <!--Card Header-->
+    <integer name="cardHeaderTopPadding">12</integer>
+    <integer name="cardHeaderBottomPadding">20</integer>
+
+    <!--Authentication Screens Dimensions-->
+    <integer name="smallText">16</integer>
+
+    <!--Button-->
+    <integer name="buttonHeight">52</integer>
+    <integer name="buttonRoundCornerShape">20</integer>
+    <integer name="roundedCornerShape">12</integer>
+    <integer name="buttonWidth">244</integer>
+
+    <!--Custom Card Dimensions-->
+    <integer name="cardPadding">8</integer>
+    <integer name="customCardShadow">32</integer>
+    <integer name="customCardRound">8</integer>
+
+</resources>
