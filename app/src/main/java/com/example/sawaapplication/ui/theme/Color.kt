@@ -10,6 +10,8 @@ val Gray = Color(0x59000000)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
+val OrangePrimary = Color(0xFFF37021)
+=======
 //GradientButton Colors
 val firstOrange = Color(0xF8FF6F3C)
 val secondOrange = Color(0xEBFF6F3C)
@@ -23,3 +25,4 @@ val thirdDarkGreen = Color(0xFFF082B27)*/
 //Basic colors
 val black = Color(0xFF000000)
 val white = Color(0XFFFFFFFF)
+
