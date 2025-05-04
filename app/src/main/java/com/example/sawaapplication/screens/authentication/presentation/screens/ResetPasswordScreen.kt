@@ -1,0 +1,65 @@
+package com.example.sawaapplication.screens.authentication.presentation.screens
+
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+
+@Composable
+fun ResetPasswordScreen(navController: NavHostController){
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+//        ThemedLogo(
+//            modifier = Modifier
+//                .padding(top = integerResource(id= R.integer.logoExtraLargeSpace).dp)
+//                .align(CenterHorizontally),
+//        )
+//        Spacer(modifier = Modifier.padding(integerResource(id= R.integer.logoMediumSpace).dp))
+
+        CustomCard(
+            modifier = Modifier
+                .size(width = integerResource(id= R.integer.cardWidth).dp, height = integerResource(id= R.integer.cardHeightSmall).dp)
+                .align(CenterHorizontally)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding((integerResource(id= R.integer.smallSpace).dp)),
+                horizontalAlignment = CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(id = R.string.forgotPassword),
+                    color = Color.Black,
+                    fontSize = integerResource(id= R.integer.cardHeaderSize).sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = integerResource(id= R.integer.cardHeaderTopPadding).dp, bottom = integerResource(id= R.integer.cardHeaderBottomPadding).dp)
+                )
+                CustomTextField(
+                    value = email,
+                    onValueChange = { viewModel.email = it },
+                    label = stringResource(id = R.string.email),
+                )
+                Spacer(modifier = Modifier.height(integerResource(id= R.integer.buttonTextFieldSpace).dp))
+
+                GradientButton(
+                    onClick = { navController.navigate(Screen.NewPass.route)
+                        viewModel.sendPasswordResetEmail(email)},
+                    text = stringResource(id = R.string.send)
+                )
+            }
+        }
+    }
+}
