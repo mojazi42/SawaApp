@@ -5,7 +5,8 @@
     <integer name="smallSpace">12</integer>
     <integer name="mediumSpace">16</integer>
     <integer name="largeSpace">20</integer>
-    <integer name="extraLargeSpace">24</integer>
+    <integer name="largerSpace">24</integer>
+    <integer name="extraLargeSpace">32</integer>
 
     <!-- space between button and text filed-->
     <integer name="buttonTextFieldSpace">24</integer>
@@ -14,6 +15,7 @@
     <integer name="cardHeaderSize">28</integer>
     <integer name="cardWidth">332</integer>
     <integer name="cardHeightSignUp">500</integer>
+    <integer name="cardHeightLogin">440</integer>
     <integer name="roundCardCornerShape">8</integer>
     <integer name="shadow">16</integer>
 
