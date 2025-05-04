@@ -2,11 +2,13 @@ package com.example.sawaapplication.screens.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -43,27 +45,33 @@ fun ProfileScreen() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //Image
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
-            contentDescription = "Profile image",
+        Spacer(Modifier.height(64.dp))
+
+        Box(
             modifier = Modifier
-                .clip(CircleShape)
-        )
-
-        //Edit icon
-        IconButton(
-            onClick = { readOnly = !readOnly },
+                .size(124.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.Create,
-                contentDescription = "Edit icon",
+            //Image
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_background),
+                contentDescription = "Profile image",
+                modifier = Modifier
+                    .clip(CircleShape),
             )
-        }
 
+            //Edit icon
+            IconButton(
+                onClick = { readOnly = !readOnly },
+                modifier = Modifier.align(Alignment.BottomEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Create,
+                    contentDescription = "Edit icon",
+                )
+            }
+        }
         //Name
         TextField(
             value = "Shahad Aldawsari",
