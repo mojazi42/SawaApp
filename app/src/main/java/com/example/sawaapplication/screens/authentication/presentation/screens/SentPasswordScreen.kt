@@ -9,27 +9,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.screenComponent.CustomCard
-import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.screenComponent.GradientButton
 
 @Composable
-fun ResetPasswordScreen() {
-    //Fix this when implement VM to be a VM object rather than Remember
-    var email by remember { mutableStateOf("") }
+fun SentPasswordScreen() {
 
     Column(
         modifier = Modifier
@@ -59,20 +53,19 @@ fun ResetPasswordScreen() {
                 )
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(32.dp),
                 horizontalAlignment = CenterHorizontally
             ) {
-                CustomTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = stringResource(id = R.string.email),
-                )
 
+                Text(
+                    text = stringResource(id = R.string.SentPassword),
+                    textAlign = TextAlign.Center
+                )
                 Spacer(modifier = Modifier.height(integerResource(id = R.integer.cardSpacerResetPass).dp))
 
                 GradientButton(
                     onClick = {},
-                    text = stringResource(id = R.string.resetPassword)
+                    text = stringResource(id = R.string.BackToLogIn)
                 )
             }
         }
