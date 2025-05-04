@@ -18,6 +18,9 @@
     <integer name="cardHeightLogin">440</integer>
     <integer name="roundCardCornerShape">8</integer>
     <integer name="shadow">16</integer>
+    <integer name="cardHeightResetPass">250</integer>
+    <integer name="cardWidthResetPass">373</integer>
+    <integer name="cardSpacerResetPass">48</integer>
 
     <!--Card Header-->
     <integer name="cardHeaderTopPadding">12</integer>

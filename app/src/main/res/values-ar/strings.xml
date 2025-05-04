@@ -15,6 +15,8 @@
     <string name="dont_have_account">ليس لديك حساب؟</string>
 
     <string name="forgotPassword">نسيت كلمة المرور</string>
-    <string name="newPassword">كلمة المرور الجديدة</string>
+    <string name="resetPassword">إعادة تعيين كلمة المرور</string>
+    <string name="SentPassword">تم إرسال رسالة لاستعادة كلمة المرور إلى بريدك الإلكتروني.</string>
+    <string name="BackToLogIn">إعادة تسجيل الدخول</string>
 
 </resources>
