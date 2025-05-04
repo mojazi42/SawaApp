@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.authentication.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,12 +8,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,18 +27,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.LoginViewModel
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.ValidationInputViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomCard
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.screenComponent.GradientButton
 import com.example.sawaapplication.ui.theme.black
+import androidx.compose.ui.platform.LocalContext
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.handleAuthStateLogin
 
 @Composable
 fun LoginScreen() {
+    val loginViewModel: LoginViewModel = hiltViewModel()
     var showPassword by remember { mutableStateOf(false) }
-    //need to delete when implement vm
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val validationInputViewModel: ValidationInputViewModel = hiltViewModel()
+    val context = LocalContext.current
+
+    val authState by loginViewModel.authState.collectAsState()
+    LaunchedEffect(authState) {
+        handleAuthStateLogin(authState, context)// Add navController argument when navigation is finished
+
+    }
 
     Column(
         modifier = Modifier
@@ -73,15 +86,15 @@ fun LoginScreen() {
             ) {
 
                 CustomTextField(
-                    value = email,
-                    onValueChange = {},
+                    value = loginViewModel.email,
+                    onValueChange = {loginViewModel.email = it},
                     label = stringResource(id = R.string.email),
                 )
                 Spacer(modifier = Modifier.padding(bottom = integerResource(id = R.integer.mediumSpace).dp))
 
                 CustomTextField(
-                    value = password,
-                    onValueChange = {},
+                    value = loginViewModel.password,
+                    onValueChange = {loginViewModel.password = it},
                     label = stringResource(id = R.string.password),
                     isPassword = true,
                     showPassword = showPassword,
@@ -104,7 +117,17 @@ fun LoginScreen() {
                 }
 
                 GradientButton(
-                    onClick = { },
+                    onClick = {
+                        val emailInput = loginViewModel.email.trim()
+                        val passwordInput = loginViewModel.password.trim()
+
+                        validationInputViewModel.email = emailInput
+                        validationInputViewModel.password = passwordInput
+                        validationInputViewModel.validateEmailAndPassword()
+
+                        validationInputViewModel.emailAndPasswordError?.let {
+                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                        } ?: loginViewModel.login(emailInput, passwordInput)},
                     text = stringResource(id = R.string.Login),
                     modifier = Modifier.padding(top= integerResource(id = R.integer.extraLargeSpace).dp)
                 )

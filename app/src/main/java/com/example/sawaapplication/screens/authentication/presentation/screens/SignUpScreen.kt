@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,12 +21,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.SignUpViewModel
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.handleAuthStateSignUp
 import com.example.sawaapplication.ui.screenComponent.CustomCard
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.screenComponent.GradientButton
@@ -32,13 +38,17 @@ import com.example.sawaapplication.ui.theme.black
 
 @Composable
 fun SignUpScreen() {
+    val context = LocalContext.current
+    val signUpViewModel: SignUpViewModel = hiltViewModel()
     var showPassword by remember { mutableStateOf(false) }
     var showConfirmPassword by remember { mutableStateOf(false) }
-    //need to delete when implement vm
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+
+    val authState = signUpViewModel.authState.collectAsState().value
+
+    LaunchedEffect(authState) {
+        handleAuthStateSignUp(authState, context)// Add navController argument when navigation is finished
+
+    }
 
     Column(
         modifier = Modifier
@@ -73,26 +83,26 @@ fun SignUpScreen() {
                 horizontalAlignment = CenterHorizontally
             ) {
                 CustomTextField(
-                    value = "",
-                    onValueChange =  {username = it},
+                    value = signUpViewModel.name,
+                    onValueChange =  {signUpViewModel.name = it},
                     label = stringResource(id = R.string.username)
                 )
                 CustomTextField(
-                    value ="",
-                    onValueChange = {email= it},
+                    value =signUpViewModel.email,
+                    onValueChange = {signUpViewModel.email= it},
                     label = stringResource(id = R.string.email),
                 )
                 CustomTextField(
-                    value = "",
-                    onValueChange = {password= it},
+                    value = signUpViewModel.password,
+                    onValueChange = {signUpViewModel.password= it},
                     label = stringResource(id = R.string.password),
                     isPassword = true,
                     showPassword = showPassword,
                     onTogglePasswordVisibility = { showPassword = !showPassword },
                 )
                 CustomTextField(
-                    value = "",
-                    onValueChange ={confirmPassword = it} ,
+                    value = signUpViewModel.confirmPassword ,
+                    onValueChange ={signUpViewModel.confirmPassword = it} ,
                     label = stringResource(id = R.string.confirmPassword),
                     isPassword = true,
                     showPassword = showConfirmPassword,
@@ -100,7 +110,14 @@ fun SignUpScreen() {
                 )
                 Spacer(modifier = Modifier.padding(integerResource(id = R.integer.smallSpace).dp))
                 GradientButton(
-                    onClick = {},
+                    onClick = {
+                        signUpViewModel.signUp(
+                            name = signUpViewModel.name,
+                            email = signUpViewModel.email,
+                            password = signUpViewModel.password,
+                            confirmPassword = signUpViewModel.confirmPassword
+                        )
+                    },
                     text = stringResource(id = R.string.Signup),
                     modifier = Modifier.padding(top= integerResource(id = R.integer.largeSpace).dp)
                 )
