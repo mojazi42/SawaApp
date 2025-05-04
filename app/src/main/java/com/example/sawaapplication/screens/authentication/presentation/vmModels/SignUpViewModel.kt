@@ -1,5 +1,7 @@
 package com.example.sawaapplication.screens.authentication.presentation.vmModels
 
+import android.content.Context
+import android.widget.Toast
 import com.example.sawaapplication.screens.authentication.domain.useCases.SignUpUseCase
 
 
@@ -56,6 +58,27 @@ class SignUpViewModel @Inject constructor(
                 onFailure = { AuthState.Error(it.message ?: "Unknown error") }
             )
         }
+    }
+}
+
+fun handleAuthStateSignUp(
+    authState: AuthState,
+    context: Context,
+  //  navController: NavController
+) {
+    when (authState) {
+        is AuthState.Authenticated -> {
+            Toast.makeText(context, "Sign-Up successfully", Toast.LENGTH_SHORT).show()
+//            navController.navigate(Screen.Home) {
+//                popUpTo(Screen.Login) { inclusive = true }
+//            }
+        }
+
+        is AuthState.Error -> {
+            Toast.makeText(context, authState.message, Toast.LENGTH_SHORT).show()
+        }
+
+        else -> Unit
     }
 }
 

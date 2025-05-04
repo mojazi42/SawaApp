@@ -8,6 +8,8 @@ plugins {
     id("com.google.dagger.hilt.android")
     // Firebase
     alias(libs.plugins.google.firebase.crashlytics)
+    // Serialization Dep
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 android {
@@ -107,6 +109,9 @@ dependencies {
 
     // Google maps Compose
     implementation(libs.maps.compose)
+
+    // Serialization Dependency
+    implementation(libs.kotlinx.serialization.json)
 
 }
 
