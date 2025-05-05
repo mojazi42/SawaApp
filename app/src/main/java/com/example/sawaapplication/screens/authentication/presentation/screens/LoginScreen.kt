@@ -42,7 +42,7 @@ import com.example.sawaapplication.screens.authentication.presentation.vmModels.
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
+    navController: NavController
 ) {
     val loginViewModel: LoginViewModel = hiltViewModel()
     var showPassword by remember { mutableStateOf(false) }
@@ -51,7 +51,7 @@ fun LoginScreen(
 
     val authState by loginViewModel.authState.collectAsState()
     LaunchedEffect(authState) {
-        handleAuthStateLogin(authState, context)// Add navController argument when navigation is finished
+        handleAuthStateLogin(authState, context, navController)
 
     }
 
@@ -71,7 +71,7 @@ fun LoginScreen(
                 bottom = integerResource(id = R.integer.cardHeaderBottomPadding).dp
             )
         )
-        Spacer(modifier = Modifier.padding(bottom= integerResource(id = R.integer.extraSmallSpace).dp))
+        Spacer(modifier = Modifier.padding(bottom = integerResource(id = R.integer.extraSmallSpace).dp))
 
         CustomCard(
             modifier = Modifier
@@ -81,7 +81,7 @@ fun LoginScreen(
                 )
                 .align(CenterHorizontally)
         ) {
-            Spacer(modifier = Modifier.padding(bottom=integerResource(id = R.integer.smallSpace).dp))
+            Spacer(modifier = Modifier.padding(bottom = integerResource(id = R.integer.smallSpace).dp))
 
             Column(
                 modifier = Modifier
@@ -91,14 +91,14 @@ fun LoginScreen(
 
                 CustomTextField(
                     value = loginViewModel.email,
-                    onValueChange = {loginViewModel.email = it},
+                    onValueChange = { loginViewModel.email = it },
                     label = stringResource(id = R.string.email),
                 )
                 Spacer(modifier = Modifier.padding(bottom = integerResource(id = R.integer.mediumSpace).dp))
 
                 CustomTextField(
                     value = loginViewModel.password,
-                    onValueChange = {loginViewModel.password = it},
+                    onValueChange = { loginViewModel.password = it },
                     label = stringResource(id = R.string.password),
                     isPassword = true,
                     showPassword = showPassword,
@@ -107,7 +107,7 @@ fun LoginScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical=integerResource(id = R.integer.smallSpace).dp),
+                        .padding(vertical = integerResource(id = R.integer.smallSpace).dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(
@@ -131,35 +131,36 @@ fun LoginScreen(
 
                         validationInputViewModel.emailAndPasswordError?.let {
                             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                        } ?: loginViewModel.login(emailInput, passwordInput)},
+                        } ?: loginViewModel.login(emailInput, passwordInput)
+                    },
                     text = stringResource(id = R.string.Login),
-                    modifier = Modifier.padding(top= integerResource(id = R.integer.extraLargeSpace).dp)
+                    modifier = Modifier.padding(top = integerResource(id = R.integer.extraLargeSpace).dp)
                 )
             }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = integerResource(id = R.integer.mediumSpace).dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.dont_have_account),
-                        fontSize = integerResource(id = R.integer.smallText).sp,
-                        color = black,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = stringResource(id = R.string.Signup),
-                        fontSize = integerResource(id = R.integer.smallText).sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = integerResource(id = R.integer.mediumSpace).dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(id = R.string.dont_have_account),
+                    fontSize = integerResource(id = R.integer.smallText).sp,
+                    color = black,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = stringResource(id = R.string.Signup),
+                    fontSize = integerResource(id = R.integer.smallText).sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable {
 
-                            navController.navigate(Screen.SignUp)
+                        navController.navigate(Screen.SignUp)
 
-                        }
-                    )
-                }
+                    }
+                )
+            }
         }
     }
 }

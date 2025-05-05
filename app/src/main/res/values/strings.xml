@@ -33,5 +33,6 @@
     <string name="failedSend">Failed to send reset email</string>
     <string name="BackToLogIn">Back to Log In</string>
 
+    <string name="aboutMe">About Me:</string>
 
 </resources>

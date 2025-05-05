@@ -7,8 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.sawaapplication.core.sharedPreferences.AuthPreferences
 import com.example.sawaapplication.core.sharedPreferences.TokenProvider
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.domain.useCases.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,8 +30,6 @@ class LoginViewModel @Inject constructor(
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
     val authState: StateFlow<AuthState> = _authState
-
-
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -53,14 +53,14 @@ class LoginViewModel @Inject constructor(
 fun handleAuthStateLogin(
     authState: AuthState,
     context: Context,
-    // navController: NavController
+     navController: NavController
 ) {
     when (authState) {
         is AuthState.Authenticated -> {
             Toast.makeText(context, "Logged in successfully", Toast.LENGTH_SHORT).show()
-//            navController.navigate(Screen.Home) {
-//                popUpTo(Screen.Login) { inclusive = true }
-//            }
+            navController.navigate(Screen.Profile) {
+                popUpTo(Screen.Login) { inclusive = true }
+            }
         }
 
         is AuthState.Error -> {

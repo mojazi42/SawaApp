@@ -34,5 +34,6 @@
     <string name="failedSend">فشل في إرسال بريد إعادة التعيين</string>
     <string name="BackToLogIn">إعادة تسجيل الدخول</string>
 
+    <string name="aboutMe">عني:</string>
 
 </resources>
