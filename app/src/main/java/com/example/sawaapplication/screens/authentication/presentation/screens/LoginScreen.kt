@@ -36,10 +36,14 @@ import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.screenComponent.GradientButton
 import com.example.sawaapplication.ui.theme.black
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.handleAuthStateLogin
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    navController: NavController,
+) {
     val loginViewModel: LoginViewModel = hiltViewModel()
     var showPassword by remember { mutableStateOf(false) }
     val validationInputViewModel: ValidationInputViewModel = hiltViewModel()
@@ -150,9 +154,9 @@ fun LoginScreen() {
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable {
-/*
-                            navController.navigate(Screen.SignUp.route)
-*/
+
+                            navController.navigate(Screen.SignUp)
+
                         }
                     )
                 }

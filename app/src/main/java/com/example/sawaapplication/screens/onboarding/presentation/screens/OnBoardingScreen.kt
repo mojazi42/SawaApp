@@ -178,7 +178,7 @@ fun OnboardingPageV2(
                     Button(
                         onClick = {
                             navController.navigate(Screen.Login) {
-                                popUpTo(Screen.Onboarding) { inclusive = false }
+                                //popUpTo(Screen.Onboarding) { inclusive = false }
                             }
                         },
                         modifier = Modifier
