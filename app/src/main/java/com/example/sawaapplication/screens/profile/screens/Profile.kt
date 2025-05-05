@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.profile.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 
 @Composable
@@ -163,6 +166,17 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
             )
+        )
+        // This text is for navigation to the login screen and will be removed after implementing Log out.
+        Text(
+            text = stringResource(id = R.string.Login),
+            fontSize = integerResource(id = R.integer.smallText).sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.clickable {
+                navController.navigate(Screen.Login)
+
+            }
         )
     }
 }
