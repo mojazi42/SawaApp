@@ -29,17 +29,6 @@ class LoginViewModel @Inject constructor(
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
     val authState: StateFlow<AuthState> = _authState
 
-    private val _isPasswordResetCompleted = MutableStateFlow(false)
-    val isPasswordResetCompleted: StateFlow<Boolean> = _isPasswordResetCompleted
-
-    fun authenticate(isAuthenticated: Boolean) {
-        _authState.value = if (isAuthenticated) {
-            AuthState.Authenticated
-        } else {
-            AuthState.Unauthenticated
-        }
-    }
-
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
