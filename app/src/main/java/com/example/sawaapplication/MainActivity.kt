@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import com.example.sawaapplication.navigation.AppNavigation
+import com.example.sawaapplication.screens.profile.ProfileScreen
 import com.example.sawaapplication.ui.theme.SawaApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 

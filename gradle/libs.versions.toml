@@ -31,6 +31,7 @@ firebaseStorage = "21.0.1"
 mapsCompose = "4.3.3"
 places = "3.5.0"
 playServicesMaps = "19.0.0"
+kotlinx-serialization = "1.6.3"
 
 
 [libraries]
@@ -75,6 +76,8 @@ firebase-storage = { group = "com.google.firebase", name = "firebase-storage", v
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

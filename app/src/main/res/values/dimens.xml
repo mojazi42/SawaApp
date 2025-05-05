@@ -40,4 +40,13 @@
     <integer name="customCardShadow">32</integer>
     <integer name="customCardRound">8</integer>
 
+    <!--Profile Dimensions-->
+    <integer name="profilePadding">16</integer>
+    <integer name="topSpacing">64</integer>
+    <integer name="pioSpacer">64</integer>
+    <integer name="photoBoxSize">124</integer>
+    <integer name="zero">0</integer>
+    <integer name="textSize1">14</integer>
+    <integer name="textSize2">20</integer>
+
 </resources>
