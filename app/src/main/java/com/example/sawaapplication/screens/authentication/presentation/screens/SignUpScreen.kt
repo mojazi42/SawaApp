@@ -28,7 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.sawaapplication.R
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.SignUpViewModel
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.handleAuthStateSignUp
 import com.example.sawaapplication.ui.screenComponent.CustomCard
@@ -37,7 +39,9 @@ import com.example.sawaapplication.ui.screenComponent.GradientButton
 import com.example.sawaapplication.ui.theme.black
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(
+    navController: NavController,
+) {
     val context = LocalContext.current
     val signUpViewModel: SignUpViewModel = hiltViewModel()
     var showPassword by remember { mutableStateOf(false) }
@@ -140,7 +144,7 @@ fun SignUpScreen() {
                     fontSize = integerResource(id = R.integer.smallText).sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { /*navController.navigate(Screen.LogIn.route)*/ }
+                    modifier = Modifier.clickable { navController.navigate(Screen.Login) }
                 )
             }
         }

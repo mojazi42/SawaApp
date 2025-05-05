@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.sawaapplication.screens.authentication.presentation.screens.LoginScreen
+import com.example.sawaapplication.screens.authentication.presentation.screens.SignUpScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
 
 @Composable
@@ -21,6 +23,12 @@ fun AppNavigation(
         ) {
             composable<Screen.Onboarding> {
                 OnBoardingScreen(navController)
+            }
+            composable<Screen.Login> {
+                LoginScreen(navController)
+            }
+            composable<Screen.SignUp> {
+                SignUpScreen(navController)
             }
 
         }
