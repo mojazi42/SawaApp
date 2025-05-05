@@ -29,4 +29,8 @@ class AuthRepositoryImpl @Inject constructor(private val firebaseAuthDataSource:
     override suspend fun sendPasswordResetEmail(email: String) {
         firebaseAuthDataSource.sendPasswordResetEmail(email)
     }
+
+    override fun logOut() {
+        firebaseAuthDataSource.logOut()
+    }
 }

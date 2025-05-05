@@ -39,4 +39,8 @@ class FirebaseAuthDataSource @Inject constructor(
     suspend fun sendPasswordResetEmail(email: String) {
         firebaseAuth.sendPasswordResetEmail(email).await()
     }
+
+     fun logOut(){
+        firebaseAuth.signOut()
+    }
 }
