@@ -14,7 +14,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navDeepLink
 import com.example.sawaapplication.core.sharedPreferences.AuthPreferences
 import com.example.sawaapplication.navigation.bottomBar.CustomBottomBar
 import com.example.sawaapplication.screens.authentication.presentation.screens.LoginScreen
@@ -24,9 +23,9 @@ import com.example.sawaapplication.screens.communities.presentation.CommunityScr
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
+import com.example.sawaapplication.screens.communities.presentation.screens.NewCommunity
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
 import com.example.sawaapplication.screens.profile.screens.ProfileScreen
-import kotlinx.coroutines.delay
 
 @Composable
 fun AppNavigation(
@@ -77,7 +76,21 @@ fun AppNavigation(
             composable<Screen.Login> { LoginScreen(navController) }
             composable<Screen.SignUp> { SignUpScreen(navController) }
             composable <Screen.ForgotPass> { ResetPasswordScreen(navController) }
-
+            composable<Screen.Onboarding> {
+                OnBoardingScreen(navController)
+            }
+            composable<Screen.Login> {
+                LoginScreen(navController)
+            }
+            composable<Screen.SignUp> {
+                SignUpScreen(navController)
+            }
+            composable<Screen.Profile> {
+                ProfileScreen(navController)
+            }
+            composable<Screen.NewCommunity> {
+                NewCommunity(navController)
+            }
             composable<Screen.Home> {
                 HomeScreen(
                     navController = navController,
