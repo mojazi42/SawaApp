@@ -194,5 +194,6 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
             text = "Log Out",
             modifier = Modifier.padding(top = integerResource(id = R.integer.largerSpace).dp)
         )
+
     }
 }
