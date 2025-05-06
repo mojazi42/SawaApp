@@ -31,6 +31,7 @@ sealed class Screen {
     @Serializable
     data object ForgotPass : Screen()
 
-
+    @Serializable
+    data object NewCommunity : Screen()
 
 }

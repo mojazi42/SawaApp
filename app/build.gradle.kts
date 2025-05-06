@@ -113,6 +113,15 @@ dependencies {
     // Serialization Dependency
     implementation(libs.kotlinx.serialization.json)
 
+    //Picking an image from gallery
+    implementation(libs.androidx.activity.compose.v180)
+    //building blocks for Compose UIs ex: LazyColumn
+    implementation(libs.androidx.foundation)
+    //load image for url
+    implementation(libs.coil.compose)
+
+
+
 }
 
 // Allow references to generated code
