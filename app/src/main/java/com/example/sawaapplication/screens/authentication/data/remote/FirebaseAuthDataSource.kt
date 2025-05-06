@@ -19,8 +19,11 @@ class FirebaseAuthDataSource @Inject constructor(
             val userData = mapOf(
                 "uid" to it.uid,
                 "email" to email,
-                "name" to name,
-                "createdAt" to FieldValue.serverTimestamp()
+                "name" to name, //update username
+                "createdAt" to FieldValue.serverTimestamp(),
+                "aboutMe" to "", //update it in profile
+                "image" to "", //update image
+                "updatedAt" to "",
             )
             FirebaseFirestore.getInstance()
                 .collection("User")
@@ -38,5 +41,22 @@ class FirebaseAuthDataSource @Inject constructor(
 
     suspend fun sendPasswordResetEmail(email: String) {
         firebaseAuth.sendPasswordResetEmail(email).await()
+    }
+
+    suspend fun updateUserInfo(
+        aboutMe : String
+//        name : String
+    ){
+        val user = firebaseAuth.currentUser
+        user?.let{
+            val userRef = FirebaseFirestore
+                .getInstance()
+                .collection("User")
+                .document(it.uid)
+
+            userRef.update("aboutMe",aboutMe).await()
+//            userRef.update("name",name).await()
+        }
+
     }
 }

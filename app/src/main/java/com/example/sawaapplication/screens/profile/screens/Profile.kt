@@ -47,10 +47,12 @@ import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val userName by profileViewModel.userName.collectAsState()
     val userEmail by profileViewModel.userEmail.collectAsState()
+    val aboutMe by profileViewModel.userEmail.collectAsState()
 
     var readOnly by remember { mutableStateOf(false) }
     var editedName by remember { mutableStateOf(userName ?: "") }
     var editedEmail by remember { mutableStateOf(userEmail ?: "") }
+    var editedAboutMe by remember { mutableStateOf(aboutMe ?: "") }
 
     Column(
         modifier = Modifier
@@ -142,8 +144,9 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
             fontSize = integerResource(R.integer.textSize2).sp
         )
         TextField(
-            value = "Hi! I like to explore and try new things",
-            onValueChange = {},
+            value = editedAboutMe,
+            onValueChange = {editedAboutMe = it
+                            profileViewModel.updateAboutMe(it)},
             readOnly = readOnly,
             modifier = Modifier
                 .wrapContentSize()
