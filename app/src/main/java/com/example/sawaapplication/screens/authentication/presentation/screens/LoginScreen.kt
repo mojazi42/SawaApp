@@ -116,7 +116,7 @@ fun LoginScreen(
                         color = Color(0xFFBE4A4A),
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier
-                            .clickable { /*navController.navigate(Screen.ForgotPass.route)*/ }
+                            .clickable { navController.navigate(Screen.ForgotPass) }
                     )
                 }
 

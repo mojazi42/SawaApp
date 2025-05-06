@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.ForgotPasswordViewModel
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LoginViewModel
@@ -34,7 +35,9 @@ import com.example.sawaapplication.ui.screenComponent.GradientButton
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ResetPasswordScreen() {
+fun ResetPasswordScreen(
+    navController: NavController
+) {
     val context = LocalContext.current
     val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel()
     val emailState by forgotPasswordViewModel.email.collectAsState()

@@ -16,4 +16,21 @@ sealed class Screen {
     @Serializable
     data object Profile : Screen()
 
+    @Serializable
+    data object Home : Screen()
+
+    @Serializable
+    data object Explore : Screen()
+
+    @Serializable
+    data object Community : Screen()
+
+    @Serializable
+    data object Notification : Screen()
+
+    @Serializable
+    data object ForgotPass : Screen()
+
+
+
 }
