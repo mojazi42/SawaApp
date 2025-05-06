@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,16 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
     var editedName by remember { mutableStateOf(userName ?: "") }
     var editedEmail by remember { mutableStateOf(userEmail ?: "") }
     var editedAboutMe by remember { mutableStateOf(aboutMe ?: "") }
+
+    LaunchedEffect(userName) {
+        if (userName != null) editedName = userName.toString()
+    }
+    LaunchedEffect(userEmail) {
+        if (userEmail != null) editedEmail = userEmail.toString()
+    }
+    LaunchedEffect(aboutMe) {
+        if (aboutMe != null) editedAboutMe = aboutMe.toString()
+    }
 
     val logOutViewModel : LogOutViewModel = hiltViewModel()
 
@@ -93,7 +104,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
         TextField(
             value = editedName,
             onValueChange = { editedName = it
-                            profileViewModel.updateName(editedName)},
+                            profileViewModel.updateName(it)},
             readOnly = readOnly,
             textStyle = TextStyle(
                 textAlign = TextAlign.Center,

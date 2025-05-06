@@ -19,10 +19,10 @@ class FirebaseAuthDataSource @Inject constructor(
             val userData = mapOf(
                 "uid" to it.uid,
                 "email" to email,
-                "name" to name, //update username
+                "name" to name,
                 "createdAt" to FieldValue.serverTimestamp(),
-                "aboutMe" to "", //update it in profile
-                "image" to "", //update image
+                "aboutMe" to "",
+                "image" to "",
                 "updatedAt" to "",
             )
             FirebaseFirestore.getInstance()
@@ -48,7 +48,7 @@ class FirebaseAuthDataSource @Inject constructor(
     }
 
     suspend fun updateUserInfo(
-        aboutMe : String
+        newAboutMe : String
     ){
         val user = firebaseAuth.currentUser
         user?.let{
@@ -56,13 +56,17 @@ class FirebaseAuthDataSource @Inject constructor(
                 .getInstance()
                 .collection("User")
                 .document(it.uid)
-            userRef.update("aboutMe",aboutMe).await()
+            userRef.update(
+                mapOf(
+                "aboutMe" to newAboutMe,
+                "updatedAt" to FieldValue.serverTimestamp()
+            )).await()
         }
 
     }
 
     suspend fun updateUserName(
-        name : String
+        newName : String
     ){
         val user = firebaseAuth.currentUser
         user?.let{
@@ -70,7 +74,12 @@ class FirebaseAuthDataSource @Inject constructor(
                 .getInstance()
                 .collection("User")
                 .document(it.uid)
-            userRef.update("name",name).await()
+            userRef.update(
+                mapOf(
+                    "name" to newName,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
         }
 
     }

@@ -36,19 +36,11 @@ class ProfileViewModel @Inject constructor(
         _userEmail.value = user?.email
         user?.let {
             fetchAboutMe(it.uid)
+            fetchUserName(it.uid)
         }
     }
 
-    private fun fetchAboutMe(userId : String){
-        val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
-        userRef.get().addOnSuccessListener{ document ->
-            if(document != null && document.exists()) {
-                _aboutMe.value = document.getString("aboutMe") ?: ""
-            }
-        }
-    }
-
-     fun updateAboutMe(newAboutMe: String){
+    fun updateAboutMe(newAboutMe: String){
         viewModelScope.launch {
             firebaseAuthDataSource.updateUserInfo(newAboutMe)
             _aboutMe.value = newAboutMe
@@ -60,4 +52,23 @@ class ProfileViewModel @Inject constructor(
             _userName.value = newName
         }
     }
+
+    private fun fetchAboutMe(userId : String){
+        val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
+        userRef.get().addOnSuccessListener{ document ->
+            if(document != null && document.exists()) {
+                _aboutMe.value = document.getString("aboutMe")
+            }
+        }
+    }
+
+    private fun fetchUserName(userId: String) {
+        val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                _userName.value = document.getString("name")
+            }
+        }
+    }
+
 }
