@@ -18,10 +18,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             SawaApplicationTheme {
-                /*AppNavigation(
+                AppNavigation(
                     navController = navController,
-                )*/
-                ViewMyCommunitiesScreen()
+                )
+                //ViewMyCommunitiesScreen()
             }
         }
     }
