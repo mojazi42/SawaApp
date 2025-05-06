@@ -15,14 +15,16 @@ private val DarkColorScheme = darkColorScheme(
     primary = PrimaryOrange,
     secondary = PurpleGrey80,
     tertiary = Pink80,
-/*
-    inversePrimary = firstDarkGreen,
-    inverseSurface = secondDarkGreen,
-    inverseOnSurface = thirdDarkGreen,
+    background = black,
 
-    onPrimaryContainer= Gray,
-    background = white,
-*/
+    /*
+        inversePrimary = firstDarkGreen,
+        inverseSurface = secondDarkGreen,
+        inverseOnSurface = thirdDarkGreen,
+
+        onPrimaryContainer= Gray,
+        background = white,
+    */
 
     )
 

@@ -11,11 +11,12 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val OrangePrimary = Color(0xFFF37021)
+val OrangeText = Color(0xFFFF6F3C)
 
 //GradientButton Colors
-val firstOrange = Color(0xF8FF6F3C)
-val secondOrange = Color(0xEBFF6F3C)
-val thirdOrange = Color(0xC9FF6F3C)
+val firstOrange = Color(0xFFFF6F3C)
+val secondOrange = Color(0xEEFF6F3C)
+val thirdOrange = Color(0xDAFF6F3C)
 
 //GradientDarkButton Colors
 /*val firstDarkGreen = Color(0xC9082B27)

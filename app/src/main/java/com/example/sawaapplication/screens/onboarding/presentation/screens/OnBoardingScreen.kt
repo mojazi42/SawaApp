@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,36 +47,36 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.ui.screenComponent.CustomButton
+import com.example.sawaapplication.ui.screenComponent.GradientButton
 import com.example.sawaapplication.ui.theme.OrangePrimary
+import com.example.sawaapplication.ui.theme.OrangeText
 import com.example.sawaapplication.ui.theme.SawaApplicationTheme
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun OnBoardingScreen(
-    navController : NavController,
-
-    ){
-  val pagerState = rememberPagerState { 3 }
+    navController: NavController,
+) {
+    val pagerState = rememberPagerState { 3 }
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val isTablet = screenWidth> 600
+    val isTablet = screenWidth > 600
 
-    Box (
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding( if (isTablet) 32.dp else 16.dp),
+                .padding(if (isTablet) 32.dp else 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
-            ) {
-                page ->
+            ) { page ->
                 OnboardingPageV2(page = page, isTablet = isTablet, navController = navController)
             }
         }
@@ -132,7 +133,7 @@ fun OnboardingPageV2(
                 text = titles[page],
                 fontSize = if (isTablet) 28.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = OrangePrimary,
+                color = OrangeText,
                 textAlign = TextAlign.Center
             )
 
@@ -141,14 +142,14 @@ fun OnboardingPageV2(
             Text(
                 text = descriptions[page],
                 fontSize = if (isTablet) 18.sp else 16.sp,
-                color = Color.Black,
+                color = Color.White,
                 textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(40.dp))
 
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
@@ -160,7 +161,7 @@ fun OnboardingPageV2(
                             .clip(CircleShape)
                             .background(
                                 if (page == index)
-                                    OrangePrimary
+                                    OrangeText
                                 else
                                     Color.Gray
                             )
@@ -172,27 +173,41 @@ fun OnboardingPageV2(
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Spacer(modifier = Modifier.width(12.dp))
-                    Button(
+                    /*   Button(
+                           onClick = {
+                               navController.navigate(Screen.Login) {
+                                   //popUpTo(Screen.Onboarding) { inclusive = false }
+                               }
+                           },
+                           modifier = Modifier
+                               .height(48.dp)
+                               .width(200.dp)
+                               .padding(top = 5.dp ,end = 57.dp  ),
+                           shape = RoundedCornerShape(12.dp),
+                           colors = ButtonDefaults.buttonColors(
+                               containerColor = OrangePrimary,
+                               contentColor = Color.White
+                           )
+                       ) {
+                           Text(text = stringResource(R.string.get_started))
+                       }*/
+                    CustomButton(
                         onClick = {
                             navController.navigate(Screen.Login) {
                                 //popUpTo(Screen.Onboarding) { inclusive = false }
                             }
+
                         },
+
+                        text = stringResource(R.string.get_started),
                         modifier = Modifier
                             .height(48.dp)
                             .width(200.dp)
-                            .padding(top = 5.dp ,end = 57.dp  ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = OrangePrimary,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text(text = stringResource(R.string.get_started))
-                    }
+                            .clip(RoundedCornerShape(integerResource(id = R.integer.buttonRoundCornerShape).dp))
+                    )
                 }
             }
         }
