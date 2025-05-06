@@ -41,7 +41,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+import com.example.sawaapplication.ui.screenComponent.GradientButton
 
 @Composable
 fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
@@ -53,6 +55,8 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
     var editedName by remember { mutableStateOf(userName ?: "") }
     var editedEmail by remember { mutableStateOf(userEmail ?: "") }
     var editedAboutMe by remember { mutableStateOf(aboutMe ?: "") }
+
+    val logOutViewModel : LogOutViewModel = hiltViewModel()
 
     Column(
         modifier = Modifier
@@ -181,6 +185,14 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                 navController.navigate(Screen.Login)
 
             }
+        )
+
+        GradientButton(
+            onClick = {
+                logOutViewModel.preformLogOut(navController)
+            },
+            text = "Log Out",
+            modifier = Modifier.padding(top = integerResource(id = R.integer.extraLargeSpace).dp)
         )
     }
 }
