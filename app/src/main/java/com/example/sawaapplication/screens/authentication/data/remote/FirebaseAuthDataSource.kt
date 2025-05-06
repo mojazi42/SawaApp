@@ -45,7 +45,6 @@ class FirebaseAuthDataSource @Inject constructor(
 
     suspend fun updateUserInfo(
         aboutMe : String
-//        name : String
     ){
         val user = firebaseAuth.currentUser
         user?.let{
@@ -53,9 +52,21 @@ class FirebaseAuthDataSource @Inject constructor(
                 .getInstance()
                 .collection("User")
                 .document(it.uid)
-
             userRef.update("aboutMe",aboutMe).await()
-//            userRef.update("name",name).await()
+        }
+
+    }
+
+    suspend fun updateUserName(
+        name : String
+    ){
+        val user = firebaseAuth.currentUser
+        user?.let{
+            val userRef = FirebaseFirestore
+                .getInstance()
+                .collection("User")
+                .document(it.uid)
+            userRef.update("name",name).await()
         }
 
     }

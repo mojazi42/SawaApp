@@ -54,4 +54,10 @@ class ProfileViewModel @Inject constructor(
             _aboutMe.value = newAboutMe
         }
     }
+    fun updateName(newName: String){
+        viewModelScope.launch {
+            firebaseAuthDataSource.updateUserName(newName)
+            _userName.value = newName
+        }
+    }
 }

@@ -47,7 +47,7 @@ import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val userName by profileViewModel.userName.collectAsState()
     val userEmail by profileViewModel.userEmail.collectAsState()
-    val aboutMe by profileViewModel.userEmail.collectAsState()
+    val aboutMe by profileViewModel.aboutMe.collectAsState()
 
     var readOnly by remember { mutableStateOf(false) }
     var editedName by remember { mutableStateOf(userName ?: "") }
@@ -88,7 +88,8 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
         //Name
         TextField(
             value = editedName,
-            onValueChange = { editedName = it },
+            onValueChange = { editedName = it
+                            profileViewModel.updateName(editedName)},
             readOnly = readOnly,
             textStyle = TextStyle(
                 textAlign = TextAlign.Center,
