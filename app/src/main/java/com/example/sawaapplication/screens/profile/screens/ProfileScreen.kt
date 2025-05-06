@@ -175,24 +175,13 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                 disabledIndicatorColor = Color.Transparent,
             )
         )
-        // This text is for navigation to the login screen and will be removed after implementing Log out.
-        Text(
-            text = stringResource(id = R.string.Login),
-            fontSize = integerResource(id = R.integer.smallText).sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.clickable {
-                navController.navigate(Screen.Login)
-
-            }
-        )
 
         GradientButton(
             onClick = {
                 logOutViewModel.preformLogOut(navController)
             },
             text = "Log Out",
-            modifier = Modifier.padding(top = integerResource(id = R.integer.extraLargeSpace).dp)
+            modifier = Modifier.padding(top = integerResource(id = R.integer.largerSpace).dp)
         )
     }
 }
