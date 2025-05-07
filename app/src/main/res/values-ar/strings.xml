@@ -1,43 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-        <string name="app_name"> سوا</string>
+    <string name="app_name"> سوا</string>
 
-        <!-- عناوين شاشة البدء -->
-        <string name="onboarding_title_1">مرحبًا بك في سوا</string>
-        <string name="onboarding_title_2">اكتشف الشغف المشترك</string>
-        <string name="onboarding_title_3">ابنِ علاقات ذات معنى</string>
+    <!-- عناوين شاشة البدء -->
+    <string name="onboarding_title_1">مرحبًا بك في سوا</string>
+    <string name="onboarding_title_2">اكتشف الشغف المشترك</string>
+    <string name="onboarding_title_3">ابنِ علاقات ذات معنى</string>
 
-        <!-- وصف شاشة البدء -->
-        <string name="onboarding_text_1">مكان يجتمع فيه الناس من خلال شغفهم المشترك، مهما كان نوعه</string>
-        <string name="onboarding_text_2">استكشف مجموعة متنوعة من المجتمعات المهتمة وتواصل مع من يشاركونك اهتماماتك</string>
-        <string name="onboarding_text_3">شارك في الحوارات، وتبادل التجارب، وانمُ مع مجتمعات تشعر فيها وكأنك في بيتك</string>
+    <!-- وصف شاشة البدء -->
+    <string name="onboarding_text_1">مكان يجتمع فيه الناس من خلال شغفهم المشترك، مهما كان نوعه</string>
+    <string name="onboarding_text_2">استكشف مجموعة متنوعة من المجتمعات المهتمة وتواصل مع من يشاركونك اهتماماتك</string>
+    <string name="onboarding_text_3">شارك في الحوارات، وتبادل التجارب، وانمُ مع مجتمعات تشعر فيها وكأنك في بيتك</string>
 
-        <!-- نص الزر -->
-        <string name="get_started">ابدأ الآن</string>
+    <!-- نص الزر -->
+    <string name="get_started">ابدأ الآن</string>
 
-        <string name="Signup">تسجيل</string>
-        <string name="Login">تسجيل الدخول </string>
+    <string name="Signup">تسجيل</string>
+    <string name="Login">تسجيل الدخول </string>
 
-        <string name="email">البريد الإلكتروني</string>
-        <string name="password">كلمة المرور</string>
-        <string name="confirmPassword">تأكيد كلمة المرور</string>
-        <string name="username">اسم المستخدم</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="confirmPassword">تأكيد كلمة المرور</string>
+    <string name="username">اسم المستخدم</string>
 
-        <string name="already_have_account">لديك حساب بالفعل؟</string>
-        <string name="forgot_password">هل نسيت كلمة المرور؟</string>
-        <string name="dont_have_account">ليس لديك حساب؟</string>
+    <string name="already_have_account">لديك حساب بالفعل؟</string>
+    <string name="forgot_password">هل نسيت كلمة المرور؟</string>
+    <string name="dont_have_account">ليس لديك حساب؟</string>
 
-        <string name="forgotPassword">نسيت كلمة المرور</string>
-        <string name="resetPassword">إعادة تعيين كلمة المرور</string>
-        <string name="SentPassword">تم إرسال رسالة لاستعادة كلمة المرور إلى بريدك الإلكتروني.</string>
-        <string name="failedSend">فشل في إرسال بريد إعادة التعيين</string>
-        <string name="BackToLogIn">إعادة تسجيل الدخول</string>
+    <string name="forgotPassword">نسيت كلمة المرور</string>
+    <string name="resetPassword">إعادة تعيين كلمة المرور</string>
+    <string name="SentPassword">تم إرسال رسالة لاستعادة كلمة المرور إلى بريدك الإلكتروني.</string>
+    <string name="failedSend">فشل في إرسال بريد إعادة التعيين</string>
+    <string name="BackToLogIn">إعادة تسجيل الدخول</string>
 
-        <string name="aboutMe">عني:</string>
+    <string name="aboutMe">عني:</string>
 
     <string name="create">إنشاء</string>
     <string name="cancel">إلغاء</string>
     <string name="description">الوصف</string>
+
+    <string name="notification">الإشعارات</string>
 
 </resources>

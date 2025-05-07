@@ -40,4 +40,7 @@
 
     <string name="description">Description</string>
 
+    <string name="notification">Notification</string>
+
+
 </resources>

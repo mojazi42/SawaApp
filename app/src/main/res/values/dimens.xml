@@ -80,4 +80,8 @@
     <integer name="imageBoxSize">148</integer>
     <integer name="descriptionBoxSize">124</integer>
 
+    <!--Notification Dimensions-->
+    <integer name="belowTitle">24</integer>
+
+
 </resources>
