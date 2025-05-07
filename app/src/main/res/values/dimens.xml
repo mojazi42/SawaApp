@@ -56,7 +56,6 @@
     <integer name="Space">40</integer>
     <integer name="topPadding">48</integer>
 
-
     <!--font size-->
     <integer name="TitleFontSize">24</integer>
     <integer name="textFontSize">16</integer>
@@ -73,5 +72,12 @@
     <integer name="tabletOnboardingImage">350</integer>
     <integer name="tabletPadding">32</integer>
 
+
+    <!--Create Post-->
+    <integer name="padding">16</integer>
+    <integer name="verticalArrangement">16</integer>
+    <integer name="RoundedCornerShape">16</integer>
+    <integer name="imageBoxSize">148</integer>
+    <integer name="descriptionBoxSize">124</integer>
 
 </resources>

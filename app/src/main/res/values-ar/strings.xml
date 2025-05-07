@@ -36,4 +36,8 @@
 
         <string name="aboutMe">عني:</string>
 
+    <string name="create">إنشاء</string>
+    <string name="cancel">إلغاء</string>
+    <string name="description">الوصف</string>
+
 </resources>
