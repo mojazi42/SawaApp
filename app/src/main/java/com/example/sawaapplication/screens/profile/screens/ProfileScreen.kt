@@ -125,19 +125,23 @@ fun ProfileScreen(
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
-                    title = { Text("Edit Profile") },
+                    title = {
+                        Text("Edit Profile", color = Color.Black)
+                    },
                     text = {
                         Column {
                             OutlinedTextField(
                                 value = editedName,
                                 onValueChange = { editedName = it },
-                                label = { Text("Enter your name") }
+                                label = { Text("Enter your name", color = Color.Gray) },
+                                textStyle = TextStyle(color = Color.Black)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             OutlinedTextField(
                                 value = editedAboutMe,
                                 onValueChange = { editedAboutMe = it },
-                                label = { Text("Enter new about me ") }
+                                label = { Text("About me", color = Color.Gray) },
+                                textStyle = TextStyle(color = Color.Black)
                             )
                         }
                     },
@@ -147,19 +151,19 @@ fun ProfileScreen(
                             profileViewModel.updateAboutMe(editedAboutMe)
                             showDialog = false
                         }) {
-                            Text("Save")
+                            Text("Save", color = Color.Black)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = {
                             showDialog = false
                         }) {
-                            Text("Cancel")
+                            Text("Cancel", color = Color.Gray)
                         }
-                    }
+                    },
+                    containerColor = Color.White
                 )
             }
-
             //Name
             TextField(
                 value = editedName,
