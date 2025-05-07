@@ -22,8 +22,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,9 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
-import com.example.sawaapplication.ui.screenComponent.CustomButton
 import com.example.sawaapplication.ui.screenComponent.GradientButton
-import com.example.sawaapplication.ui.theme.OrangePrimary
 import com.example.sawaapplication.ui.theme.OrangeText
 import com.example.sawaapplication.ui.theme.SawaApplicationTheme
 
@@ -69,7 +65,7 @@ fun OnBoardingScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(if (isTablet) 32.dp else 16.dp),
+                .padding(if (isTablet) integerResource(id= R.integer.tabletPadding).dp else integerResource(id= R.integer.mediumSpace).dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -123,30 +119,30 @@ fun OnboardingPageV2(
                 Image(
                     painter = painterResource(id = images[page]),
                     contentDescription = "Onboarding Image",
-                    modifier = Modifier.size(if (isTablet) 350.dp else 280.dp)
+                    modifier = Modifier.size(if (isTablet) integerResource(id= R.integer.tabletOnboardingImage).dp else integerResource(id= R.integer.onboardingImage).dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(integerResource(id=R.integer.mediumSpace).dp))
 
             Text(
                 text = titles[page],
-                fontSize = if (isTablet) 28.sp else 24.sp,
+                fontSize = if (isTablet) integerResource(id = R.integer.tabletFontSize).sp else integerResource(id = R.integer.TitleFontSize).sp,
                 fontWeight = FontWeight.Bold,
                 color = OrangeText,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(integerResource(id=R.integer.smallerSpace).dp))
 
             Text(
                 text = descriptions[page],
-                fontSize = if (isTablet) 18.sp else 16.sp,
-                color = Color.White,
+                fontSize = if (isTablet) integerResource(id = R.integer.tabletFontSize).sp else integerResource(id = R.integer.textFontSize).sp,
+                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(integerResource(id= R.integer.Space).dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -156,8 +152,8 @@ fun OnboardingPageV2(
                 repeat(3) { index ->
                     Box(
                         modifier = Modifier
-                            .size(20.dp)
-                            .padding(4.dp)
+                            .size(integerResource(id= R.integer.circleSize).dp)
+                            .padding(integerResource(id= R.integer.extraSmallSpace).dp)
                             .clip(CircleShape)
                             .background(
                                 if (page == index)
@@ -170,42 +166,24 @@ fun OnboardingPageV2(
             }
 
             if (page == 2) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(integerResource(id= R.integer.extraLargeSpace).dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Spacer(modifier = Modifier.width(12.dp))
-                    /*   Button(
-                           onClick = {
-                               navController.navigate(Screen.Login) {
-                                   //popUpTo(Screen.Onboarding) { inclusive = false }
-                               }
-                           },
-                           modifier = Modifier
-                               .height(48.dp)
-                               .width(200.dp)
-                               .padding(top = 5.dp ,end = 57.dp  ),
-                           shape = RoundedCornerShape(12.dp),
-                           colors = ButtonDefaults.buttonColors(
-                               containerColor = OrangePrimary,
-                               contentColor = Color.White
-                           )
-                       ) {
-                           Text(text = stringResource(R.string.get_started))
-                       }*/
-                    CustomButton(
+                    Spacer(modifier = Modifier.width(integerResource(id= R.integer.smallSpace).dp))
+
+                    GradientButton(
                         onClick = {
                             navController.navigate(Screen.Login) {
-                                //popUpTo(Screen.Onboarding) { inclusive = false }
+                                popUpTo(Screen.Onboarding) { inclusive = false }
                             }
-
                         },
 
                         text = stringResource(R.string.get_started),
                         modifier = Modifier
-                            .height(48.dp)
-                            .width(200.dp)
+                            .height(integerResource(id = R.integer.getStartedButtonHeight).dp)
+                            .width(integerResource(id = R.integer.getStartedButtonWidth).dp)
                             .clip(RoundedCornerShape(integerResource(id = R.integer.buttonRoundCornerShape).dp))
                     )
                 }
