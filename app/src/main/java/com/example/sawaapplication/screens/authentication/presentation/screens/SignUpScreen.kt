@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -62,7 +63,7 @@ fun SignUpScreen(
     ) {
         Text(
             text = stringResource(id = R.string.Signup),
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = integerResource(id = R.integer.cardHeaderSize).sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(
@@ -79,11 +80,11 @@ fun SignUpScreen(
                 )
                 .align(CenterHorizontally),
         ) {
-            Spacer(modifier = Modifier.padding(bottom=integerResource(id = R.integer.extraSmallSpace).dp))
+            Spacer(modifier = Modifier.padding(bottom=integerResource(id = R.integer.smallSpace).dp))
 
             Column(
                 modifier = Modifier
-                    .padding((integerResource(id = R.integer.largeSpace).dp)),
+                    .padding((integerResource(id = R.integer.smallSpace).dp)),
                 horizontalAlignment = CenterHorizontally
             ) {
                 CustomTextField(
@@ -91,11 +92,15 @@ fun SignUpScreen(
                     onValueChange =  {signUpViewModel.name = it},
                     label = stringResource(id = R.string.username)
                 )
+                Spacer(modifier = Modifier.padding(bottom = integerResource(id = R.integer.smallerSpace).dp))
+
                 CustomTextField(
                     value =signUpViewModel.email,
                     onValueChange = {signUpViewModel.email= it},
                     label = stringResource(id = R.string.email),
                 )
+                Spacer(modifier = Modifier.padding(bottom = integerResource(id = R.integer.smallerSpace).dp))
+
                 CustomTextField(
                     value = signUpViewModel.password,
                     onValueChange = {signUpViewModel.password= it},
@@ -104,6 +109,8 @@ fun SignUpScreen(
                     showPassword = showPassword,
                     onTogglePasswordVisibility = { showPassword = !showPassword },
                 )
+                Spacer(modifier = Modifier.padding(bottom = integerResource(id = R.integer.smallerSpace).dp))
+
                 CustomTextField(
                     value = signUpViewModel.confirmPassword ,
                     onValueChange ={signUpViewModel.confirmPassword = it} ,
@@ -123,20 +130,20 @@ fun SignUpScreen(
                         )
                     },
                     text = stringResource(id = R.string.Signup),
-                    modifier = Modifier.padding(top= integerResource(id = R.integer.largeSpace).dp)
+                    modifier = Modifier.padding(top= integerResource(id = R.integer.largeSpace).dp,bottom = integerResource(id = R.integer.mediumSpace).dp)
                 )
             }
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = integerResource(id = R.integer.mediumSpace).dp),
+
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = stringResource(id = R.string.already_have_account),
                     fontSize = integerResource(id = R.integer.smallText).sp,
-                    color = black,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(

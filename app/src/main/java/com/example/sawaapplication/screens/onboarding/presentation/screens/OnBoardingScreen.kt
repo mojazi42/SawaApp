@@ -22,8 +22,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,36 +45,34 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
-import com.example.sawaapplication.ui.theme.OrangePrimary
+import com.example.sawaapplication.ui.screenComponent.GradientButton
+import com.example.sawaapplication.ui.theme.OrangeText
 import com.example.sawaapplication.ui.theme.SawaApplicationTheme
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun OnBoardingScreen(
-    navController : NavController,
-
-    ){
-  val pagerState = rememberPagerState { 3 }
+    navController: NavController,
+) {
+    val pagerState = rememberPagerState { 3 }
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val isTablet = screenWidth> 600
+    val isTablet = screenWidth > 600
 
-    Box (
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding( if (isTablet) 32.dp else 16.dp),
+                .padding(if (isTablet) integerResource(id= R.integer.tabletPadding).dp else integerResource(id= R.integer.mediumSpace).dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
-            ) {
-                page ->
+            ) { page ->
                 OnboardingPageV2(page = page, isTablet = isTablet, navController = navController)
             }
         }
@@ -110,7 +107,7 @@ fun OnboardingPageV2(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 48.dp),
+                .padding(top = integerResource(id= R.integer.topPadding).dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -122,45 +119,45 @@ fun OnboardingPageV2(
                 Image(
                     painter = painterResource(id = images[page]),
                     contentDescription = "Onboarding Image",
-                    modifier = Modifier.size(if (isTablet) 350.dp else 280.dp)
+                    modifier = Modifier.size(if (isTablet) integerResource(id= R.integer.tabletOnboardingImage).dp else integerResource(id= R.integer.onboardingImage).dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(integerResource(id=R.integer.mediumSpace).dp))
 
             Text(
                 text = titles[page],
-                fontSize = if (isTablet) 28.sp else 24.sp,
+                fontSize = if (isTablet) integerResource(id = R.integer.tabletFontSize).sp else integerResource(id = R.integer.TitleFontSize).sp,
                 fontWeight = FontWeight.Bold,
-                color = OrangePrimary,
+                color = OrangeText,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(integerResource(id=R.integer.smallerSpace).dp))
 
             Text(
                 text = descriptions[page],
-                fontSize = if (isTablet) 18.sp else 16.sp,
-                color = Color.Black,
+                fontSize = if (isTablet) integerResource(id = R.integer.tabletFontSize).sp else integerResource(id = R.integer.textFontSize).sp,
+                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(integerResource(id= R.integer.Space).dp))
 
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
                 repeat(3) { index ->
                     Box(
                         modifier = Modifier
-                            .size(20.dp)
-                            .padding(4.dp)
+                            .size(integerResource(id= R.integer.circleSize).dp)
+                            .padding(integerResource(id= R.integer.extraSmallSpace).dp)
                             .clip(CircleShape)
                             .background(
                                 if (page == index)
-                                    OrangePrimary
+                                    OrangeText
                                 else
                                     Color.Gray
                             )
@@ -169,30 +166,26 @@ fun OnboardingPageV2(
             }
 
             if (page == 2) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(integerResource(id= R.integer.extraLargeSpace).dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Button(
+                    Spacer(modifier = Modifier.width(integerResource(id= R.integer.smallSpace).dp))
+
+                    GradientButton(
                         onClick = {
                             navController.navigate(Screen.Login) {
-                                //popUpTo(Screen.Onboarding) { inclusive = false }
+                                popUpTo(Screen.Onboarding) { inclusive = false }
                             }
                         },
+
+                        text = stringResource(R.string.get_started),
                         modifier = Modifier
-                            .height(48.dp)
-                            .width(200.dp)
-                            .padding(top = 5.dp ,end = 57.dp  ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = OrangePrimary,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text(text = stringResource(R.string.get_started))
-                    }
+                            .height(integerResource(id = R.integer.getStartedButtonHeight).dp)
+                            .width(integerResource(id = R.integer.getStartedButtonWidth).dp)
+                            .clip(RoundedCornerShape(integerResource(id = R.integer.buttonRoundCornerShape).dp))
+                    )
                 }
             }
         }

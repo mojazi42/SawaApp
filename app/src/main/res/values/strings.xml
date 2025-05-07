@@ -3,7 +3,7 @@
     <string name="app_name">Sawa Application</string>
 
     <!-- Onboarding Titles -->
-    <string name="onboarding_title_1">Welcome to My Community</string>
+    <string name="onboarding_title_1">Welcome to Sawa</string>
     <string name="onboarding_title_2">Discover Shared Passions</string>
     <string name="onboarding_title_3">Build Meaningful Connections</string>
 
