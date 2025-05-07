@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.authentication.data.remote
+package com.example.sawaapplication.screens.authentication.data.dataSources.remote
 
 
 import com.google.firebase.auth.FirebaseAuth

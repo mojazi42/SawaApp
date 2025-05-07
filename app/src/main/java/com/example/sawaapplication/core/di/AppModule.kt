@@ -3,7 +3,7 @@ package com.example.sawaapplication.core.di
 import com.example.sawaapplication.core.sharedPreferences.AuthInterceptor
 import com.example.sawaapplication.core.sharedPreferences.OkHTTPBuilder
 import com.example.sawaapplication.core.sharedPreferences.TokenProvider
-import com.example.sawaapplication.screens.authentication.data.remote.FirebaseAuthDataSource
+import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
 import com.example.sawaapplication.screens.authentication.data.repository.AuthRepositoryImpl
 import com.example.sawaapplication.screens.authentication.domain.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
