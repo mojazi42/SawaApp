@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.profile.vm
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
@@ -53,20 +54,42 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun fetchAboutMe(userId : String){
+    private fun fetchAboutMe(userId : String) {
         val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
-        userRef.get().addOnSuccessListener{ document ->
-            if(document != null && document.exists()) {
-                _aboutMe.value = document.getString("aboutMe")
+
+        // Start a real-time Firestore listener on the user document to track 'aboutMe' updates
+        userRef.addSnapshotListener { documentSnapshot, error ->
+
+            if (error != null) {
+                Log.e("ProfileViewModel", "Firestore error: ", error)
+                return@addSnapshotListener
+            }
+
+            //  When the document exists and is not null, extract the 'aboutMe' field
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                val about = documentSnapshot.getString("aboutMe")
+
+                //  Update the StateFlow with the latest value from Firestore
+                // This triggers recomposition in the UI if it's collecting aboutMe
+                _aboutMe.value = about
             }
         }
     }
 
     private fun fetchUserName(userId: String) {
         val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
-        userRef.get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                _userName.value = document.getString("name")
+
+        // Changed from .get() to addSnapshotListener for real-time Firestore updates
+        // Now directly updates _userName.value when Firestore document changes
+        userRef.addSnapshotListener { documentSnapshot, error ->
+            if (error != null) {
+                Log.e("ProfileViewModel", "Firestore error (fetchUserName): ", error)
+                return@addSnapshotListener // early return if Firestore listener throws an error
+            }
+
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                val name = documentSnapshot.getString("name")
+                _userName.value = name //  update StateFlow to notify UI of real-time name change
             }
         }
     }

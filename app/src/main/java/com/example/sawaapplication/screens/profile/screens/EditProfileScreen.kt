@@ -41,6 +41,16 @@ fun EditProfileScreen(
     var name by remember { mutableStateOf(nameState ?: "") }
     var about by remember { mutableStateOf(aboutState ?: "") }
 
+    // LaunchedEffect is used here to synchronize the ViewModel state (nameState, aboutState)
+    // into the local editable form fields (name, about).
+    // This ensures that whenever the ViewModel data updates (e.g., after Firestore loads),
+    // the UI text fields are automatically populated with the latest data.
+    // Without this, the fields would only initialize once and not reflect later updates.
+    LaunchedEffect(nameState, aboutState) {
+        name = nameState ?: ""
+        about = aboutState ?: ""
+    }
+
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
         imageUri = it
