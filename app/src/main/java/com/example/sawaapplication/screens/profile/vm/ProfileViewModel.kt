@@ -2,7 +2,7 @@ package com.example.sawaapplication.screens.profile.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sawaapplication.screens.authentication.data.remote.FirebaseAuthDataSource
+import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel

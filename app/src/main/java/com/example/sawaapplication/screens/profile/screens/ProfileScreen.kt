@@ -156,6 +156,8 @@ fun ProfileScreen(
                     },
                     dismissButton = {
                         TextButton(onClick = {
+                            editedName = userName?:""
+                            editedAboutMe = aboutMe?:""
                             showDialog = false
                         }) {
                             Text("Cancel", color = Color.Gray)
@@ -164,56 +166,26 @@ fun ProfileScreen(
                     containerColor = Color.White
                 )
             }
+
             //Name
-            TextField(
-                value = editedName,
-                onValueChange = {
-                    editedName = it
-                    profileViewModel.updateName(it)
-                },
-                readOnly = readOnly,
-                textStyle = TextStyle(
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
+            Text(
+                text = editedName,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(integerResource(R.integer.zero).dp),
-                colors = TextFieldDefaults.colors(
-
-                    // Transparent background
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-
-                    // Remove underline
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                )
+                    .padding(integerResource(R.integer.zero).dp)
             )
 
-            // Email TextField
-            TextField(
-                value = editedEmail,
-                onValueChange = { editedEmail = it },
-                readOnly = readOnly,
-                textStyle = TextStyle(
-                    textAlign = TextAlign.Center,
-                    fontSize = integerResource(R.integer.textSize1).sp
-                ),
+            //Email
+            Text(
+                text = editedEmail,
+                textAlign = TextAlign.Center,
+                fontSize = integerResource(R.integer.textSize1).sp,
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(integerResource(R.integer.zero).dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                )
+                    .padding(integerResource(R.integer.zero).dp)
             )
 
             Spacer(Modifier.height(integerResource(R.integer.pioSpacer).dp))
@@ -225,34 +197,15 @@ fun ProfileScreen(
                 fontWeight = FontWeight.Bold,
                 fontSize = integerResource(R.integer.textSize2).sp
             )
-            TextField(
-                value = editedAboutMe,
-                onValueChange = {
-                    editedAboutMe = it
-                    profileViewModel.updateAboutMe(it)
-                },
-                readOnly = readOnly,
+
+            // About me content
+            Text(
+                text = editedAboutMe,
+                textAlign = TextAlign.Center,
+                fontSize = integerResource(R.integer.textSize2).sp,
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(integerResource(R.integer.zero).dp),
-                singleLine = false,
-                textStyle = TextStyle(
-                    textAlign = TextAlign.Center,
-                    fontSize = integerResource(R.integer.textSize2).sp
-                ),
-
-                colors = TextFieldDefaults.colors(
-
-                    // Transparent background
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-
-                    // Remove underline
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                )
+                    .padding(integerResource(R.integer.zero).dp)
             )
 
             GradientButton(
