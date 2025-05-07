@@ -18,12 +18,8 @@ val firstOrange = Color(0xFFFF6F3C)
 val secondOrange = Color(0xEEFF6F3C)
 val thirdOrange = Color(0xDAFF6F3C)
 
-//GradientDarkButton Colors
-/*val firstDarkGreen = Color(0xC9082B27)
-val secondDarkGreen = Color(0xEB082B27)
-val thirdDarkGreen = Color(0xFFF082B27)*/
-
 //Basic colors
 val black = Color(0xFF000000)
 val white = Color(0XFFFFFFFF)
+
 
