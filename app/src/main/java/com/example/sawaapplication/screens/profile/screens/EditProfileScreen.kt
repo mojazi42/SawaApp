@@ -37,6 +37,7 @@ fun EditProfileScreen(
     val context = LocalContext.current
     val nameState by viewModel.userName.collectAsState()
     val aboutState by viewModel.aboutMe.collectAsState()
+    val profileImageUrl by viewModel.profileImageUrl.collectAsState()
 
     var name by remember { mutableStateOf(nameState ?: "") }
     var about by remember { mutableStateOf(aboutState ?: "") }
@@ -77,10 +78,25 @@ fun EditProfileScreen(
 
                     Button(
                         onClick = {
-                            viewModel.updateName(name)
-                            viewModel.updateAboutMe(about)
-                            Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
+                            if (imageUri != null) {
+                                viewModel.uploadProfileImage(
+                                    imageUri!!,
+                                    onSuccess = {
+                                        viewModel.updateName(name)
+                                        viewModel.updateAboutMe(about)
+                                        Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT).show()
+                                        navController.popBackStack()
+                                    },
+                                    onFailure = {
+                                        Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            } else {
+                                viewModel.updateName(name)
+                                viewModel.updateAboutMe(about)
+                                Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFFFF6B00),
@@ -122,20 +138,31 @@ fun EditProfileScreen(
                     .clickable { imagePickerLauncher.launch("image/*") },
                 contentAlignment = Alignment.Center
             ) {
-                if (imageUri != null) {
-                    Image(
-                        painter = rememberAsyncImagePainter(imageUri),
-                        contentDescription = "Selected Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Text(
-                        text = "Tap to upload\nimage",
-                        textAlign = TextAlign.Center,
-                        color = Color.Gray,
-                        fontSize = 12.sp
-                    )
+                when {
+                    imageUri != null -> {
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUri),
+                            contentDescription = "Selected Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    profileImageUrl != null -> {
+                        Image(
+                            painter = rememberAsyncImagePainter(profileImageUrl),
+                            contentDescription = "Profile Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    else -> {
+                        Text(
+                            text = "Tap to upload\nimage",
+                            textAlign = TextAlign.Center,
+                            color = Color.Gray,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
 

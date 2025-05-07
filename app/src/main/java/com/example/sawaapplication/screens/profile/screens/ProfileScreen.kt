@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.profile.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Settings
@@ -26,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,10 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
-import com.example.sawaapplication.ui.screenComponent.GradientButton
 
 
 @Composable
@@ -49,6 +52,7 @@ fun ProfileScreen(
     val userName by profileViewModel.userName.collectAsState()
     val userEmail by profileViewModel.userEmail.collectAsState()
     val aboutMe by profileViewModel.aboutMe.collectAsState()
+    val imageUrl by profileViewModel.profileImageUrl.collectAsState()
 
     val logOutViewModel: LogOutViewModel = hiltViewModel()
     var showMenu by remember { mutableStateOf(false) }
@@ -95,16 +99,33 @@ fun ProfileScreen(
                 modifier = Modifier.size(integerResource(R.integer.photoBoxSize).dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    painter = if (imageUrl != null)
+                        rememberAsyncImagePainter(imageUrl)
+                    else
+                        painterResource(id = R.drawable.ic_launcher_background),
                     contentDescription = "Profile image",
-                    modifier = Modifier.clip(CircleShape)
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(integerResource(R.integer.photoBoxSize).dp)
                 )
 
                 IconButton(
                     onClick = { navController.navigate("edit_profile") },
-                    modifier = Modifier.align(Alignment.BottomEnd)
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .background(
+                            color = Color(0xFFFF5722) ,
+                            shape = RoundedCornerShape(48.dp)
+                        )
+                        .size(32.dp)
                 ) {
-                    Icon(imageVector = Icons.Filled.Create, contentDescription = "Edit")
+                    Icon(
+                        imageVector = Icons.Filled.Create,
+                        contentDescription = "Edit",
+                        modifier = Modifier
+                            .size(24.dp),
+                        tint = Color.Black
+                    )
                 }
             }
 
