@@ -19,7 +19,7 @@ import com.example.sawaapplication.navigation.bottomBar.CustomBottomBar
 import com.example.sawaapplication.screens.authentication.presentation.screens.LoginScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.ResetPasswordScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SignUpScreen
-import com.example.sawaapplication.screens.communities.presentation.CommunityScreen
+import com.example.sawaapplication.screens.communities.presentation.screens.CommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
