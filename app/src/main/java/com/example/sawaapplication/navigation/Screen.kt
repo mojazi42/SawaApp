@@ -34,4 +34,7 @@ sealed class Screen {
     @Serializable
     data object NewCommunity : Screen()
 
+    @Serializable
+    data object SplashScreen : Screen()
+
 }
