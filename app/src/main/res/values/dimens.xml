@@ -54,6 +54,8 @@
     <integer name="getStartedButtonWidth">200</integer>
     <integer name="circleSize">20</integer>
     <integer name="Space">40</integer>
+    <integer name="topPadding">48</integer>
+
 
     <!--font size-->
     <integer name="TitleFontSize">24</integer>
@@ -67,7 +69,6 @@
     <integer name="largeFontSize">18</integer>
     <integer name="tabletOnboardingImage">350</integer>
     <integer name="tabletPadding">32</integer>
-
 
 
 

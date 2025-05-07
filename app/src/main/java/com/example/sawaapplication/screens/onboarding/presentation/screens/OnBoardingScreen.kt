@@ -107,7 +107,7 @@ fun OnboardingPageV2(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 48.dp),
+                .padding(top = integerResource(id= R.integer.topPadding).dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
