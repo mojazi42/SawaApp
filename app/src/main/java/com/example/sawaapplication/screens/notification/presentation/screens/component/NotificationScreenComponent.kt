@@ -47,27 +47,28 @@ fun NotificationCard(
 
             // Notification Content (center)
             Column(modifier = Modifier.weight(1f)) {
-
-                Row {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = action,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = action,
+                        style = MaterialTheme.typography.bodySmall
+                    )
 
-                Text(
-                    text = time,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = time,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(8.dp))
