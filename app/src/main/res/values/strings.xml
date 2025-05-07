@@ -35,4 +35,9 @@
 
     <string name="aboutMe">About Me:</string>
 
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="description">Description</string>
+
 </resources>
