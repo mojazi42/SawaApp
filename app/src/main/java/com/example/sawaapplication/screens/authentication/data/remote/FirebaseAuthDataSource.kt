@@ -20,7 +20,10 @@ class FirebaseAuthDataSource @Inject constructor(
                 "uid" to it.uid,
                 "email" to email,
                 "name" to name,
-                "createdAt" to FieldValue.serverTimestamp()
+                "createdAt" to FieldValue.serverTimestamp(),
+                "aboutMe" to "",
+                "image" to "",
+                "updatedAt" to "",
             )
             FirebaseFirestore.getInstance()
                 .collection("User")
@@ -42,5 +45,42 @@ class FirebaseAuthDataSource @Inject constructor(
 
      fun logOut(){
         firebaseAuth.signOut()
+    }
+
+    suspend fun updateUserInfo(
+        newAboutMe : String
+    ){
+        val user = firebaseAuth.currentUser
+        user?.let{
+            val userRef = FirebaseFirestore
+                .getInstance()
+                .collection("User")
+                .document(it.uid)
+            userRef.update(
+                mapOf(
+                "aboutMe" to newAboutMe,
+                "updatedAt" to FieldValue.serverTimestamp()
+            )).await()
+        }
+
+    }
+
+    suspend fun updateUserName(
+        newName : String
+    ){
+        val user = firebaseAuth.currentUser
+        user?.let{
+            val userRef = FirebaseFirestore
+                .getInstance()
+                .collection("User")
+                .document(it.uid)
+            userRef.update(
+                mapOf(
+                    "name" to newName,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
+        }
+
     }
 }

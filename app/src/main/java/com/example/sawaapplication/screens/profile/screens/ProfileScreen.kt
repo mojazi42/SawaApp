@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,16 +42,32 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+import com.example.sawaapplication.ui.screenComponent.GradientButton
 
 @Composable
 fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val userName by profileViewModel.userName.collectAsState()
     val userEmail by profileViewModel.userEmail.collectAsState()
+    val aboutMe by profileViewModel.aboutMe.collectAsState()
 
     var readOnly by remember { mutableStateOf(false) }
     var editedName by remember { mutableStateOf(userName ?: "") }
     var editedEmail by remember { mutableStateOf(userEmail ?: "") }
+    var editedAboutMe by remember { mutableStateOf(aboutMe ?: "") }
+
+    LaunchedEffect(userName) {
+        if (userName != null) editedName = userName.toString()
+    }
+    LaunchedEffect(userEmail) {
+        if (userEmail != null) editedEmail = userEmail.toString()
+    }
+    LaunchedEffect(aboutMe) {
+        if (aboutMe != null) editedAboutMe = aboutMe.toString()
+    }
+
+    val logOutViewModel : LogOutViewModel = hiltViewModel()
 
     Column(
         modifier = Modifier
@@ -86,7 +103,8 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
         //Name
         TextField(
             value = editedName,
-            onValueChange = { editedName = it },
+            onValueChange = { editedName = it
+                            profileViewModel.updateName(it)},
             readOnly = readOnly,
             textStyle = TextStyle(
                 textAlign = TextAlign.Center,
@@ -142,8 +160,9 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
             fontSize = integerResource(R.integer.textSize2).sp
         )
         TextField(
-            value = "Hi! I like to explore and try new things",
-            onValueChange = {},
+            value = editedAboutMe,
+            onValueChange = {editedAboutMe = it
+                            profileViewModel.updateAboutMe(it)},
             readOnly = readOnly,
             modifier = Modifier
                 .wrapContentSize()
@@ -167,18 +186,14 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                 disabledIndicatorColor = Color.Transparent,
             )
         )
-        // This text is for navigation to the login screen and will be removed after implementing Log out.
-        Text(
-            text = stringResource(id = R.string.Login),
-            fontSize = integerResource(id = R.integer.smallText).sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.clickable {
-                navController.navigate(Screen.Login)
 
-            }
+        GradientButton(
+            onClick = {
+                logOutViewModel.preformLogOut(navController)
+            },
+            text = "Log Out",
+            modifier = Modifier.padding(top = integerResource(id = R.integer.largerSpace).dp)
         )
-
 
     }
 }
