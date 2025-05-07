@@ -61,8 +61,11 @@
     <integer name="TitleFontSize">24</integer>
     <integer name="textFontSize">16</integer>
     <integer name="smallTextFontSize">14</integer>
-    <integer name="onboardingImage">280</integer>
+    <integer name="onboardingImage">300</integer>
 
+    <!--Logo-->
+    <integer name="logoHeight">80</integer>
+    <integer name="logoWidth">100</integer>
 
     <!--Tablet size-->
     <integer name="tabletFontSize">28</integer>
