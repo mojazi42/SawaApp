@@ -1,7 +1,7 @@
 package com.example.sawaapplication.screens.authentication.data.repository
 
 
-import com.example.sawaapplication.screens.authentication.data.remote.FirebaseAuthDataSource
+import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
 import com.example.sawaapplication.screens.authentication.domain.repository.AuthRepository
 import javax.inject.Inject
 

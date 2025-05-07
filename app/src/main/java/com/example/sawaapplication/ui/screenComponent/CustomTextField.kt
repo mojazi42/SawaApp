@@ -51,7 +51,7 @@ fun CustomTextField(
         ),
         shape = RoundedCornerShape(integerResource(id = R.integer.roundedCornerShape).dp),
         modifier = modifier.fillMaxWidth(),
-        textStyle = LocalTextStyle.current.copy(color = Color.Black),
+        textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onPrimary),
         keyboardOptions = keyboardOptions,
         visualTransformation = if (isPassword && !showPassword) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = {
@@ -70,3 +70,4 @@ fun CustomTextField(
         }
     )
 }
+

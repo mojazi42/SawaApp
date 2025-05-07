@@ -3,15 +3,18 @@ package com.example.sawaapplication.core.di
 import com.example.sawaapplication.core.sharedPreferences.AuthInterceptor
 import com.example.sawaapplication.core.sharedPreferences.OkHTTPBuilder
 import com.example.sawaapplication.core.sharedPreferences.TokenProvider
-import com.example.sawaapplication.screens.authentication.data.remote.FirebaseAuthDataSource
+import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
 import com.example.sawaapplication.screens.authentication.data.repository.AuthRepositoryImpl
 import com.example.sawaapplication.screens.authentication.domain.repository.AuthRepository
+import com.example.sawaapplication.screens.communities.data.dataSources.remote.CommunityRemoteDataSource
+import com.example.sawaapplication.screens.communities.data.repository.CommunityRepositoryImpl
+import com.example.sawaapplication.screens.communities.domain.repository.CommunityRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -26,6 +29,26 @@ object AppModule {
     ): FirebaseAuthDataSource = FirebaseAuthDataSource(firebaseAuth)
 
     @Provides
+    fun provideCommunityRemoteDataSource(
+        firestore: FirebaseFirestore
+    ): CommunityRemoteDataSource {
+        return CommunityRemoteDataSource(firestore)
+    }
+
+    @Provides
+    fun provideFirebaseFirestore(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
+    }
+
+
+    @Provides
+    fun provideCommunityRepository(
+        remoteDataSource: CommunityRemoteDataSource
+    ): CommunityRepository {
+        return CommunityRepositoryImpl(remoteDataSource)
+    }
+
+    @Provides
     fun provideAuthRepository( //AuthRepository
         firebaseAuthDataSource: FirebaseAuthDataSource
     ): AuthRepository = AuthRepositoryImpl(firebaseAuthDataSource)
@@ -36,13 +59,11 @@ object AppModule {
     ): TokenProvider = TokenProvider(firebaseAuth)
 
     @Provides
-    @Singleton
     fun provideAuthInterceptor(
         tokenProvider: TokenProvider
     ): AuthInterceptor = AuthInterceptor(tokenProvider)
 
     @Provides
-    @Singleton
     fun provideOkHTTPBuilder(
         authInterceptor: AuthInterceptor
     ): OkHTTPBuilder = OkHTTPBuilder(authInterceptor)

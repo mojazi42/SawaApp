@@ -1,27 +1,87 @@
 {
   "project_info": {
-    "project_number": "677657960826",
-    "firebase_url": "https://communityapp-ff8be-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "communityapp-ff8be",
-    "storage_bucket": "communityapp-ff8be.firebasestorage.app"
+    "project_number": "235980589398",
+    "project_id": "digikhata-616f4",
+    "storage_bucket": "digikhata-616f4.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:677657960826:android:691198ca27d105783eb6c3",
+        "mobilesdk_app_id": "1:235980589398:android:618e4a478d76a38ab16ef7",
         "android_client_info": {
-          "package_name": "com.example.sawaapplication"
+          "package_name": "com.example.digi_khata"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "235980589398-ttjfqvbj8o1n4a1tbcigaq57spdafi70.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.digi_khata",
+            "certificate_hash": "04e995fb9f1f2e426ea79e88360412b15cdda786"
+          }
+        },
+        {
+          "client_id": "235980589398-ful2a6iqrsfekut3l3j3ghp0adtmudhh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyC3l_f_Z6UmbboUT21ulyrnQ6qpg4fxc40"
+          "current_key": "AIzaSyDAj8aW57AHNWiQ8YJ4YJhT9-KUxrO5pSE"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "235980589398-ful2a6iqrsfekut3l3j3ghp0adtmudhh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "235980589398-v1qgiufs6n6smv9eq64i7294pic5tfn6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.digiKhata"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235980589398:android:2c5c755d25038e48b16ef7",
+        "android_client_info": {
+          "package_name": "com.example.sawaapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "235980589398-ful2a6iqrsfekut3l3j3ghp0adtmudhh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAj8aW57AHNWiQ8YJ4YJhT9-KUxrO5pSE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "235980589398-ful2a6iqrsfekut3l3j3ghp0adtmudhh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "235980589398-v1qgiufs6n6smv9eq64i7294pic5tfn6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.digiKhata"
+              }
+            }
+          ]
         }
       }
     }

@@ -63,7 +63,7 @@ fun LoginScreen(
     ) {
         Text(
             text = stringResource(id = R.string.Login),
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = integerResource(id = R.integer.cardHeaderSize).sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(
@@ -85,7 +85,7 @@ fun LoginScreen(
 
             Column(
                 modifier = Modifier
-                    .padding(integerResource(id = R.integer.largerSpace).dp),
+                    .padding(integerResource(id = R.integer.smallSpace).dp),
                 horizontalAlignment = CenterHorizontally
             ) {
 
@@ -134,7 +134,7 @@ fun LoginScreen(
                         } ?: loginViewModel.login(emailInput, passwordInput)
                     },
                     text = stringResource(id = R.string.Login),
-                    modifier = Modifier.padding(top = integerResource(id = R.integer.extraLargeSpace).dp)
+                    modifier = Modifier.padding(top = integerResource(id = R.integer.extraLargeSpace).dp,bottom = integerResource(id = R.integer.mediumSpace).dp)
                 )
             }
             Row(
@@ -146,7 +146,7 @@ fun LoginScreen(
                 Text(
                     text = stringResource(id = R.string.dont_have_account),
                     fontSize = integerResource(id = R.integer.smallText).sp,
-                    color = black,
+                    color =  MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
