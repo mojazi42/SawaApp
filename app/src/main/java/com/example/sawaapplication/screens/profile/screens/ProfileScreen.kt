@@ -1,7 +1,6 @@
 package com.example.sawaapplication.screens.profile.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,10 +12,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -41,13 +43,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
-import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 import com.example.sawaapplication.ui.screenComponent.GradientButton
 
 @Composable
-fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
+fun ProfileScreen(
+    navController: NavController,
+    profileViewModel: ProfileViewModel = hiltViewModel()
+) {
     val userName by profileViewModel.userName.collectAsState()
     val userEmail by profileViewModel.userEmail.collectAsState()
     val aboutMe by profileViewModel.aboutMe.collectAsState()
@@ -56,6 +60,8 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
     var editedName by remember { mutableStateOf(userName ?: "") }
     var editedEmail by remember { mutableStateOf(userEmail ?: "") }
     var editedAboutMe by remember { mutableStateOf(aboutMe ?: "") }
+
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(userName) {
         if (userName != null) editedName = userName.toString()
@@ -67,133 +73,192 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
         if (aboutMe != null) editedAboutMe = aboutMe.toString()
     }
 
-    val logOutViewModel : LogOutViewModel = hiltViewModel()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(integerResource(R.integer.profilePadding).dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.height(integerResource(R.integer.topSpacing).dp))
-
-        Box(
+    val logOutViewModel: LogOutViewModel = hiltViewModel()
+    Box(modifier = Modifier.fillMaxSize()) {
+        //Edit profile
+        IconButton(
+            onClick = {
+                showDialog = true
+            },
             modifier = Modifier
-                .size(integerResource(R.integer.photoBoxSize).dp)
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
         ) {
-            //Image
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Profile image",
-                modifier = Modifier
-                    .clip(CircleShape),
+            Icon(
+                imageVector = Icons.Filled.Settings,
+                contentDescription = "Settings icon"
             )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(integerResource(R.integer.profilePadding).dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(integerResource(R.integer.topSpacing).dp))
 
-            //Edit icon
-            IconButton(
-                onClick = { readOnly = !readOnly },
-                modifier = Modifier.align(Alignment.BottomEnd)
+            Box(
+                modifier = Modifier
+                    .size(integerResource(R.integer.photoBoxSize).dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Create,
-                    contentDescription = "Edit icon",
+                //Image
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    contentDescription = "Profile image",
+                    modifier = Modifier
+                        .clip(CircleShape),
+                )
+
+                //Edit icon
+                IconButton(
+                    onClick = {
+                        readOnly = readOnly
+                    },
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Create,
+                        contentDescription = "Edit icon",
+                    )
+                }
+            }
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Edit Profile") },
+                    text = {
+                        Column {
+                            OutlinedTextField(
+                                value = editedName,
+                                onValueChange = { editedName = it },
+                                label = { Text("Enter your name") }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = editedAboutMe,
+                                onValueChange = { editedAboutMe = it },
+                                label = { Text("Enter new about me ") }
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            profileViewModel.updateName(editedName)
+                            profileViewModel.updateAboutMe(editedAboutMe)
+                            showDialog = false
+                        }) {
+                            Text("Save")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showDialog = false
+                        }) {
+                            Text("Cancel")
+                        }
+                    }
                 )
             }
-        }
-        //Name
-        TextField(
-            value = editedName,
-            onValueChange = { editedName = it
-                            profileViewModel.updateName(it)},
-            readOnly = readOnly,
-            textStyle = TextStyle(
+
+            //Name
+            TextField(
+                value = editedName,
+                onValueChange = {
+                    editedName = it
+                    profileViewModel.updateName(it)
+                },
+                readOnly = readOnly,
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                ),
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(integerResource(R.integer.zero).dp),
+                colors = TextFieldDefaults.colors(
+
+                    // Transparent background
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+
+                    // Remove underline
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                )
+            )
+
+            // Email TextField
+            TextField(
+                value = editedEmail,
+                onValueChange = { editedEmail = it },
+                readOnly = readOnly,
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Center,
+                    fontSize = integerResource(R.integer.textSize1).sp
+                ),
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(integerResource(R.integer.zero).dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                )
+            )
+
+            Spacer(Modifier.height(integerResource(R.integer.pioSpacer).dp))
+
+            // About Me Section
+            Text(
+                text = stringResource(id = R.string.aboutMe),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            ),
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(integerResource(R.integer.zero).dp),
-            colors = TextFieldDefaults.colors(
-
-                // Transparent background
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-
-                // Remove underline
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-            )
-        )
-
-        // Email TextField
-        TextField(
-            value = editedEmail,
-            onValueChange = { editedEmail = it },
-            readOnly = readOnly,
-            textStyle = TextStyle(
-                textAlign = TextAlign.Center,
-                fontSize = integerResource(R.integer.textSize1).sp
-            ),
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(integerResource(R.integer.zero).dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-            )
-        )
-
-        Spacer(Modifier.height(integerResource(R.integer.pioSpacer).dp))
-
-        // About Me Section
-        Text(
-            text = stringResource(id = R.string.aboutMe),
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
-            fontSize = integerResource(R.integer.textSize2).sp
-        )
-        TextField(
-            value = editedAboutMe,
-            onValueChange = {editedAboutMe = it
-                            profileViewModel.updateAboutMe(it)},
-            readOnly = readOnly,
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(integerResource(R.integer.zero).dp),
-            singleLine = false,
-            textStyle = TextStyle(
-                textAlign = TextAlign.Center,
                 fontSize = integerResource(R.integer.textSize2).sp
-            ),
-
-            colors = TextFieldDefaults.colors(
-
-                // Transparent background
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-
-                // Remove underline
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
             )
-        )
+            TextField(
+                value = editedAboutMe,
+                onValueChange = {
+                    editedAboutMe = it
+                    profileViewModel.updateAboutMe(it)
+                },
+                readOnly = readOnly,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(integerResource(R.integer.zero).dp),
+                singleLine = false,
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Center,
+                    fontSize = integerResource(R.integer.textSize2).sp
+                ),
 
-        GradientButton(
-            onClick = {
-                logOutViewModel.preformLogOut(navController)
-            },
-            text = "Log Out",
-            modifier = Modifier.padding(top = integerResource(id = R.integer.largerSpace).dp)
-        )
+                colors = TextFieldDefaults.colors(
 
+                    // Transparent background
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+
+                    // Remove underline
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                )
+            )
+
+            GradientButton(
+                onClick = {
+                    logOutViewModel.preformLogOut(navController)
+                },
+                text = "Log Out",
+                modifier = Modifier.padding(top = integerResource(id = R.integer.largerSpace).dp)
+            )
+
+        }
     }
 }
