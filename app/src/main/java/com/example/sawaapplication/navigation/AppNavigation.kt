@@ -19,11 +19,11 @@ import com.example.sawaapplication.navigation.bottomBar.CustomBottomBar
 import com.example.sawaapplication.screens.authentication.presentation.screens.LoginScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.ResetPasswordScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SignUpScreen
-import com.example.sawaapplication.screens.communities.presentation.screens.CommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.NewCommunity
+import com.example.sawaapplication.screens.communities.presentation.screens.ViewMyCommunitiesScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
 import com.example.sawaapplication.screens.profile.screens.EditProfileScreen
 import com.example.sawaapplication.screens.profile.screens.ProfileScreen
@@ -101,7 +101,7 @@ fun AppNavigation(
             }
             composable<Screen.Explore> { ExploreScreen(navController) }
             composable<Screen.Notification> { NotificationScreen(navController) }
-            composable<Screen.Community> { CommunityScreen(navController) }
+            composable<Screen.Community> { ViewMyCommunitiesScreen(navController) }
             composable<Screen.Profile> { ProfileScreen(navController) }
 
             composable("edit_profile") {
