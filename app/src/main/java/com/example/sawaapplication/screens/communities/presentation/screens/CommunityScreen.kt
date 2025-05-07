@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.communities.presentation
+package com.example.sawaapplication.screens.communities.presentation.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

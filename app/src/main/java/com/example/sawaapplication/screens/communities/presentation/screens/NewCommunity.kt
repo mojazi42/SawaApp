@@ -34,8 +34,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -44,6 +47,8 @@ fun NewCommunity(navController: NavController) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    val viewModel: CommunityViewModel = hiltViewModel()
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -67,12 +72,19 @@ fun NewCommunity(navController: NavController) {
             }
             Button(
                 onClick = {
-                    // Handle community creation logic here
+                    viewModel.createCommunity(
+                        name = name,
+                        description = description,
+                        imageUri = imageUri,
+                        currentUserId = currentUserId
+                    )
                     Toast.makeText(context, "Community Created!", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
                 }
             ) {
                 Text("Create")
             }
+
         }
 
         Box(
@@ -85,7 +97,7 @@ fun NewCommunity(navController: NavController) {
             contentAlignment = Alignment.Center,
 
 
-        ) {
+            ) {
             if (imageUri != null) {
                 Image(
                     painter = rememberAsyncImagePainter(imageUri),

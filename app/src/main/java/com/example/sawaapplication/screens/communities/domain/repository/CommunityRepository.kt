@@ -1,0 +1,8 @@
+package com.example.sawaapplication.screens.communities.domain.repository
+
+import com.example.sawaapplication.screens.communities.domain.model.Community
+
+
+interface CommunityRepository {
+    suspend fun createCommunity(community: Community): Result<Unit>
+}
