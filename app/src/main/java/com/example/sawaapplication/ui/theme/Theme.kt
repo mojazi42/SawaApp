@@ -26,9 +26,9 @@ private val DarkColorScheme = darkColorScheme(
         inverseSurface = secondDarkGreen,
         inverseOnSurface = thirdDarkGreen,
 
-        onPrimaryContainer= Gray,
-        background = white,
-    */
+    onPrimaryContainer= Gray,
+    background = white,
+*/
 
     )
 
