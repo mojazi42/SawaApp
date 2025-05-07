@@ -71,7 +71,7 @@ fun PostsTab() {
         items(15) { index ->
             PostCard(
                 community = "Coffee Community",
-                name = "Shouq Albdrsni",
+                name = "Shouq Albdrani",
                 username = "shouq.bd1",
                 time = "8h",
                 text = "Coffee Lovers: You can only bring one item to a remote island to help you perfect your coffee ritual. What do you bring? Grinder? French Press? Beans? Tell me why! #CoffeeTal",

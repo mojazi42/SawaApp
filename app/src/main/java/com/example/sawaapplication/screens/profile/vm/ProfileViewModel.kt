@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -27,6 +29,9 @@ class ProfileViewModel @Inject constructor(
     private val _aboutMe = MutableStateFlow<String?>(null)
     val aboutMe: StateFlow<String?> get() = _aboutMe
 
+    private val _profileImageUrl = MutableStateFlow<String?>(null)
+    val profileImageUrl: StateFlow<String?> get() = _profileImageUrl
+
     init {
         getUserData()
     }
@@ -38,6 +43,7 @@ class ProfileViewModel @Inject constructor(
         user?.let {
             fetchAboutMe(it.uid)
             fetchUserName(it.uid)
+            fetchProfileImageUrl(it.uid)
         }
     }
 
@@ -92,6 +98,36 @@ class ProfileViewModel @Inject constructor(
                 _userName.value = name //  update StateFlow to notify UI of real-time name change
             }
         }
+    }
+
+    private fun fetchProfileImageUrl(userId: String) {
+        val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                _profileImageUrl.value = document.getString("image")
+            }
+        }
+    }
+
+    fun uploadProfileImage(uri: Uri, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val user = firebaseAuth.currentUser ?: return
+        val storageRef = FirebaseStorage.getInstance().reference
+            .child("profileImages/${user.uid}.jpg")
+
+        storageRef.putFile(uri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    FirebaseFirestore.getInstance()
+                        .collection("User")
+                        .document(user.uid)
+                        .update("image", downloadUri.toString())
+                        .addOnSuccessListener {
+                            onSuccess()
+                        }
+                        .addOnFailureListener { onFailure(it) }
+                }
+            }
+            .addOnFailureListener { onFailure(it) }
     }
 
 }
