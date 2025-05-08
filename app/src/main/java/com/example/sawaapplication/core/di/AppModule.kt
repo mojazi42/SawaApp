@@ -31,11 +31,14 @@ object AppModule {
 
     @Provides
     fun provideCommunityRemoteDataSource(
-        firestore: FirebaseFirestore
+        firestore: FirebaseFirestore,
+        firebaseAuth: FirebaseAuth
     ): CommunityRemoteDataSource {
-        return CommunityRemoteDataSource(firestore)
+        return CommunityRemoteDataSource(
+            firestore,
+            firebaseAuth
+        )
     }
-
     @Provides
     fun provideFirebaseFirestore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
