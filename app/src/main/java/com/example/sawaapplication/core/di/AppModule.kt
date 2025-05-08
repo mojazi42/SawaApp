@@ -9,6 +9,7 @@ import com.example.sawaapplication.screens.authentication.domain.repository.Auth
 import com.example.sawaapplication.screens.communities.data.dataSources.remote.CommunityRemoteDataSource
 import com.example.sawaapplication.screens.communities.data.repository.CommunityRepositoryImpl
 import com.example.sawaapplication.screens.communities.domain.repository.CommunityRepository
+import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCreatedCommunitiesUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -40,7 +41,6 @@ object AppModule {
         return FirebaseFirestore.getInstance()
     }
 
-
     @Provides
     fun provideCommunityRepository(
         remoteDataSource: CommunityRemoteDataSource
@@ -48,8 +48,16 @@ object AppModule {
         return CommunityRepositoryImpl(remoteDataSource)
     }
 
+    // Provide GetUserCreatedCommunitiesUseCase
     @Provides
-    fun provideAuthRepository( //AuthRepository
+    fun provideGetUserCreatedCommunitiesUseCase(
+        communityRepository: CommunityRepository
+    ): GetUserCreatedCommunitiesUseCase {
+        return GetUserCreatedCommunitiesUseCase(communityRepository)
+    }
+
+    @Provides
+    fun provideAuthRepository( // AuthRepository
         firebaseAuthDataSource: FirebaseAuthDataSource
     ): AuthRepository = AuthRepositoryImpl(firebaseAuthDataSource)
 

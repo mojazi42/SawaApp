@@ -13,5 +13,10 @@ class CommunityRepositoryImpl @Inject constructor(
     override suspend fun createCommunity(community: Community): Result<Unit> {
         return remoteDataSource.createCommunity(community)
     }
+
+    override suspend fun fetchCommunities(userId: String): Result<List<Community>> {
+        return remoteDataSource.fetchCommunity(userId)
+    }
+
 }
 

@@ -18,4 +18,20 @@ class CommunityRemoteDataSource @Inject constructor(
             Result.failure(e)
         }
     }
+    suspend fun fetchCommunity(userId: String): Result<List<Community>> {
+        return try {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("Community")
+                .whereArrayContains("members", userId)
+                .get()
+                .await()
+
+            val communities = snapshot.documents.mapNotNull { it.toObject(Community::class.java) }
+
+            Result.success(communities)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
+

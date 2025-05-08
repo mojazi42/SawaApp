@@ -5,4 +5,6 @@ import com.example.sawaapplication.screens.communities.domain.model.Community
 
 interface CommunityRepository {
     suspend fun createCommunity(community: Community): Result<Unit>
+    suspend fun fetchCommunities(userId: String): Result<List<Community>>
+
 }
