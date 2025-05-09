@@ -52,4 +52,13 @@
     <string name="newCommunity">مجتمع جديد</string>
     <string name="myCommunities">مجتمعاتي</string>
 
+    <!--Create new event-->
+    <string name="newEvent">دث جديد</string>
+    <string name="eventName">اسم الحدث</string>
+    <string name="eventDescription">وصف الحدث</string>
+    <string name="eventMembersLimit">عدد للحضور</string>
+    <string name="ok">تم</string>
+    <string name="eventDate">تاريخ الحدث</string>
+    <string name="eventLocation">مكان الحدث</string>
+
 </resources>
