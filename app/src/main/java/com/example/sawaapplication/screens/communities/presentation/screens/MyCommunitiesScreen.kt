@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
-fun ViewMyCommunitiesScreen(
+fun MyCommunitiesScreen(
     navController: NavController,
     viewModel: CommunityViewModel = hiltViewModel()
 ) {
@@ -37,7 +37,6 @@ fun ViewMyCommunitiesScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchCreatedCommunities(currentUserId)
     }
-
 
     // Observe the state of communities and loading
     val communities by viewModel.createdCommunities.collectAsState()
@@ -61,7 +60,7 @@ fun ViewMyCommunitiesScreen(
             }
         }
         FloatingButton(
-            onClick = { navController.navigate(Screen.NewCommunity) },
+            onClick = { navController.navigate(Screen.NewCommunity.route) },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(integerResource(R.integer.mediumSpace).dp)

@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 
@@ -113,7 +114,7 @@ fun ProfileScreen(
                 )
 
                 IconButton(
-                    onClick = { navController.navigate("edit_profile") },
+                    onClick = { navController.navigate(Screen.EditProfile.route) },
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .background(

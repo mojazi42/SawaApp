@@ -175,8 +175,8 @@ fun OnboardingPageV2(
 
                     GradientButton(
                         onClick = {
-                            navController.navigate(Screen.Login) {
-                                popUpTo(Screen.Onboarding) { inclusive = false }
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.Onboarding.route) { inclusive = false }
                             }
                         },
 
