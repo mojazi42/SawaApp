@@ -40,4 +40,9 @@
 
     <string name="description">Description</string>
 
+    <string name="notification">Notification</string>
+
+    <string name="exploreCommunity">Explore Community </string>
+
+
 </resources>

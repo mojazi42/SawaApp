@@ -24,6 +24,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,22 +40,29 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
-import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 
 
 @Composable
 fun NewCommunity(navController: NavController) {
     val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
     val viewModel: CommunityViewModel = hiltViewModel()
-    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val success by viewModel.success.collectAsState()
+    val error by viewModel.error.collectAsState()
+
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        imageUri = uri
+        viewModel.imageUri = uri
+
+    }
+
+    if (success) {
+        LaunchedEffect(success) {
+            Toast.makeText(context, "Community Created!", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+        }
     }
 
     Column(
@@ -72,19 +81,20 @@ fun NewCommunity(navController: NavController) {
             }
             Button(
                 onClick = {
-                    viewModel.createCommunity(
-                        name = name,
-                        description = description,
-                        imageUri = imageUri,
-                        currentUserId = currentUserId
-                    )
-                    Toast.makeText(context, "Community Created!", Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
+                    if (viewModel.imageUri == null) {
+                        Toast.makeText(context, "Please upload an image", Toast.LENGTH_SHORT).show()
+                    } else {
+                        viewModel.createCommunity(
+                            name = viewModel.name,
+                            description = viewModel.description,
+                            imageUri = viewModel.imageUri,
+                            currentUserId = viewModel.currentUserId
+                        )
+                    }
                 }
             ) {
                 Text("Create")
             }
-
         }
 
         Box(
@@ -98,9 +108,9 @@ fun NewCommunity(navController: NavController) {
 
 
             ) {
-            if (imageUri != null) {
+            if (viewModel.imageUri != null) {
                 Image(
-                    painter = rememberAsyncImagePainter(imageUri),
+                    painter = rememberAsyncImagePainter(viewModel.imageUri),
                     contentDescription = "Selected Image",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
@@ -112,16 +122,16 @@ fun NewCommunity(navController: NavController) {
 
         // Community Name input
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+            value = viewModel.name,
+            onValueChange = { viewModel.name = it },
             label = { Text("Community Name") },
             modifier = Modifier.fillMaxWidth()
         )
 
         // Description Input
         OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
+            value = viewModel.description,
+            onValueChange = { viewModel.description = it },
             label = { Text("Description") },
             modifier = Modifier
                 .fillMaxWidth()

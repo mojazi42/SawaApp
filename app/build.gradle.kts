@@ -59,12 +59,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.database)
-    implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.messaging)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.storage)
 
     // Testing
     testImplementation(libs.junit)
@@ -81,6 +75,12 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging.ktx)
+    implementation (libs.firebase.storage)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
 
     // Icons and Material
     implementation(libs.androidx.material.icons.extended)
