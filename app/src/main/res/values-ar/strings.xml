@@ -35,13 +35,21 @@
     <string name="BackToLogIn">إعادة تسجيل الدخول</string>
 
     <string name="aboutMe">عني:</string>
+    <string name="editProfile">تعديل الملف الشخصي</string>
+
 
     <string name="create">إنشاء</string>
     <string name="cancel">إلغاء</string>
     <string name="description">الوصف</string>
+    <string name="save">حفظ</string>
+    <string name="search">بحث</string>
+    <string name="join">إنضم</string>
+    <string name="joined">انضم</string>
 
     <string name="notification">الإشعارات</string>
 
     <string name="exploreCommunity">استكشف المجتمعات</string>
+    <string name="newCommunity">مجتمع جديد</string>
+    <string name="myCommunities">مجتمعاتي</string>
 
 </resources>

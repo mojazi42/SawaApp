@@ -18,7 +18,7 @@ class LogOutViewModel @Inject constructor(
      fun preformLogOut(navController: NavController){
         logOutUseCase.invoke()
         preferenceManager.clearToken()
-        navController.navigate(Screen.Login)
+        navController.navigate(Screen.Login.route)
     }
 
 }

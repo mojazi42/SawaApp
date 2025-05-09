@@ -151,7 +151,7 @@ fun SignUpScreen(
                     fontSize = integerResource(id = R.integer.smallText).sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { navController.navigate(Screen.Login) }
+                    modifier = Modifier.clickable { navController.navigate(Screen.Login.route) }
                 )
             }
         }
