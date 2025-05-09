@@ -42,5 +42,13 @@
 
     <string name="notification">Notification</string>
 
+    <!--Create new event-->
+    <string name="newEvent">New Event</string>
+    <string name="eventName">Event Name</string>
+    <string name="eventDescription">Event Description</string>
+    <string name="eventMembersLimit">Number of Attendance</string>
+    <string name="ok">OK</string>
+    <string name="eventDate">Event Date</string>
+    <string name="eventLocation">Event Location</string>
 
 </resources>
