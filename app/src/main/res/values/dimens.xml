@@ -11,11 +11,15 @@
     <!-- space between button and text filed-->
     <integer name="buttonTextFieldSpace">24</integer>
 
+    <!--Image Size-->
+    <integer name="AvatarImage">80</integer>
+
     <!--card Size-->
     <integer name="cardHeaderSize">28</integer>
     <integer name="cardWidth">340</integer>
     <integer name="cardHeightSignUp">512</integer>
     <integer name="cardHeightLogin">440</integer>
+    <integer name="cardHeightMyCommunity">232</integer>
     <integer name="roundCardCornerShape">8</integer>
     <integer name="shadow">16</integer>
     <integer name="cardHeightResetPass">250</integer>
@@ -34,6 +38,8 @@
     <integer name="buttonRoundCornerShape">20</integer>
     <integer name="roundedCornerShape">12</integer>
     <integer name="buttonWidth">244</integer>
+    <integer name="floatingButton">36</integer>
+
 
     <!--Custom Card Dimensions-->
     <integer name="cardPadding">8</integer>
@@ -60,6 +66,7 @@
     <integer name="TitleFontSize">24</integer>
     <integer name="textFontSize">16</integer>
     <integer name="smallTextFontSize">14</integer>
+    <integer name="smallerTextFontSize">12</integer>
     <integer name="onboardingImage">300</integer>
 
     <!--Logo-->
@@ -72,13 +79,16 @@
     <integer name="tabletOnboardingImage">350</integer>
     <integer name="tabletPadding">32</integer>
 
-
     <!--Create Post-->
     <integer name="padding">16</integer>
     <integer name="verticalArrangement">16</integer>
     <integer name="RoundedCornerShape">16</integer>
     <integer name="imageBoxSize">148</integer>
     <integer name="descriptionBoxSize">124</integer>
+
+    <!--My Community-->
+    <integer name="CardRoundedCornerShape">25</integer>
+    <integer name="communityCardElevation">8</integer>
 
     <!--Notification Dimensions-->
     <integer name="belowTitle">24</integer>

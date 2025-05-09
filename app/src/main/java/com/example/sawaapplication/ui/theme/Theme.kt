@@ -1,6 +1,5 @@
 package com.example.sawaapplication.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -13,39 +12,26 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryOrange,
- /*   secondary = PurpleGrey80,
-    tertiary = Pink80,*/
     background = black,
     inversePrimary = firstOrange,
     inverseSurface = secondOrange,
     inverseOnSurface = thirdOrange,
-    onPrimary = white,
-
-    /*
-        inversePrimary = firstDarkGreen,
-        inverseSurface = secondDarkGreen,
-        inverseOnSurface = thirdDarkGreen,
-
-    onPrimaryContainer= Gray,
-    background = white,
-*/
-
+    onPrimary = white, //Community Text Color
+    primaryContainer = DarkContainer,//Community Card Color
+    secondaryContainer = DarkBorder, //Community Card border
+    onSecondaryContainer = lightGray,
     )
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryOrange,
     onPrimaryContainer= Gray,
     onPrimary = black,
-/*
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-*/
-
+    primaryContainer = LightContainer,
+    secondaryContainer = LightBorder,
+    onSecondaryContainer = darkGray,
     inversePrimary = firstOrange,
     inverseSurface = secondOrange,
     inverseOnSurface = thirdOrange,
-
-
     background = white,
 
     /* Other default colors to override
