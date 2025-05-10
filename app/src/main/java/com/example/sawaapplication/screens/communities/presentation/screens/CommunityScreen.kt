@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -59,12 +60,19 @@ private val FakeCommunityUiState = CommunityUiState(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
+    communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onClick: () -> Unit
 ) {
     val uiState = FakeCommunityUiState
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Posts", "Events")
+    LaunchedEffect(communityId) {
+        Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
+        viewModel.fetchCommunityDetail(communityId)
+    }
+    val communityDetail by viewModel.communityDetail.collectAsState()
 
     Scaffold(
         topBar = {
@@ -74,8 +82,9 @@ fun CommunityScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = white),
-                title = {}
+                title = {},
+                windowInsets = WindowInsets(0)
+
             )
         },
         floatingActionButton = {
@@ -89,9 +98,12 @@ fun CommunityScreen(
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Post")
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.End,
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             contentPadding = innerPadding,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -99,33 +111,36 @@ fun CommunityScreen(
             item {
                 Spacer(Modifier.height(24.dp))
                 AsyncImage(
-                    model = uiState.logoUrl,
+                    model = communityDetail?.image,
                     contentDescription = null,
                     modifier = Modifier
                         .size(100.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, PrimaryOrange, CircleShape),
+                        .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(16.dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.name,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = black
+                    )
+                }
                 Text(
-                    text = uiState.communityName,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = black
-                )
-                Text(
-                    text = "${uiState.membersCount} Members",
+                    text = "${communityDetail?.members?.size ?: 0} Members",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray
                 )
                 Spacer(Modifier.height(12.dp))
-                Text(
-                    text = uiState.communityDescription,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 32.dp)
-                )
+                communityDetail?.let {
+                    Text(
+                        text = it.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = black,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                }
                 Spacer(Modifier.height(20.dp))
                 Button(
                     onClick = { /* TODO: Handle Join */ },

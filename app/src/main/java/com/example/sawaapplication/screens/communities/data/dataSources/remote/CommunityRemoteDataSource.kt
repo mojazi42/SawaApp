@@ -47,7 +47,9 @@ class CommunityRemoteDataSource @Inject constructor(
             val snapshot = FirebaseFirestore.getInstance().collection("Community")
                 .whereArrayContains("members", userId).get().await()
 
-            val communities = snapshot.documents.mapNotNull { it.toObject(Community::class.java) }
+            val communities = snapshot.documents.mapNotNull { document ->
+                document.toObject(Community::class.java)?.copy(id = document.id) // added `.copy(id = document.id)` to set Firestore document ID into the model
+            }
             Result.success(communities)
         } catch (e: Exception) {
             Result.failure(e)
