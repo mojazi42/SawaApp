@@ -100,10 +100,7 @@ fun getTopBar(
                         )
 
                         val logoPainter = painterResource(
-                            id = if (isSystemInDarkTheme())
-                                R.drawable.white_app_icon
-                            else
-                                R.drawable.applogo
+                            id = R.drawable.applogo
                         )
 
                         Image(
