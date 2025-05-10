@@ -97,14 +97,6 @@ fun ProfileScreen(
         ) {
             Spacer(Modifier.height(integerResource(R.integer.topSpacing).dp))
 
-            // 🔙 Prev button
-            Button(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.align(Alignment.Start)
-            ) {
-                Text(text = "Prev")
-            }
-
             Box(
                 modifier = Modifier.size(integerResource(R.integer.photoBoxSize).dp)
             ) {

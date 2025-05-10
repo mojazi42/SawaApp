@@ -37,14 +37,6 @@ fun NotificationScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // 🔙 Prev button
-        Button(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier.align(Alignment.Start)
-        ) {
-            Text(text = "Prev")
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         if (notifications.isEmpty()) {
