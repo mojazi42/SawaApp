@@ -1,12 +1,14 @@
 package com.example.sawaapplication.navigation.topBar
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -20,19 +22,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,8 +72,16 @@ fun TopBar(
 fun getTopBar(
     currentRoute: String?,
     navController: NavController,
-    imageUrl: String?
+    imageUrl: String?,
+    notificationViewModel: NotificationViewModel = hiltViewModel()
 ): (@Composable () -> Unit)? {
+
+    val hasUnread = notificationViewModel.hasUnreadNotifications.collectAsState().value
+
+    LaunchedEffect(currentRoute) {
+        notificationViewModel.checkUnreadStatus()
+    }
+
     return when (currentRoute) {
         Screen.Community.route -> {
             { TopBar(title = stringResource(id = R.string.myCommunities)) }
@@ -109,13 +124,28 @@ fun getTopBar(
                             modifier = Modifier.size(integerResource(id = R.integer.topBarIconSize).dp)
                         )
 
-                        IconButton(onClick = { navController.navigate(Screen.Notification.route) }) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                        IconButton(onClick = {
+                            notificationViewModel.markNotificationsAsSeen()
+                            navController.navigate(Screen.Notification.route) }) {
+                            Box {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Notifications",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+
+                                if (hasUnread) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(10.dp)
+                                            .align(Alignment.TopEnd)
+                                            .offset(x = 2.dp, y = (-2).dp)
+                                            .background(Color.Red, CircleShape)
+                                    )
+                                }
+                            }
                         }
+
                     }
                 }
             }
