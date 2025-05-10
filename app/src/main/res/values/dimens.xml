@@ -40,7 +40,6 @@
     <integer name="buttonWidth">244</integer>
     <integer name="floatingButton">36</integer>
 
-
     <!--Custom Card Dimensions-->
     <integer name="cardPadding">8</integer>
     <integer name="customCardShadow">32</integer>
@@ -68,6 +67,7 @@
     <integer name="smallTextFontSize">14</integer>
     <integer name="smallerTextFontSize">12</integer>
     <integer name="onboardingImage">300</integer>
+    <integer name="homeScreenFontSize">10</integer>
 
     <!--Logo-->
     <integer name="logoHeight">80</integer>
@@ -93,5 +93,24 @@
     <!--Notification Dimensions-->
     <integer name="belowTitle">24</integer>
 
+    <!--Bottom Bar-->
+    <integer name="bottomBarHeight">56</integer>
+    <integer name="bottomBarIconSize">25</integer>
+    <integer name="bottomBarIconSmallSize">20</integer>
+
+    <!--Top Bar-->
+    <integer name="topBarIconSize">36</integer>
+
+    <!--Home Screen-->
+    <integer name="homeScreenHorizontalPadding">16</integer>
+    <integer name="homeScreenVerticalPadding">8</integer>
+    <integer name="homeScreenRoundedCornerShape">16</integer>
+    <integer name="homeScreenCardElevation">4</integer>
+    <integer name="homeScreenEventImageSize">140</integer>
+    <integer name="homeScreenIconSize">16</integer>
+    <integer name="homeCommunityNamePostPadding">64</integer>
+    <integer name="homePostProfileImage">48</integer>
+    <integer name="homeScreenTopPadding">56</integer>
+    <integer name="homeScreenBottomPadding">12</integer>
 
 </resources>
