@@ -1,0 +1,170 @@
+package com.example.sawaapplication.screens.home.presentation.screens.component
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+
+@Composable
+fun EventCard(
+    image: Painter,
+    community: String,
+    title: String,
+    description: String,
+    location: String,
+    time: String,
+    participants: Int,
+    modifier: Modifier = Modifier
+) {
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+    val imageUrl by profileViewModel.profileImageUrl.collectAsState()
+
+    OutlinedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(integerResource(id = R.integer.smallerSpace).dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+        shape = RoundedCornerShape(integerResource(id = R.integer.homeScreenRoundedCornerShape).dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = integerResource(id = R.integer.homeScreenCardElevation).dp
+        ),
+        border = BorderStroke(
+            1.dp, MaterialTheme.colorScheme.secondaryContainer
+        ),
+    ) {
+        Column {
+            Row {
+                Image(
+                    painter = if (imageUrl != null)
+                        rememberAsyncImagePainter(imageUrl)
+                    else
+                        painterResource(id = R.drawable.ic_launcher_background),
+                    contentDescription = "Profile image",
+                    contentScale = ContentScale.Crop,
+
+                    modifier = Modifier
+                        .clip(RectangleShape)
+                        .clip(RoundedCornerShape(topStart = integerResource(id = R.integer.homeScreenRoundedCornerShape).dp))
+                        .size(integerResource(id = R.integer.homeScreenEventImageSize).dp)
+                )
+
+                Spacer(modifier = Modifier.width(integerResource(id = R.integer.smallSpace).dp))
+
+                Column(
+                    modifier = Modifier
+                        .padding(top = integerResource(id = R.integer.smallSpace).dp)
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = community,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Gray,
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = integerResource(id = R.integer.smallSpace).dp,
+                        vertical = integerResource(id = R.integer.smallerSpace).dp
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+
+                ) {
+                    Icon(
+                        Icons.Outlined.LocationOn,
+                        contentDescription = "Time",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
+                    )
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+
+                }
+
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Group,
+                        contentDescription = "Participants",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
+                    )
+                    Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
+                    Text(
+                        text = "$participants",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        }
+    }
+}
