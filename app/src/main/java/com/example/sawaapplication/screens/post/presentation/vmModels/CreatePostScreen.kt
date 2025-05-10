@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.poste
+package com.example.sawaapplication.screens.post.presentation.vmModels
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
