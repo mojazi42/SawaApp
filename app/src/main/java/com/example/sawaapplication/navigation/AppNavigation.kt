@@ -121,7 +121,6 @@ fun AppNavigation(
                             launchSingleTop = true
                         }
                     },
-                    navController = navController
                 )
             }
         }
@@ -153,7 +152,7 @@ fun AppNavigation(
                 NewCommunity(navController)
             }
             composable(Screen.Home.route) {
-                HomeScreen(navController)
+                HomeScreen()
             }
             composable(Screen.Explore.route) {
                 ExploreScreen(navController)
