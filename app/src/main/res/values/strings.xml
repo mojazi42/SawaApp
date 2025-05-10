@@ -34,15 +34,30 @@
     <string name="BackToLogIn">Back to Log In</string>
 
     <string name="aboutMe">About Me:</string>
+    <string name="editProfile">Edit Profile</string>
 
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="search">Search</string>
+    <string name="join">Join</string>
+    <string name="joined">Joined</string>
 
     <string name="description">Description</string>
 
     <string name="notification">Notification</string>
 
-    <string name="exploreCommunity">Explore Community </string>
+    <string name="exploreCommunity">Explore Communities</string>
+    <string name="newCommunity">New Community</string>
+    <string name="myCommunities">My Communities</string>
 
+    <!--Create new event-->
+    <string name="newEvent">New Event</string>
+    <string name="eventName">Event Name</string>
+    <string name="eventDescription">Event Description</string>
+    <string name="eventMembersLimit">Number of Attendance</string>
+    <string name="ok">OK</string>
+    <string name="eventDate">Event Date</string>
+    <string name="eventLocation">Event Location</string>
 
 </resources>
