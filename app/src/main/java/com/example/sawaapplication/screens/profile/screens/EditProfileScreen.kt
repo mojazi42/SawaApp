@@ -26,13 +26,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
     navController: NavController,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val nameState by viewModel.userName.collectAsState()
@@ -44,7 +46,7 @@ fun EditProfileScreen(
 
     // LaunchedEffect is used here to synchronize the ViewModel state (nameState, aboutState)
     // into the local editable form fields (name, about).
-    // This ensures that whenever the ViewModel data updates (e.g., after Firestore loads),
+    // This ensures that whenever the ViewModel data updates (e.g., after FireStore loads),
     // the UI text fields are automatically populated with the latest data.
     // Without this, the fields would only initialize once and not reflect later updates.
     LaunchedEffect(nameState, aboutState) {
@@ -53,9 +55,10 @@ fun EditProfileScreen(
     }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-        imageUri = it
-    }
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+            imageUri = it
+        }
 
     Scaffold(
         topBar = {
@@ -84,17 +87,28 @@ fun EditProfileScreen(
                                     onSuccess = {
                                         viewModel.updateName(name)
                                         viewModel.updateAboutMe(about)
-                                        Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT).show()
+                                        notificationViewModel.storeProfileUpdateNotification() // Store notification
+                                        Toast.makeText(
+                                            context,
+                                            "Saved Successfully!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                         navController.popBackStack()
                                     },
                                     onFailure = {
-                                        Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Failed to upload image",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 )
                             } else {
                                 viewModel.updateName(name)
                                 viewModel.updateAboutMe(about)
-                                Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT).show()
+                                notificationViewModel.storeProfileUpdateNotification() // Store notification
+                                Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT)
+                                    .show()
                                 navController.popBackStack()
                             }
                         },
@@ -147,6 +161,7 @@ fun EditProfileScreen(
                             modifier = Modifier.fillMaxSize()
                         )
                     }
+
                     profileImageUrl != null -> {
                         Image(
                             painter = rememberAsyncImagePainter(profileImageUrl),
@@ -155,6 +170,7 @@ fun EditProfileScreen(
                             modifier = Modifier.fillMaxSize()
                         )
                     }
+
                     else -> {
                         Text(
                             text = "Tap to upload\nimage",
