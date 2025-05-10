@@ -31,15 +31,16 @@ fun NotificationScreen(
     ) {
 
         Spacer(Modifier.height(integerResource(R.integer.topSpacing).dp))
-
-        Text(
-            text = stringResource(id = R.string.notification),
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
-            fontSize = integerResource(R.integer.textSize2).sp
-        )
-
-        Spacer(Modifier.height(integerResource(R.integer.belowTitle).dp))
+/**
+  COMMENT IT SINCE THE TITLE IS ALREADY IN THE TOPBAR
+**/
+//        Text(
+//            text = stringResource(id = R.string.notification),
+//            textAlign = TextAlign.Center,
+//            fontWeight = FontWeight.Bold,
+//            fontSize = integerResource(R.integer.textSize2).sp
+//        )
+//        Spacer(Modifier.height(integerResource(R.integer.belowTitle).dp))
 
         NotificationCards()
 

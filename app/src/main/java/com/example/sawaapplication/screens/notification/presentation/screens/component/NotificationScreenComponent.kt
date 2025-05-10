@@ -15,6 +15,11 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+/**
+ * the content of notification card
+ * update it later with specific posts
+ */
+
 @Composable
 fun NotificationCard(
     name: String,
