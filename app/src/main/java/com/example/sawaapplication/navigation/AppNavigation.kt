@@ -66,8 +66,8 @@ import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    //isDarkTheme: Boolean,
-    //changeAppTheme: () -> Unit
+    isDarkTheme: Boolean,
+    changeAppTheme: () -> Unit
 ) {
     var tokenState by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
@@ -165,7 +165,9 @@ fun AppNavigation(
                 MyCommunitiesScreen(navController)
             }
             composable(Screen.EditProfile.route) {
-                EditProfileScreen(navController = navController)
+                EditProfileScreen(navController = navController,
+                    isDarkTheme = isDarkTheme,
+                    changeAppTheme = changeAppTheme)
             }
             composable(
                 route = "community_screen/{communityId}",
