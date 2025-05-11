@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +58,10 @@ fun CreatePostScreen(
         viewModel.imageUri = uri
     }
 
+    LaunchedEffect(communityId) {
+        viewModel.communityId = communityId
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -74,9 +79,7 @@ fun CreatePostScreen(
             Button(
                 onClick = {
                     viewModel.createPost(communityId)
-                    navController.popBackStack()
                 },
-                enabled = (viewModel.content.isNotBlank() || viewModel.imageUri != null) && communityId.isNotBlank()
             ){Text(stringResource(R.string.create))}
         }
         Box(

@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.example.sawaapplication.screens.post.domain.useCases.CreatePostUseCase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -55,6 +54,8 @@ class CreatePostViewModel @Inject constructor(
             imageUri = "", // Will be updated after upload
             username = username,
             userIcon = userIcon,
+            communityId = communityId,
+
 
         )
 
