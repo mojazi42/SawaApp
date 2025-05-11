@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddLocationAlt
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.Icon
@@ -53,8 +52,18 @@ import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import java.text.DateFormat
 import java.util.Date
 import android.widget.Toast
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.firebase.firestore.GeoPoint
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.android.gms.maps.model.LatLng
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateNewEventScreen(
     navController: NavHostController, communityId: String,
@@ -62,6 +71,7 @@ fun CreateNewEventScreen(
 ) {
     val context = LocalContext.current
     val success = viewModel.success.value
+    var pickedLocation by remember { mutableStateOf<LatLng?>(null) }
 
     LaunchedEffect(communityId) {
         viewModel.communityId = communityId
@@ -174,15 +184,18 @@ fun CreateNewEventScreen(
 
             //event location
             CustomTextField(
-                value = "",
+                value = viewModel.locationText,
                 onValueChange = {},
                 label = stringResource(id = R.string.eventLocation),
                 readOnly = true,
                 trailingIcon = {
                     Icon(
-                        imageVector = Icons.Default.AddLocationAlt,
-                        contentDescription = "set a location",
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Pick location",
                         tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            viewModel.isMapVisible = !viewModel.isMapVisible
+                        }
                     )
                 }
             )
@@ -219,6 +232,37 @@ fun CreateNewEventScreen(
                 label = stringResource(R.string.eventMembersLimit),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
+            // Google Map to pick location
+            if (viewModel.isMapVisible) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.isMapVisible = false }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                    ) {
+                        GoogleMap(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            onMapClick = { latLng ->
+                                pickedLocation = latLng
+                                viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
+                                viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
+                                viewModel.isMapVisible = false  // Close the map after selecting location
+                            },
+                            cameraPositionState = rememberCameraPositionState {
+                                position = CameraPosition.fromLatLngZoom(
+                                    pickedLocation ?: LatLng(24.7136, 46.6753), 5f
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
         }
     }
 }

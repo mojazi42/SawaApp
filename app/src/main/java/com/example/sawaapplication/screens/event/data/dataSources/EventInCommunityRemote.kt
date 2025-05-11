@@ -38,8 +38,8 @@ class EventInCommunityRemote @Inject constructor(
 
             // Reference to Firestore subcollection for events
             firestore.collection("Community")  // Ensure consistency in collection name
-                .document(communityId).collection("events").document()
-                .set(updatedEvent, SetOptions.merge()) // Create a new document
+                .document(communityId).collection("event").document()
+                .set(updatedEvent, SetOptions.merge())
 
 
             Log.d("Firebase", "Event created successfully in community: $communityId")
@@ -49,6 +49,5 @@ class EventInCommunityRemote @Inject constructor(
             Log.e("Firebase", "Error creating event: ${e.message}")
         }
     }
-
-
 }
+
