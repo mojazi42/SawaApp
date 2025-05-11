@@ -42,6 +42,10 @@
     <string name="search">Search</string>
     <string name="join">Join</string>
     <string name="joined">Joined</string>
+    <string name="logout">Logout</string>
+    <string name="name">Name</string>
+    <string name="darkMode">Dark Mode</string>
+    <string name="language">Language</string>
 
     <string name="description">Description</string>
 

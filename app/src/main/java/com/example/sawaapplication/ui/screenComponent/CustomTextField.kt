@@ -35,7 +35,8 @@ fun CustomTextField(
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     trailingIcon: (@Composable (() -> Unit))? = null,
-) {
+    maxLines: Int = Int.MAX_VALUE,
+    ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -67,7 +68,8 @@ fun CustomTextField(
                 }
                 trailingIcon != null -> trailingIcon()
             }
-        }
+        },
+        maxLines = maxLines
     )
 }
 

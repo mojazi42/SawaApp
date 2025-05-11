@@ -45,6 +45,10 @@
     <string name="search">بحث</string>
     <string name="join">إنضم</string>
     <string name="joined">انضم</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="name">الاسم</string>
+    <string name="language">اللغة</string>
+    <string name="darkMode">الوضع الليلي</string>
 
     <string name="notification">الإشعارات</string>
 
