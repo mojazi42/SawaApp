@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,31 +44,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.event.presentation.vmModels.CreateEventViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import java.text.DateFormat
 import java.util.Date
 
 @Composable
-fun CreateNewEventScreen(navController: NavHostController) {
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var eventDate by remember {
-        mutableStateOf<Long?>(System.currentTimeMillis())}
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var membersLimitInput by remember { mutableStateOf("") }
-    val membersLimit: Int? = membersLimitInput.toIntOrNull()
+fun CreateNewEventScreen(
+    navController: NavHostController, communityId: String,
+    viewModel: CreateEventViewModel = hiltViewModel(),
+) {
+
+    LaunchedEffect(communityId) {
+        viewModel.communityId = communityId
+    }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        imageUri = uri
+        viewModel.imageUri = uri
     }
-
     var showDatePicker by remember { mutableStateOf(false) }
-
-    val formattedDate = eventDate?.let {
+    val communityID = viewModel.communityId
+    val formattedDate = viewModel.eventDate?.let {
         DateFormat.getDateInstance().format(Date(it))
     } ?: ""
 
@@ -88,7 +90,12 @@ fun CreateNewEventScreen(navController: NavHostController) {
             }
             Button(
                 onClick = {
-                    if (membersLimit != null && membersLimit > 0) {
+                    if (viewModel.membersLimit != null && viewModel.membersLimit!! > 0) {
+
+                        if (communityID != null) {
+                            viewModel.createEvent(communityID)
+                        }
+
                         // Use membersLimit for event creation
                     } else {
                         // Show error or ignore
@@ -122,9 +129,9 @@ fun CreateNewEventScreen(navController: NavHostController) {
 
                 // Post image
             ) {
-                if (imageUri != null) {
+                if (viewModel.imageUri != null) {
                     Image(
-                        painter = rememberAsyncImagePainter(imageUri),
+                        painter = rememberAsyncImagePainter(viewModel.imageUri),
                         contentDescription = "Selected Image",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
@@ -140,15 +147,15 @@ fun CreateNewEventScreen(navController: NavHostController) {
 
             //event name
             CustomTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = viewModel.name,
+                onValueChange = { viewModel.name = it },
                 label = stringResource(R.string.eventName),
             )
 
             //event description
             CustomTextField(
-                value = description,
-                onValueChange = { description = it },
+                value = viewModel.description,
+                onValueChange = { viewModel.description = it },
                 label = stringResource(R.string.eventDescription),
                 singleLine = false,
             )
@@ -186,7 +193,7 @@ fun CreateNewEventScreen(navController: NavHostController) {
             if (showDatePicker) {
                 DatePickerModal(
                     onDateSelected = {
-                        eventDate = it
+                        viewModel.eventDate = it
                         showDatePicker = false
                     },
                     onDismiss = { showDatePicker = false }
@@ -195,8 +202,8 @@ fun CreateNewEventScreen(navController: NavHostController) {
 
             //event member limit
             CustomTextField(
-                value = membersLimitInput,
-                onValueChange = { membersLimitInput = it },
+                value = viewModel.membersLimitInput,
+                onValueChange = { viewModel.membersLimitInput = it },
                 label = stringResource(R.string.eventMembersLimit),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )

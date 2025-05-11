@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.theme.*
@@ -63,7 +64,8 @@ fun CommunityScreen(
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    navController: NavHostController
 ) {
     val uiState = FakeCommunityUiState
     var selectedTab by remember { mutableStateOf(0) }
@@ -190,7 +192,7 @@ fun CommunityScreen(
                 }
             } else {
                 item {
-                    EventCard()
+                    EventCard(navController = navController, communityId = communityId)
                 }
             }
         }

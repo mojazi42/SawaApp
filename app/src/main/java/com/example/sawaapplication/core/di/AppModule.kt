@@ -10,6 +10,9 @@ import com.example.sawaapplication.screens.communities.data.dataSources.remote.C
 import com.example.sawaapplication.screens.communities.data.repository.CommunityRepositoryImpl
 import com.example.sawaapplication.screens.communities.domain.repository.CommunityRepository
 import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCreatedCommunitiesUseCase
+import com.example.sawaapplication.screens.event.data.dataSources.EventInCommunityRemote
+import com.example.sawaapplication.screens.event.data.repository.EventRepositoryImpl
+import com.example.sawaapplication.screens.event.domain.repository.EventRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -79,4 +82,22 @@ object AppModule {
     fun provideOkHTTPBuilder(
         authInterceptor: AuthInterceptor
     ): OkHTTPBuilder = OkHTTPBuilder(authInterceptor)
+
+    @Provides
+    fun provideEventRemoteDataSource(
+        firestore: FirebaseFirestore,
+        firebaseAuth: FirebaseAuth
+    ): EventInCommunityRemote {
+        return EventInCommunityRemote(
+            firestore,
+            firebaseAuth
+        )
+    }
+
+    @Provides
+    fun provideEventRepository(
+        remoteDataSource: EventInCommunityRemote,
+    ): EventRepository {
+        return EventRepositoryImpl(remoteDataSource)
+    }
 }
