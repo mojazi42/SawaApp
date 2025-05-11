@@ -19,11 +19,13 @@ import androidx.compose.foundation.lazy.items
 @Composable
 fun ExploreCommunityCardList(
     communities: List<Community>,
-    onCommunityClick: (String) -> Unit
+    currentUserId: String,
+    onCommunityClick: (String) -> Unit,
+    onJoinClick: (String) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(communities, key = { it.id }) { community ->
-            var isJoined by remember { mutableStateOf(false) }
+            val isJoined = currentUserId in community.members
 
             CommunityCard(
                 communityName = community.name,
@@ -32,7 +34,7 @@ fun ExploreCommunityCardList(
                 joinButton = {
                     JoinButton(
                         isJoined = isJoined,
-                        onClick = { isJoined = !isJoined }
+                        onClick = { onJoinClick(community.id) }
                     )
                 },
                 onClick = {
