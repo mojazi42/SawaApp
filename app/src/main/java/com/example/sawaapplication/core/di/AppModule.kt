@@ -13,6 +13,10 @@ import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCr
 import com.example.sawaapplication.screens.event.data.dataSources.EventInCommunityRemote
 import com.example.sawaapplication.screens.event.data.repository.EventRepositoryImpl
 import com.example.sawaapplication.screens.event.domain.repository.EventRepository
+import com.example.sawaapplication.screens.post.data.dataSources.remote.PostsInCommunityRemote
+import com.example.sawaapplication.screens.post.data.repository.PostRepositoryImpl
+import com.example.sawaapplication.screens.post.domain.repository.PostRepository
+import com.example.sawaapplication.screens.post.domain.useCases.CreatePostUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -106,4 +110,25 @@ object AppModule {
      * 1- PostRemoteDataSource
      * 2- PostRepository
      * */
+    @Provides
+    fun providePostRemoteDataSource(
+        firestore: FirebaseFirestore,
+        firebaseAuth: FirebaseAuth
+    ): PostsInCommunityRemote {
+        return PostsInCommunityRemote(firestore, firebaseAuth)
+    }
+
+    @Provides
+    fun providePostRepository(
+        postRemoteDataSource: PostsInCommunityRemote
+    ): PostRepository {
+        return PostRepositoryImpl(postRemoteDataSource)
+    }
+
+    @Provides
+    fun provideCreatePostUseCase(
+        postRepository: PostRepository
+    ): CreatePostUseCase {
+        return CreatePostUseCase(postRepository)
+    }
 }

@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,20 +36,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.post.presentation.vmModels.CreatePostViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 
 @Composable
-fun CreatePostScreen(navController: NavController){
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var description by remember { mutableStateOf("") }
+fun CreatePostScreen(
+    navController: NavController,
+){
+    val viewModel: CreatePostViewModel = hiltViewModel()
+    val imageUri by remember { derivedStateOf { viewModel.imageUri } }
+    val communityId = viewModel.communityId ?: ""
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        imageUri = uri
+        viewModel.imageUri = uri
     }
 
     Column(
@@ -67,7 +73,10 @@ fun CreatePostScreen(navController: NavController){
             }
             Button(
                 onClick = {
+                    viewModel.createPost(communityId)
+                    navController.popBackStack()
                 },
+                enabled = (viewModel.content.isNotBlank() || viewModel.imageUri != null) && communityId.isNotBlank()
             ){Text(stringResource(R.string.create))}
         }
         Box(
@@ -99,8 +108,8 @@ fun CreatePostScreen(navController: NavController){
 
         // Description Input
         CustomTextField(
-            value = description,
-            onValueChange = { description = it },
+            value = viewModel.content,
+            onValueChange = { viewModel.content = it },
             label = stringResource(R.string.description),
             modifier = Modifier
                 .fillMaxWidth()
