@@ -46,6 +46,7 @@ import com.example.sawaapplication.screens.profile.vm.ThemeViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.theme.Red
 import com.example.sawaapplication.ui.theme.firstOrange
+import com.example.sawaapplication.utils.LocaleHelper
 
 @Composable
 fun EditProfileScreen(
@@ -214,7 +215,8 @@ fun EditProfileScreen(
                 )
                 SettingsSwitches(
                     isArabic = isArabic,
-                    onLanguageToggle = { isArabic = !isArabic }
+                    onLanguageToggle = { themeViewModel.toggleLanguage()
+                        LocaleHelper.changeLanguage(context)}
                 )
             }
         }
