@@ -11,20 +11,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.sawaapplication.R
+import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.screens.communities.domain.model.Community
+import androidx.compose.foundation.lazy.items
 
 @Composable
-fun ExploreCommunityCardList(communities: List<String>) {
-
+fun ExploreCommunityCardList(
+    communities: List<Community>,
+    onCommunityClick: (String) -> Unit
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(communities.size) { index ->
+        items(communities, key = { it.id }) { community ->
             var isJoined by remember { mutableStateOf(false) }
+
             CommunityCard(
-                communityName = "Saudi Community",
-                communityMember = 2500000,
-                communityImage = painterResource(id = R.drawable.saudi_logo),
+                communityName = community.name,
+                communityMember = community.members.size,
+                communityImage = rememberAsyncImagePainter(community.image),
                 joinButton = {
                     JoinButton(
                         isJoined = isJoined,
@@ -32,17 +36,15 @@ fun ExploreCommunityCardList(communities: List<String>) {
                     )
                 },
                 onClick = {
-                    // Handle card click
+                    onCommunityClick(community.id)
                 }
             )
 
-            if (index < 5) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    thickness = 1.dp,
-                    color = Color.LightGray
-                )
-            }
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                thickness = 1.dp,
+                color = Color.LightGray
+            )
         }
     }
 }
