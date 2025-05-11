@@ -90,17 +90,36 @@ fun CommunityScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier.size(56.dp),
-                shape = CircleShape,
-                containerColor = PrimaryOrange,
-                contentColor = white,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Post")
+            when (selectedTab) {
+                0 -> {
+                    // FAB for Posts tab
+                    FloatingActionButton(
+                        onClick = { /* TODO: Handle Post FAB click */ },
+                        modifier = Modifier.size(56.dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = "Add Post")
+                    }
+                }
+                1 -> {
+                    // FAB for Events tab
+                    FloatingActionButton(
+                        onClick = { /* TODO: Handle Event FAB click */ },
+                        modifier = Modifier.size(56.dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    ) {
+                        Icon(Icons.Default.Event, contentDescription = "Add Event")
+                    }
+                }
             }
         },
+
         floatingActionButtonPosition = FabPosition.End,
         contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
