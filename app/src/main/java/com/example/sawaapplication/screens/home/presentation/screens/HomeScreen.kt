@@ -11,12 +11,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -82,29 +84,38 @@ fun PostsTab() {
     }
 }
 
+
 @Composable
 fun MyEventsTab() {
+    val eventsCount = 10
+    // Just track join states — this is safe
+    val joinedStates = remember { mutableStateListOf(*Array(eventsCount) { true }) }
+
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
-        items(10) { index ->
-            var isJoined by remember { mutableStateOf(true) }
+        items(eventsCount) { index ->
+            // ✅ Composable call inside the proper scope
+            val imagePainter = painterResource(id = R.drawable.first)
+
             EventCard(
-                image = painterResource(id = R.drawable.first),
+                image = imagePainter,
                 community = "Saudi Innovation Community",
                 title = "Fine art between past and present",
                 description = "World Art Day, which falls on April 15, celebrates artists and their contributions...",
                 location = "Madinah",
                 time = "16 Feb 25 • 06:00 PM-10:00 PM",
-                //joined = isJoined,
                 participants = 12,
-                //onJoinClick = { isJoined = !isJoined },
-                modifier = Modifier
-                    .padding(
-                        top = if (index == 0) integerResource(id = R.integer.homeScreenTopPadding).dp  else 0.dp,
-                    )
+                joined = joinedStates[index],
+                onJoinClick = { joinedStates[index] = !joinedStates[index] },
+                showCancelButton = true,
+                modifier = Modifier.padding(
+                    top = if (index == 0) integerResource(id = R.integer.homeScreenTopPadding).dp else 0.dp
+                )
             )
         }
     }
 }
+
+
+
