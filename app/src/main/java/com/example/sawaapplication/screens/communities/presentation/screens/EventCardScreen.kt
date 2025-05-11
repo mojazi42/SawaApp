@@ -17,12 +17,11 @@ import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.ui.theme.PrimaryOrange
 @Composable
-fun EventCardScreen(navController: NavHostController, communityId: String) {
+fun EventCardScreen() {
     val events = listOf(
         EventData(
             image = painterResource(id = R.drawable.ic_launcher_background),
