@@ -1,9 +1,7 @@
 package com.example.sawaapplication.screens.post.domain.model
 
 data class Post(
-    val id : String = "",
-    val username: String = "",
-    val userIcon: String = "",
+    val userId: String = "", // Reference to User collection
     val content: String = "" ,
     val imageUri: String = "" ,
     val likes: Int = 0 ,

@@ -29,11 +29,11 @@ class CreatePostViewModel @Inject constructor(
     private val uid: String
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
-    private val username: String
-        get() = firebaseAuth.currentUser?.displayName ?: "Anonymous"
-
-    private val userIcon: String
-        get() = firebaseAuth.currentUser?.photoUrl?.toString() ?: ""
+//    private val username: String
+//        get() = firebaseAuth.currentUser?.displayName ?: "Anonymous"
+//
+//    private val userIcon: String
+//        get() = firebaseAuth.currentUser?.photoUrl?.toString() ?: ""
 
     fun createPost(communityId: String) {
         if (communityId.isBlank()) {
@@ -52,8 +52,7 @@ class CreatePostViewModel @Inject constructor(
             content = postContent,
             createdAt = Date().toString(),
             imageUri = "", // Will be updated after upload
-            username = username,
-            userIcon = userIcon,
+            userId = uid,
             communityId = communityId,
 
 

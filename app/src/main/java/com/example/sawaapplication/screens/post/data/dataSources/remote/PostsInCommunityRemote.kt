@@ -40,11 +40,12 @@ class PostsInCommunityRemote @Inject constructor(
 
             // Create updated post with the image URL if an image was uploaded
             val updatedPost = post.copy(
+                userId = user.uid, // UserID
                 imageUri = imageUrl,
                 createdAt = Date().toString()
             )
 
-            // Reference to Firestore subcollection for posts
+            // Reference to Firestore sub-collection for posts
             firestore.collection("Community")
                 .document(communityId)
                 .collection("posts")
