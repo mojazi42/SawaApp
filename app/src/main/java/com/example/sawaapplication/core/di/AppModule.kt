@@ -100,4 +100,10 @@ object AppModule {
     ): EventRepository {
         return EventRepositoryImpl(remoteDataSource)
     }
+
+    /**
+     * Add two provides
+     * 1- PostRemoteDataSource
+     * 2- PostRepository
+     * */
 }

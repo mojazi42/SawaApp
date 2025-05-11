@@ -6,10 +6,12 @@ import javax.inject.Inject
 //@HiltViewModel
 //class CreatePostVM @Inject constructor(){
 //
-//    //image
-//    //description
-//    //date & time
-//    //user
-//    //community
 //
+//
+////    //image
+////    //description
+////    //date & time
+////    //user
+////    //community
+////
 //}
