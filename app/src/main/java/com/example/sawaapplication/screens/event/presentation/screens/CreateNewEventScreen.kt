@@ -46,16 +46,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.communities.domain.model.Community
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import java.text.DateFormat
 import java.util.Date
 
 @Composable
-fun CreateNewEventScreen(navController: NavHostController) {
+fun CreateNewEventScreen(
+    navController: NavHostController, communityId: String,
+) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var eventDate by remember {
-        mutableStateOf<Long?>(System.currentTimeMillis())}
+        mutableStateOf<Long?>(System.currentTimeMillis())
+    }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var membersLimitInput by remember { mutableStateOf("") }
     val membersLimit: Int? = membersLimitInput.toIntOrNull()

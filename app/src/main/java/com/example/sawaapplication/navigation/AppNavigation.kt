@@ -56,6 +56,7 @@ import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.NewCommunity
 import com.example.sawaapplication.screens.communities.presentation.screens.MyCommunitiesScreen
+import com.example.sawaapplication.screens.event.presentation.screens.CreateNewEventScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
 import com.example.sawaapplication.screens.profile.screens.EditProfileScreen
 import com.example.sawaapplication.screens.profile.screens.ProfileScreen
@@ -172,12 +173,21 @@ fun AppNavigation(
             ) { backStackEntry ->
                 val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 Log.d("DEBUG", "Navigation received communityId: $communityId")
+
+                // Pass communityId to the CommunityScreen composable
                 CommunityScreen(
                     communityId = communityId,
                     onBackPressed = { navController.popBackStack() },
-                    onClick = { /* optional */ }
+                    onClick = {  },
+                    navController = navController
                 )
             }
+
+            composable("create_event/{communityId}") { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                CreateNewEventScreen(navController, communityId)
+            }
+
         }
     }
 }
