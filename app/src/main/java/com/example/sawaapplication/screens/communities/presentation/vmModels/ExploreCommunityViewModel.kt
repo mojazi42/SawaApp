@@ -19,10 +19,9 @@ class ExploreCommunityViewModel @Inject constructor(
 ) : ViewModel() {
 
     var searchText by mutableStateOf("")
-    var communities by mutableStateOf<List<Community>>(emptyList()) // List to hold communities
+    var communities by mutableStateOf<List<Community>>(emptyList())
 
     init {
-        // Fetch data on ViewModel creation
         fetchCommunities()
     }
 
@@ -39,8 +38,7 @@ class ExploreCommunityViewModel @Inject constructor(
                             image = document.getString("image") ?: "",
                             creatorId = document.getString("creatorId") ?: "",
                             members = document.get("members") as? List<String> ?: emptyList(),
-                            createdAt = document.get("createdAt")?.toString()
-                                ?: "",  // Ensure it's a String
+                            createdAt = document.get("createdAt")?.toString() ?: "",
                             updatedAt = document.get("updatedAt")?.toString() ?: ""
                         )
                         community
@@ -54,7 +52,6 @@ class ExploreCommunityViewModel @Inject constructor(
                     }
                 }
 
-                // Sort communities by createdAt as Long (timestamp string).
                 communities = communities.sortedBy { it.createdAt.toLongOrNull() ?: Long.MAX_VALUE }
 
             } catch (e: Exception) {
