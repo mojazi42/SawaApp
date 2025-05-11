@@ -28,7 +28,14 @@ fun ExploreScreen(
             value = searchText,
             onValueChange = viewModel::onSearchTextChange,
         )
-        ExploreCommunityCardList(communities = filteredList)
+//        ExploreCommunityCardList(communities = filteredList)
+        // Pass navController to the ExploreCommunityCardList for navigation handling
+        ExploreCommunityCardList(
+            communities = filteredList,
+            onCommunityClick = { communityId ->
+                navController.navigate("community_screen/$communityId") // Navigate to the community screen
+            }
+        )
     }
 
 }
