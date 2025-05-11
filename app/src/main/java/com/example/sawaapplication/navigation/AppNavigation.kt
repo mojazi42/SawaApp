@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,6 +59,7 @@ import com.example.sawaapplication.screens.communities.presentation.screens.NewC
 import com.example.sawaapplication.screens.communities.presentation.screens.MyCommunitiesScreen
 import com.example.sawaapplication.screens.event.presentation.screens.CreateNewEventScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
+import com.example.sawaapplication.screens.post.presentation.screens.CreatePostScreen
 import com.example.sawaapplication.screens.profile.screens.EditProfileScreen
 import com.example.sawaapplication.screens.profile.screens.ProfileScreen
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
@@ -190,6 +192,10 @@ fun AppNavigation(
                 CreateNewEventScreen(navController, communityId)
             }
 
+            composable("create_post/{communityId}"){ backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                CreatePostScreen(navController, communityId)
+            }
         }
     }
 }
