@@ -140,7 +140,7 @@ fun CommunityScreen(
                 1 -> {
                     // FAB for Events tab
                     FloatingActionButton(
-                        onClick = { /* TODO: Handle Event FAB click */ },
+                        onClick = { navController.navigate("create_event/$communityId") },
                         modifier = Modifier.size(56.dp),
                         shape = CircleShape,
                         containerColor = PrimaryOrange,

@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import android.util.Log
+import kotlinx.coroutines.Job
 
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
@@ -27,6 +28,12 @@ class CreateEventViewModel @Inject constructor(
     var imageUri by mutableStateOf<Uri?>(null)
     var membersLimitInput by mutableStateOf("")
 
+    private var job: Job? = null
+    val loading = mutableStateOf(false)
+    val success = mutableStateOf(false)
+    val error = mutableStateOf<String?>(null)
+
+
     val membersLimit: Int?
         get() = membersLimitInput.toIntOrNull()
 
@@ -34,8 +41,10 @@ class CreateEventViewModel @Inject constructor(
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
     fun createEvent(communityId: String) {
-        if (communityId == null) {
-            Log.e("CreateEvent", "Missing communityId. Cannot create event.")
+        if (loading.value) return
+        if (imageUri == null) {
+            error.value = "Please select an image."
+
             return
         }
 
@@ -55,16 +64,18 @@ class CreateEventViewModel @Inject constructor(
             imageUri = image
         )
 
-        viewModelScope.launch {
+        job = viewModelScope.launch {
+            loading.value = true
             try {
-                Log.d("CreateEvent", "Creating event in communityId: $communityId")
-                createEventUseCase(communityId!!, event, imageUri!!)
-                Log.d("CreateEvent", "Event created successfully")
+                createEventUseCase(communityId, event, imageUri!!)
+                success.value = true
+                Log.d("CreateEvent", "Event created successfully ${communityId}")
             } catch (e: Exception) {
-                Log.e("CreateEvent", "Error creating event: ${e.message}", e)
+                error.value = "Failed to create event: ${e.message}"
+                Log.e("CreateEvent", "Error creating event", e)
+            } finally {
+                loading.value = false
             }
         }
     }
-
-
 }
