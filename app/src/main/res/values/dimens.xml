@@ -94,9 +94,9 @@
     <integer name="belowTitle">24</integer>
 
     <!--Bottom Bar-->
-    <integer name="bottomBarHeight">56</integer>
-    <integer name="bottomBarIconSize">25</integer>
-    <integer name="bottomBarIconSmallSize">20</integer>
+    <integer name="bottomBarHeight">76</integer>
+    <integer name="bottomBarIconSize">45</integer>
+    <integer name="bottomBarIconSmallSize">40</integer>
 
     <!--Top Bar-->
     <integer name="topBarIconSize">36</integer>
