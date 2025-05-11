@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -56,7 +57,15 @@ fun MyCommunitiesScreen(
             modifier = Modifier.padding(vertical = integerResource(id= R.integer.largerSpace).dp)
         ) {
             items(communities) { community ->
-                MyCommunitiesCard(community = community)
+                MyCommunitiesCard(
+                    community = community,
+                    onClick = {
+                        // Added debug log to confirm the community ID being navigated to
+                        Log.d("DEBUG", "Navigating to community id: ${community.id}")
+                        // Navigate to the CommunityScreen using the community ID
+                        navController.navigate("community_screen/${community.id}")
+                    }
+                )
             }
         }
         FloatingButton(

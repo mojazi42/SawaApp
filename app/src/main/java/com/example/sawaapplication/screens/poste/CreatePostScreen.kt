@@ -1,7 +1,6 @@
 package com.example.sawaapplication.screens.poste
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -33,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -43,7 +41,7 @@ import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 
 @Composable
-fun CreatePost(navController: NavController){
+fun CreatePostScreen(navController: NavController){
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var description by remember { mutableStateOf("") }
 

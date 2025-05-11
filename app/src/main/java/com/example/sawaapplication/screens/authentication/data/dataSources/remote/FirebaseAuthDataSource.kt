@@ -1,8 +1,6 @@
 package com.example.sawaapplication.screens.authentication.data.dataSources.remote
 
-
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await

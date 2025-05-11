@@ -46,9 +46,10 @@ object AppModule {
 
     @Provides
     fun provideCommunityRepository(
-        remoteDataSource: CommunityRemoteDataSource
+        remoteDataSource: CommunityRemoteDataSource,
+        firestore: FirebaseFirestore
     ): CommunityRepository {
-        return CommunityRepositoryImpl(remoteDataSource)
+        return CommunityRepositoryImpl(remoteDataSource, firestore)
     }
 
     // Provide GetUserCreatedCommunitiesUseCase

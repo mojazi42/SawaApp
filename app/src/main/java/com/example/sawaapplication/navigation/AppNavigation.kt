@@ -7,6 +7,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -34,11 +35,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import androidx.navigation.navArgument
 import com.example.sawaapplication.core.sharedPreferences.AuthPreferences
 import com.example.sawaapplication.navigation.bottomBar.CustomBottomBar
 import com.example.sawaapplication.navigation.topBar.TopBar
@@ -47,6 +50,7 @@ import com.example.sawaapplication.screens.authentication.presentation.screens.L
 import com.example.sawaapplication.screens.authentication.presentation.screens.ResetPasswordScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SignUpScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SplashScreen
+import com.example.sawaapplication.screens.communities.presentation.screens.CommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
@@ -84,18 +88,34 @@ fun AppNavigation(
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val imageUrl by profileViewModel.profileImageUrl.collectAsState()
 
-
     Scaffold(
         topBar = {
             getTopBar(currentRoute, navController, imageUrl)?.invoke()
         },
+//        topBar = {
+//            if (showTopBar) {
+//                currentRoute?.let { route ->
+//                    val screen = TopBarScreens.find { it.route == route }
+//                    screen?.let {
+//                        TopBar(screen = it)
+//                    }
+//                }
+//            }
+//
+//        },
+
+
+
+
 
         bottomBar = {
             if (showBottomBar) {
                 CustomBottomBar(
-                    selectedIndex = selectedIndex,
-                    onItemSelected = { newIndex ->
-                        val selectedScreen = bottomBarScreens[newIndex]
+                    selectedIndex = bottomBarScreens.indexOfFirst { screen ->
+                        screen::class.qualifiedName == currentRoute
+                    },
+                    onItemSelected = { selectedIndex ->
+                        val selectedScreen = bottomBarScreens[selectedIndex]
                         navController.navigate(selectedScreen.route) {
                             popUpTo(Screen.Home.route) { inclusive = false }
                             launchSingleTop = true
@@ -146,7 +166,18 @@ fun AppNavigation(
             composable(Screen.EditProfile.route) {
                 EditProfileScreen(navController = navController)
             }
-            //composable(Screen.Chat.route) { ChatScreen(navController) }
+            composable(
+                route = "community_screen/{communityId}",
+                arguments = listOf(navArgument("communityId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                Log.d("DEBUG", "Navigation received communityId: $communityId")
+                CommunityScreen(
+                    communityId = communityId,
+                    onBackPressed = { navController.popBackStack() },
+                    onClick = { /* optional */ }
+                )
+            }
         }
     }
 }

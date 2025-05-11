@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,6 +40,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.theme.Red
@@ -47,7 +49,8 @@ import com.example.sawaapplication.ui.theme.firstOrange
 @Composable
 fun EditProfileScreen(
     navController: NavController,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val nameState by viewModel.userName.collectAsState()
@@ -59,7 +62,7 @@ fun EditProfileScreen(
 
     // LaunchedEffect is used here to synchronize the ViewModel state (nameState, aboutState)
     // into the local editable form fields (name, about).
-    // This ensures that whenever the ViewModel data updates (e.g., after Firestore loads),
+    // This ensures that whenever the ViewModel data updates (e.g., after FireStore loads),
     // the UI text fields are automatically populated with the latest data.
     // Without this, the fields would only initialize once and not reflect later updates.
     LaunchedEffect(nameState, aboutState) {
@@ -68,12 +71,13 @@ fun EditProfileScreen(
     }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    var isDarkTheme by remember { mutableStateOf(false) }
+    var isArabic by remember { mutableStateOf(false) }
     val imagePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
             imageUri = it
         }
-    var isDarkTheme by remember { mutableStateOf(false) }
-    var isArabic by remember { mutableStateOf(false) }
 
     val logOutViewModel: LogOutViewModel = hiltViewModel()
 
@@ -243,6 +247,7 @@ fun EditProfileScreen(
                             onSuccess = {
                                 viewModel.updateName(name)
                                 viewModel.updateAboutMe(about)
+                                notificationViewModel.storeProfileUpdateNotification() // Store notification
                                 Toast.makeText(
                                     context,
                                     "Saved Successfully!",
@@ -262,6 +267,7 @@ fun EditProfileScreen(
                     } else {
                         viewModel.updateName(name)
                         viewModel.updateAboutMe(about)
+                        notificationViewModel.storeProfileUpdateNotification() // Store notification
                         Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT)
                             .show()
                         navController.popBackStack()
