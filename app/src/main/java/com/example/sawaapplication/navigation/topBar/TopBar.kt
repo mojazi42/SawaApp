@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.ArrowCircleLeft
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,6 +46,7 @@ import com.example.sawaapplication.screens.notification.presentation.viewmodels.
 @Composable
 fun TopBar(
     title: String,
+    navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
@@ -52,19 +54,21 @@ fun TopBar(
             Text(
                 text = title,
                 color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
             )
         },
+        navigationIcon = {
+            navigationIcon?.invoke()
+        },
         actions = actions,
-
-        colors = TopAppBarDefaults.topAppBarColors(
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
         ),
         modifier = Modifier.padding(
             horizontal = integerResource(id = R.integer.extraSmallSpace).dp,
             vertical = integerResource(id = R.integer.mediumSpace).dp,
-        ),
+        )
     )
 }
 
@@ -156,7 +160,22 @@ fun getTopBar(
         }
 
         Screen.EditProfile.route -> {
-            { TopBar(title = stringResource(id = R.string.editProfile)) }
+            {
+                TopBar(
+                    title = stringResource(id = R.string.editProfile),
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(integerResource(id = R.integer.bottomBarIconSize).dp)
+                            )
+                        }
+                    }
+                )
+            }
+
         }
 
         else -> null
