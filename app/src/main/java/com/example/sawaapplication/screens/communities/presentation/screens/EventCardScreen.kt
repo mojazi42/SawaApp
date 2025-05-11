@@ -1,3 +1,5 @@
+@file:JvmName("EventCardKt")
+
 package com.example.sawaapplication.screens.communities.presentation.screens
 
 import androidx.compose.foundation.layout.Column
@@ -13,15 +15,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.ui.theme.PrimaryOrange
 @Composable
-fun EventCardScreen() {
+fun EventCardScreen(navController: NavHostController, communityId: String) {
     val events = listOf(
         EventData(
             image = painterResource(id = R.drawable.ic_launcher_background),

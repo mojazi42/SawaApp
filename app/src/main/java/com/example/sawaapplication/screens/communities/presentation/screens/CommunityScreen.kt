@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -70,6 +71,11 @@ fun CommunityScreen(
     val uiState = FakeCommunityUiState
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Posts", "Events")
+    LaunchedEffect(communityId) {
+        Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
+        viewModel.fetchCommunityDetail(communityId)
+    }
+    val communityDetail by viewModel.communityDetail.collectAsState()
 
     Scaffold(
         topBar = {
@@ -82,26 +88,45 @@ fun CommunityScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                title = {}
+                title = {},
+                windowInsets = WindowInsets(0)
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier.size(56.dp),
-                shape = CircleShape,
-                containerColor = PrimaryOrange,
-                contentColor = white,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Post")
+            when (selectedTab) {
+                0 -> {
+                    // FAB for Posts tab
+                    FloatingActionButton(
+                        onClick = { /* TODO: Handle Post FAB click */ },
+                        modifier = Modifier.size(56.dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = "Add Post")
+                    }
+                }
+                1 -> {
+                    // FAB for Events tab
+                    FloatingActionButton(
+                        onClick = { navController.navigate("create_event/$communityId") },
+                        modifier = Modifier.size(56.dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    ) {
+                        Icon(Icons.Default.Event, contentDescription = "Add Event")
+                    }
+                }
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.End,
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = innerPadding,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -109,33 +134,36 @@ fun CommunityScreen(
             item {
                 Spacer(Modifier.height(24.dp))
                 AsyncImage(
-                    model = uiState.logoUrl,
+                    model = communityDetail?.image,
                     contentDescription = null,
                     modifier = Modifier
                         .size(100.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, PrimaryOrange, CircleShape),
+                        .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(16.dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.name,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = black
+                    )
+                }
                 Text(
-                    text = uiState.communityName,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = "${uiState.membersCount} Members",
+                    text = "${communityDetail?.members?.size ?: 0} Members",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = Gray
                 )
                 Spacer(Modifier.height(12.dp))
-                Text(
-                    text = uiState.communityDescription,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 32.dp)
-                )
+                communityDetail?.let {
+                    Text(
+                        text = it.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = black,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                }
                 Spacer(Modifier.height(20.dp))
                 Button(
                     onClick = { /* TODO: Handle Join */ },
@@ -152,7 +180,7 @@ fun CommunityScreen(
 
                 TabRow(
                     selectedTabIndex = selectedTab,
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = white,
                     indicator = { positions ->
                         TabRowDefaults.Indicator(
                             Modifier
@@ -170,7 +198,7 @@ fun CommunityScreen(
                                 Text(
                                     title,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onBackground
+                                    color = if (selectedTab == i) black else Gray
                                 )
                             }
                         )
@@ -185,7 +213,6 @@ fun CommunityScreen(
                 }
             } else {
                 item {
-                    // Here we pass both `navController` and `communityId` to EventCardScreen
                     EventCardScreen(navController = navController, communityId = communityId)
                 }
             }
