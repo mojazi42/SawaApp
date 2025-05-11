@@ -43,10 +43,6 @@ fun EventCard(navController: NavHostController,communityId: String) {
             textAlign = TextAlign.Center
         )
         //  You can replace with LazyColumn of EventCards
-        Button(onClick = {
-            navController.navigate("create_event/$communityId")
-        }) {
-            Text("Create New Event")
-        }
+
     }
 }

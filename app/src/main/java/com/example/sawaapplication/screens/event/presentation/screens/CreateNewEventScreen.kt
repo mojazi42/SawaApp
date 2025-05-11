@@ -52,16 +52,28 @@ import com.example.sawaapplication.screens.event.presentation.vmModels.CreateEve
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import java.text.DateFormat
 import java.util.Date
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun CreateNewEventScreen(
     navController: NavHostController, communityId: String,
     viewModel: CreateEventViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val success = viewModel.success.value
 
     LaunchedEffect(communityId) {
         viewModel.communityId = communityId
     }
+    LaunchedEffect(success) {
+        if (success) {
+            Toast.makeText(context, "Event Created!", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+            viewModel.success.value = false
+        }
+    }
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
