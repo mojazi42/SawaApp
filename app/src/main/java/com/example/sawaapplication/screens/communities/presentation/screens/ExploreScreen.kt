@@ -30,9 +30,14 @@ fun ExploreScreen(
         )
         ExploreCommunityCardList(
             communities = filteredList,
+            currentUserId = viewModel.currentUserId,
             onCommunityClick = { communityId ->
-                navController.navigate("community_screen/$communityId") // Navigate to the community screen
+                navController.navigate("community_screen/$communityId")
+            },
+            onJoinClick = { communityId ->
+                viewModel.joinCommunity(communityId, viewModel.currentUserId)
             }
         )
+
     }
 }

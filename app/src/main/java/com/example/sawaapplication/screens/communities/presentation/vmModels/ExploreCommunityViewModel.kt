@@ -11,15 +11,23 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.sawaapplication.screens.communities.domain.model.Community
+import com.example.sawaapplication.screens.communities.domain.useCases.JoinCommunityUseCase
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
 @HiltViewModel
 class ExploreCommunityViewModel @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
+    val currentUserId = firebaseAuth.currentUser?.uid ?: ""
+
+
 
     var searchText by mutableStateOf("")
     var communities by mutableStateOf<List<Community>>(emptyList())
+    private val _error = mutableStateOf<String?>(null)
+    val error: String? get() = _error.value
 
     init {
         fetchCommunities()
@@ -59,6 +67,20 @@ class ExploreCommunityViewModel @Inject constructor(
             }
         }
     }
+    @Inject lateinit var joinCommunityUseCase: JoinCommunityUseCase
+
+    fun joinCommunity(communityId: String, userId: String) {
+        viewModelScope.launch {
+            val result = joinCommunityUseCase(communityId, userId)
+            result.onSuccess {
+                fetchCommunities() // just refresh the list
+            }.onFailure {
+                _error.value = "Failed to join community: ${it.message}"
+            }
+        }
+    }
+
+
 
     fun onSearchTextChange(newText: String) {
         searchText = newText
