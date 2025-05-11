@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,10 +50,10 @@ import com.example.sawaapplication.ui.screenComponent.CustomTextField
 @Composable
 fun CreatePostScreen(
     navController: NavController,
-){
+    communityId : String
+) {
     val viewModel: CreatePostViewModel = hiltViewModel()
     val imageUri by remember { derivedStateOf { viewModel.imageUri } }
-    val communityId = viewModel.communityId ?: ""
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -66,58 +69,86 @@ fun CreatePostScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(integerResource(R.integer.padding).dp),
-        verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.verticalArrangement).dp)
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
     ) {
+
+        // Top Row: Cancel + Post button
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(integerResource(R.integer.padding).dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+
             TextButton(onClick = { navController.popBackStack() }) {
                 Text(stringResource(R.string.cancel))
             }
+
             Button(
                 onClick = {
                     viewModel.createPost(communityId)
+                    navController.navigate("community_screen/$communityId")
                 },
-            ){Text(stringResource(R.string.create))}
-        }
-        Box(
-            modifier = Modifier
-                .size(integerResource(R.integer.imageBoxSize).dp)
-                .clip(RoundedCornerShape(integerResource(R.integer.RoundedCornerShape).dp))
-                .clickable { imagePickerLauncher.launch("image/*") }
-                .background(Color.LightGray)
-                .align(Alignment.CenterHorizontally),
-            contentAlignment = Alignment.Center,
+            ) { Text(stringResource(R.string.post)) }
 
-            // Post image
-            ) {
-            if (imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(imageUri),
-                    contentDescription = "Selected Image",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Outlined.AddAPhoto,
-                    contentDescription = "Add photo icon",
-                    tint = Color.Gray
-                )
-            }
         }
 
-        // Description Input
-        CustomTextField(
-            value = viewModel.content,
-            onValueChange = { viewModel.content = it },
-            label = stringResource(R.string.description),
+        // Row for Community Image + Add Photo Icon
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(integerResource(R.integer.descriptionBoxSize).dp),
+                .padding(integerResource(R.integer.padding).dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Community Image
+            Image(
+                painter = rememberAsyncImagePainter("https://api.dicebear.com/7.x/lorelei/svg"),
+                contentDescription = "Profile Image",
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(Color.Blue)
+            )
+            // Add Photo Icon
+            Icon(
+                imageVector = Icons.Outlined.AddAPhoto,
+                contentDescription = "Add photo",
+                modifier = Modifier
+                    .clickable { imagePickerLauncher.launch("image/*") }
+                    .padding(8.dp),
+                tint = Color.Gray
+            )
+        }
+
+        //Post Content
+        OutlinedTextField(
+            value = viewModel.content,
+            onValueChange = { viewModel.content = it },
+            placeholder = { Text("Share your Idea", color = Color.Gray) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(bottom = 16.dp),
             singleLine = false,
+            shape = RoundedCornerShape(8.dp),
         )
+
+        // Show selected image preview if available
+        if (imageUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(imageUri),
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(bottom = 16.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
+
     }
 }

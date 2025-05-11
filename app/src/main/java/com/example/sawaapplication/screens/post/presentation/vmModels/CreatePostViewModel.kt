@@ -75,10 +75,4 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-////    //image
-////    //description
-////    //date & time
-////    //user
-////    //community
-
 }

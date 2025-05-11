@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.theme.*
 
@@ -81,7 +82,7 @@ fun CommunityScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
+                    IconButton(onClick =  {navController.navigate(Screen.Community.route)}) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -97,7 +98,7 @@ fun CommunityScreen(
                 0 -> {
                     // FAB for Posts tab
                     FloatingActionButton(
-                        onClick = { /* TODO: Handle Post FAB click */ },
+                        onClick = { navController.navigate("create_post/$communityId") },
                         modifier = Modifier.size(56.dp),
                         shape = CircleShape,
                         containerColor = PrimaryOrange,
