@@ -103,9 +103,11 @@ dependencies {
     // OkHttp logging interceptor for debugging network requests/responses in Logcat
     implementation(libs.logging.interceptor)
 
-    // Google Maps SDK for Android
+    // Google Maps SDK for Android and Add Accompanist Permissions Dependency
     implementation(libs.places)
     implementation(libs.play.services.maps)
+    implementation(libs.accompanist.permissions)
+
 
     // Google maps Compose
     implementation(libs.maps.compose)

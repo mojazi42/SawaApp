@@ -14,12 +14,14 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import android.util.Log
+import com.example.sawaapplication.core.sharedPreferences.LocationSharedPreference
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.Job
 
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
     private val createEventUseCase: CreateEventUseCase,
+    private val locationPrefs: LocationSharedPreference
 ) : ViewModel() {
 
     var communityId by mutableStateOf<String?>("")
@@ -80,5 +82,13 @@ class CreateEventViewModel @Inject constructor(
                 loading.value = false
             }
         }
+    }
+    fun shouldRequestLocation(): Boolean { // check if the permission is requested
+        val alreadyRequested = locationPrefs.hasRequested()
+        if (!alreadyRequested) {
+            locationPrefs.markAsRequested()
+            return true
+        }
+        return false
     }
 }
