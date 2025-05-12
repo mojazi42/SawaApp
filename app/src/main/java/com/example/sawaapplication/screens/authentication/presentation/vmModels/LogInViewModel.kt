@@ -58,7 +58,7 @@ fun handleAuthStateLogin(
     when (authState) {
         is AuthState.Authenticated -> {
             Toast.makeText(context, "Logged in successfully", Toast.LENGTH_SHORT).show()
-            navController.navigate(Screen.Profile.route) {
+            navController.navigate(Screen.Home.route) {
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
         }

@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
@@ -108,6 +110,7 @@ fun CommunityScreen(
         Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
         viewModel.fetchCommunityDetail(communityId)
     }
+    var joined by remember { mutableStateOf(false) }
     val communityDetail by viewModel.communityDetail.collectAsState()
 
     Scaffold(
@@ -198,17 +201,67 @@ fun CommunityScreen(
                     )
                 }
                 Spacer(Modifier.height(20.dp))
-                Button(
-                    onClick = { /* TODO: Handle Join */ },
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
-                    elevation = ButtonDefaults.buttonElevation(4.dp)
-                ) {
-                    Icon(Icons.Default.PersonAdd, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Join Community", style = MaterialTheme.typography.bodyLarge)
+
+                if(!joined) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        //Un-joined button
+                        OutlinedButton(
+                            onClick = {
+                                joined = !joined
+                            /* TODO: Handle Join */
+                            },
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
+                            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                            elevation = ButtonDefaults.buttonElevation(4.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.unjoind),
+                                contentDescription = "nu-join icon",
+                                tint = PrimaryOrange
+                                )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Joined")
+                        }
+
+                        //Go to chat button
+                        OutlinedButton(
+                            onClick = { /* TODO: Handle Join */ },
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
+                            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                            elevation = ButtonDefaults.buttonElevation(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ChatBubble,
+                                contentDescription = "chat icon",
+                                tint = PrimaryOrange
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Chat")
+                        }
+                    }
+                }else {
+                    Button(
+                        onClick = {
+                            joined = !joined
+                            /* TODO: Handle Join */
+                        },
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
+                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                        elevation = ButtonDefaults.buttonElevation(4.dp)
+                    ) {
+                        Icon(Icons.Default.PersonAdd, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Join Community", style = MaterialTheme.typography.bodyLarge)
+                    }
                 }
+
+
                 Spacer(Modifier.height(24.dp))
 
                 TabRow(
