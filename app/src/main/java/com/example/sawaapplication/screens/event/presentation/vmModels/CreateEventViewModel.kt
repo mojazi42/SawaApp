@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import android.util.Log
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.Job
 
 @HiltViewModel
@@ -27,11 +28,13 @@ class CreateEventViewModel @Inject constructor(
     var eventDate by mutableStateOf<Long?>(System.currentTimeMillis())
     var imageUri by mutableStateOf<Uri?>(null)
     var membersLimitInput by mutableStateOf("")
-
+    var location by mutableStateOf(GeoPoint(0.0, 0.0))
+    var locationText by mutableStateOf("Location not set")
     private var job: Job? = null
     val loading = mutableStateOf(false)
     val success = mutableStateOf(false)
     val error = mutableStateOf<String?>(null)
+    var isMapVisible by mutableStateOf(false)
 
 
     val membersLimit: Int?
@@ -56,7 +59,7 @@ class CreateEventViewModel @Inject constructor(
 
         val event = Event(
             title = eventName,
-            location = "",
+            location = location,
             date = Date(eventDateValue).toString(),
             description = eventDesc,
             memberLimit = limit,
