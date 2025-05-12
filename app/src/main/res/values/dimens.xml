@@ -34,9 +34,9 @@
     <integer name="smallText">16</integer>
 
     <!--Button-->
-    <integer name="buttonHeight">52</integer>
-    <integer name="buttonRoundCornerShape">20</integer>
-    <integer name="roundedCornerShape">12</integer>
+    <integer name="buttonHeight">72</integer>
+    <integer name="buttonRoundCornerShape">40</integer>
+    <integer name="roundedCornerShape">22</integer>
     <integer name="buttonWidth">244</integer>
     <integer name="floatingButton">36</integer>
 

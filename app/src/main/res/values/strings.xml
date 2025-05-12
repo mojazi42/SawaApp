@@ -51,7 +51,7 @@
 
     <string name="notification">Notification</string>
 
-    <string name="exploreCommunity">Explore Communities</string>
+    <string name="exploreCommunity">Explore</string>
     <string name="newCommunity">New Community</string>
     <string name="myCommunities">My Communities</string>
 
@@ -63,5 +63,8 @@
     <string name="ok">OK</string>
     <string name="eventDate">Event Date</string>
     <string name="eventLocation">Event Location</string>
+
+    <!-- Chats Screen-->
+    <string name="chats">Chats</string>
 
 </resources>

@@ -50,6 +50,8 @@ import com.example.sawaapplication.screens.authentication.presentation.screens.L
 import com.example.sawaapplication.screens.authentication.presentation.screens.ResetPasswordScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SignUpScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SplashScreen
+import com.example.sawaapplication.screens.chat.presentation.screens.ChatScreen
+import com.example.sawaapplication.screens.chat.presentation.screens.ViewChatsScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.CommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
@@ -65,8 +67,6 @@ import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    //isDarkTheme: Boolean,
-    //changeAppTheme: () -> Unit
 ) {
     var tokenState by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
@@ -92,21 +92,6 @@ fun AppNavigation(
         topBar = {
             getTopBar(currentRoute, navController, imageUrl)?.invoke()
         },
-//        topBar = {
-//            if (showTopBar) {
-//                currentRoute?.let { route ->
-//                    val screen = TopBarScreens.find { it.route == route }
-//                    screen?.let {
-//                        TopBar(screen = it)
-//                    }
-//                }
-//            }
-//
-//        },
-
-
-
-
 
         bottomBar = {
             if (showBottomBar) {
@@ -166,6 +151,24 @@ fun AppNavigation(
             composable(Screen.EditProfile.route) {
                 EditProfileScreen(navController = navController)
             }
+
+            composable(Screen.Chat.route) {
+                    ChatScreen(
+                        communityId = "test_community",
+                        viewModel = hiltViewModel(),
+                        navController = navController
+                    )
+
+            }
+
+            composable(Screen.Chats.route) {
+                ViewChatsScreen(
+                    navController = navController,
+                    communityId = "test_community",
+
+                )
+            }
+
             composable(
                 route = "community_screen/{communityId}",
                 arguments = listOf(navArgument("communityId") { type = NavType.StringType })
@@ -187,5 +190,5 @@ val bottomBarScreens = listOf(
     Screen.Explore,
     //Screen.Notification,
     Screen.Community,
-    //Screen.Chat
+    Screen.Chats
 )
