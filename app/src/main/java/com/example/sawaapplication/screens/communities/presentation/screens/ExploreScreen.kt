@@ -36,8 +36,12 @@ fun ExploreScreen(
             },
             onJoinClick = { communityId ->
                 viewModel.joinCommunity(communityId, viewModel.currentUserId)
+            },
+            onLeaveClick = { communityId ->
+                viewModel.leaveCommunity(communityId, viewModel.currentUserId)
             }
         )
+
 
     }
 }

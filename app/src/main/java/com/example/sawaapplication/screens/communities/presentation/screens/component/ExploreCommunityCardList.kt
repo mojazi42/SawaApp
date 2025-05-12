@@ -21,7 +21,8 @@ fun ExploreCommunityCardList(
     communities: List<Community>,
     currentUserId: String,
     onCommunityClick: (String) -> Unit,
-    onJoinClick: (String) -> Unit
+    onJoinClick: (String) -> Unit,
+    onLeaveClick: (String) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(communities, key = { it.id }) { community ->
@@ -38,8 +39,10 @@ fun ExploreCommunityCardList(
                     )
                 },
                 onClick = {
-                    onCommunityClick(community.id)
+                    if (isJoined) onLeaveClick(community.id)
+                    else onJoinClick(community.id)
                 }
+
             )
 
             HorizontalDivider(
