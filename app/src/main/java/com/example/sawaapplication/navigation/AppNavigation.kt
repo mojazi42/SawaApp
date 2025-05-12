@@ -102,8 +102,8 @@ fun AppNavigation(
             if (showBottomBar) {
                 CustomBottomBar(
                     selectedIndex = bottomBarScreens.indexOfFirst { screen ->
-                        screen::class.qualifiedName == currentRoute
-                    },
+                        screen.route == currentRoute
+                    }.coerceAtLeast(0), // fallback to index 0 if not found
                     onItemSelected = { selectedIndex ->
                         val selectedScreen = bottomBarScreens[selectedIndex]
                         navController.navigate(selectedScreen.route) {
@@ -154,17 +154,19 @@ fun AppNavigation(
                 MyCommunitiesScreen(navController)
             }
             composable(Screen.EditProfile.route) {
-                EditProfileScreen(navController = navController,
+                EditProfileScreen(
+                    navController = navController,
                     isDarkTheme = isDarkTheme,
-                    changeAppTheme = changeAppTheme)
+                    changeAppTheme = changeAppTheme
+                )
             }
 
             composable(Screen.Chat.route) {
-                    ChatScreen(
-                        communityId = "test_community",
-                        //viewModel = hiltViewModel(),
-                        navController = navController
-                    )
+                ChatScreen(
+                    communityId = "test_community",
+                    //viewModel = hiltViewModel(),
+                    navController = navController
+                )
 
             }
 
@@ -173,7 +175,7 @@ fun AppNavigation(
                     navController = navController,
                     communityId = "test_community",
 
-                )
+                    )
             }
 
             composable(
@@ -187,7 +189,7 @@ fun AppNavigation(
                 CommunityScreen(
                     communityId = communityId,
                     onBackPressed = { navController.popBackStack() },
-                    onClick = {  },
+                    onClick = { },
                     navController = navController
                 )
             }
@@ -197,7 +199,7 @@ fun AppNavigation(
                 CreateNewEventScreen(navController, communityId)
             }
 
-            composable("create_post/{communityId}"){ backStackEntry ->
+            composable("create_post/{communityId}") { backStackEntry ->
                 val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 CreatePostScreen(navController, communityId)
             }
