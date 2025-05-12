@@ -226,7 +226,7 @@ fun CommunityScreen(
                             /* TODO: Handle Join */
                             },
                             shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                             border = BorderStroke(integerResource(R.integer.buttonStroke).dp, PrimaryOrange),
                             contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, vertical = integerResource(R.integer.buttonPaddingV).dp),
                             elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
@@ -271,7 +271,7 @@ fun CommunityScreen(
                             /* TODO: Handle Join */
                         },
                         shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
                         contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, vertical = integerResource(R.integer.buttonPaddingV).dp),
                         elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
                     ) {
