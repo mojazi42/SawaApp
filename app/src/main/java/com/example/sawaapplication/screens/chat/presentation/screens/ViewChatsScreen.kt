@@ -31,14 +31,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.navigation.Screen
-import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel
+//import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 
 @Composable
 fun ViewChatsScreen(
     navController: NavController,
     communityId: String,
-) {
+) {}
+/*
     val chatViewModel : ChatViewModel = hiltViewModel()
     val communityViewModel: CommunityViewModel = hiltViewModel()
 
@@ -118,3 +119,4 @@ fun ChatCard(
     }
     HorizontalDivider(color = Gray, thickness = 0.5.dp)
 }
+*/

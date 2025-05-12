@@ -162,7 +162,7 @@ fun AppNavigation(
             composable(Screen.Chat.route) {
                     ChatScreen(
                         communityId = "test_community",
-                        viewModel = hiltViewModel(),
+                        //viewModel = hiltViewModel(),
                         navController = navController
                     )
 
