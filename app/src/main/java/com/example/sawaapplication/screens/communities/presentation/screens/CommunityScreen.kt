@@ -39,6 +39,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.theme.Gray
@@ -96,7 +98,6 @@ private val FakeCommunityUiState = CommunityUiState(
         )
     )
 )
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
@@ -120,13 +121,15 @@ fun CommunityScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
+                    IconButton(onClick =  {navController.navigate(Screen.Community.route)}) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
                 title = {},
                 windowInsets = WindowInsets(0)
-
             )
         },
         floatingActionButton = {
@@ -134,7 +137,7 @@ fun CommunityScreen(
                 0 -> {
                     // FAB for Posts tab
                     FloatingActionButton(
-                        onClick = { /* TODO: Handle Post FAB click */ },
+                        onClick = { navController.navigate("create_post/$communityId") },
                         modifier = Modifier.size(56.dp),
                         shape = CircleShape,
                         containerColor = PrimaryOrange,
@@ -159,7 +162,6 @@ fun CommunityScreen(
                 }
             }
         },
-
         floatingActionButtonPosition = FabPosition.End,
         contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
@@ -301,7 +303,7 @@ fun CommunityScreen(
                 }
             } else {
                 item {
-                    EventCard(navController = navController, communityId = communityId)
+                    EventCardScreen(navController = navController, communityId = communityId)
                 }
             }
         }
