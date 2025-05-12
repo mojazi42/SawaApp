@@ -20,6 +20,7 @@ private val DarkColorScheme = darkColorScheme(
     primaryContainer = DarkContainer,//Community Card Color
     secondaryContainer = DarkBorder, //Community Card border
     onSecondaryContainer = lightGray,
+    onPrimaryContainer= lightGray,
     )
 
 private val LightColorScheme = lightColorScheme(
