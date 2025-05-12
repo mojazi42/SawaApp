@@ -66,6 +66,12 @@
     <string name="eventDate">تاريخ الحدث</string>
     <string name="eventLocation">مكان الحدث</string>
 
+    <!--CommunityScreen-->
+    <string name="posts">المنشورات</string>
+    <string name="events">الأحداث</string>
+    <string name="chat">المحادثات</string>
+    <string name="joinCommunity">إنضم للمجتمع</string>
+
     <!-- Chats Screen-->
     <string name="chats">المحادثات</string>
 

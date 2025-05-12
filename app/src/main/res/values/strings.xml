@@ -65,6 +65,12 @@
     <string name="eventDate">Event Date</string>
     <string name="eventLocation">Event Location</string>
 
+    <!--CommunityScreen-->
+    <string name="posts">Posts</string>
+    <string name="events">Events</string>
+    <string name="chat">Chat</string>
+    <string name="joinCommunity">Join Community</string>
+
     <!-- Chats Screen-->
     <string name="chats">Chats</string>
 

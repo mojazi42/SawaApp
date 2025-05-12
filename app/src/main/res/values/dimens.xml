@@ -113,4 +113,21 @@
     <integer name="homeScreenTopPadding">56</integer>
     <integer name="homeScreenBottomPadding">12</integer>
 
+    <!--CommunityScreen-->
+    <integer name="floatingActionButtonSize">56</integer>
+    <integer name="floatingActionButtonElevation">8</integer>
+    <integer name="lazyColumnSpacedBy">16</integer>
+    <integer name="itemSpacerH">24</integer>
+    <integer name="itemSpacerSize">100</integer>
+    <integer name="itemSpacerH2nd">16</integer>
+    <integer name="communityDetailHorizontalPadding">32</integer>
+    <integer name="itemSpacerH3ed">8</integer>
+    <integer name="roundedCornerShapeCircle">50</integer>
+    <integer name="buttonStroke">1</integer>
+    <integer name="buttonPaddingH">24</integer>
+    <integer name="buttonPaddingV">12</integer>
+    <integer name="buttonElevation">4</integer>
+    <integer name="iconSize">20</integer>
+    <integer name="tabRowHeight">4</integer>
+
 </resources>
