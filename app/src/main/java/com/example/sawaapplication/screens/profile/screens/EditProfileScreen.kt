@@ -5,9 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,10 +13,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,10 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +29,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
-import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
@@ -46,7 +36,6 @@ import com.example.sawaapplication.screens.profile.vm.ThemeViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.theme.Red
 import com.example.sawaapplication.ui.theme.firstOrange
-import com.example.sawaapplication.utils.LocaleHelper
 
 @Composable
 fun EditProfileScreen(
@@ -78,7 +67,9 @@ fun EditProfileScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
-    var isArabic by remember { mutableStateOf(false) }
+
+    val isArabic by themeViewModel.isArabic.collectAsState()
+
     val imagePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
             imageUri = it
@@ -215,8 +206,11 @@ fun EditProfileScreen(
                 )
                 SettingsSwitches(
                     isArabic = isArabic,
-                    onLanguageToggle = { themeViewModel.toggleLanguage()
-                        LocaleHelper.changeLanguage(context)}
+                    onLanguageToggle = {
+                        themeViewModel.toggleLanguage()
+                        val newLang = if (isArabic) "en" else "ar"
+                        changeAppLocale(context, newLang)
+                    }
                 )
             }
         }
@@ -297,5 +291,4 @@ fun EditProfileScreen(
         }
     }
 }
-
 
