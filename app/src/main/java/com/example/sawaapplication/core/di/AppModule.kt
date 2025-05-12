@@ -1,6 +1,8 @@
 package com.example.sawaapplication.core.di
 
+import android.content.Context
 import com.example.sawaapplication.core.sharedPreferences.AuthInterceptor
+import com.example.sawaapplication.core.sharedPreferences.LocationSharedPreference
 import com.example.sawaapplication.core.sharedPreferences.OkHTTPBuilder
 import com.example.sawaapplication.core.sharedPreferences.TokenProvider
 import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
@@ -22,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module
@@ -131,4 +134,12 @@ object AppModule {
     ): CreatePostUseCase {
         return CreatePostUseCase(postRepository)
     }
+
+    @Provides
+    fun provideLocationSharedPreference(
+        @ApplicationContext context: Context
+    ): LocationSharedPreference {
+        return LocationSharedPreference(context)
+    }
 }
+

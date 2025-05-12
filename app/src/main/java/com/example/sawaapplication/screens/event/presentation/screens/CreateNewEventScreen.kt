@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.event.presentation.screens
 
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,9 +64,13 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.android.gms.maps.model.LatLng
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun CreateNewEventScreen(
     navController: NavHostController, communityId: String,
@@ -73,6 +78,8 @@ fun CreateNewEventScreen(
 ) {
     val context = LocalContext.current
     val success = viewModel.success.value
+    val locationPermissionState = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
     var pickedLocation by remember { mutableStateOf<LatLng?>(null) }
 
     LaunchedEffect(communityId) {
@@ -96,6 +103,36 @@ fun CreateNewEventScreen(
     val formattedDate = viewModel.eventDate?.let {
         DateFormat.getDateInstance().format(Date(it))
     } ?: ""
+
+    LaunchedEffect(Unit) {
+        if (viewModel.shouldRequestLocation()) {
+            locationPermissionState.launchPermissionRequest()
+        }
+    }
+
+    var showPermissionDialog by remember { mutableStateOf(false) }
+
+    // Location Permission Dialog
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            title = { Text("Location Permission") },
+            text = { Text("We need your location to pick the event location. Would you like to allow access?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    locationPermissionState.launchPermissionRequest()
+                    showPermissionDialog = false
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog = false }) {
+                    Text("Deny")
+                }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -197,11 +234,44 @@ fun CreateNewEventScreen(
                         contentDescription = "Pick location",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable {
-                            viewModel.isMapVisible = !viewModel.isMapVisible
+                            if (locationPermissionState.status.isGranted) {
+                                viewModel.isMapVisible = true
+                            } else {
+                                showPermissionDialog = true
+                            }
                         }
                     )
                 }
             )
+
+            when {
+                locationPermissionState.status.isGranted -> {
+
+                }
+
+                locationPermissionState.status.shouldShowRationale -> {
+                    // Display rationale if the user has previously denied permission
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context,
+                            "Location permission is needed to pick your event location.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                else -> {
+                    // Handle if permission is permanently denied allow from settings
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context,
+                            "Please grant location access in settings.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+            }
 
             //event date
             CustomTextField(
@@ -268,4 +338,3 @@ fun CreateNewEventScreen(
 
         }
     }
-}
