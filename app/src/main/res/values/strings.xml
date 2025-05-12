@@ -46,6 +46,7 @@
     <string name="name">Name</string>
     <string name="darkMode">Dark Mode</string>
     <string name="language">Language</string>
+    <string name="post">Post</string>
 
     <string name="description">Description</string>
 
