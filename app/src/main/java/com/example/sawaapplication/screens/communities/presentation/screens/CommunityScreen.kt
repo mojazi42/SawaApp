@@ -1,17 +1,48 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
 import android.util.Log
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,9 +51,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
-import com.example.sawaapplication.ui.theme.*
+import com.example.sawaapplication.ui.theme.Gray
+import com.example.sawaapplication.ui.theme.PrimaryOrange
+import com.example.sawaapplication.ui.theme.black
+import com.example.sawaapplication.ui.theme.white
 
 data class PostUiModel(
     val username: String,
@@ -56,14 +92,14 @@ private val FakeCommunityUiState = CommunityUiState(
         )
     )
 )
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    navController: NavHostController
 ) {
     val uiState = FakeCommunityUiState
     var selectedTab by remember { mutableStateOf(0) }
@@ -78,25 +114,45 @@ fun CommunityScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
+                    IconButton(onClick =  {navController.navigate(Screen.Community.route)}) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
                 title = {},
                 windowInsets = WindowInsets(0)
-
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier.size(56.dp),
-                shape = CircleShape,
-                containerColor = PrimaryOrange,
-                contentColor = white,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Post")
+            when (selectedTab) {
+                0 -> {
+                    // FAB for Posts tab
+                    FloatingActionButton(
+                        onClick = { navController.navigate("create_post/$communityId") },
+                        modifier = Modifier.size(56.dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = "Add Post")
+                    }
+                }
+                1 -> {
+                    // FAB for Events tab
+                    FloatingActionButton(
+                        onClick = { navController.navigate("create_event/$communityId") },
+                        modifier = Modifier.size(56.dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    ) {
+                        Icon(Icons.Default.Event, contentDescription = "Add Event")
+                    }
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -190,7 +246,7 @@ fun CommunityScreen(
                 }
             } else {
                 item {
-                    EventCard()
+                    EventCardScreen(navController = navController, communityId = communityId)
                 }
             }
         }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,7 +59,9 @@ import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.NewCommunity
 import com.example.sawaapplication.screens.communities.presentation.screens.MyCommunitiesScreen
+import com.example.sawaapplication.screens.event.presentation.screens.CreateNewEventScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
+import com.example.sawaapplication.screens.post.presentation.screens.CreatePostScreen
 import com.example.sawaapplication.screens.profile.screens.EditProfileScreen
 import com.example.sawaapplication.screens.profile.screens.ProfileScreen
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
@@ -67,6 +70,8 @@ import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 @Composable
 fun AppNavigation(
     navController: NavHostController,
+    isDarkTheme: Boolean,
+    changeAppTheme: () -> Unit
 ) {
     var tokenState by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
@@ -149,7 +154,9 @@ fun AppNavigation(
                 MyCommunitiesScreen(navController)
             }
             composable(Screen.EditProfile.route) {
-                EditProfileScreen(navController = navController)
+                EditProfileScreen(navController = navController,
+                    isDarkTheme = isDarkTheme,
+                    changeAppTheme = changeAppTheme)
             }
 
             composable(Screen.Chat.route) {
@@ -175,11 +182,24 @@ fun AppNavigation(
             ) { backStackEntry ->
                 val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 Log.d("DEBUG", "Navigation received communityId: $communityId")
+
+                // Pass communityId to the CommunityScreen composable
                 CommunityScreen(
                     communityId = communityId,
                     onBackPressed = { navController.popBackStack() },
-                    onClick = { /* optional */ }
+                    onClick = {  },
+                    navController = navController
                 )
+            }
+
+            composable("create_event/{communityId}") { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                CreateNewEventScreen(navController, communityId)
+            }
+
+            composable("create_post/{communityId}"){ backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                CreatePostScreen(navController, communityId)
             }
         }
     }

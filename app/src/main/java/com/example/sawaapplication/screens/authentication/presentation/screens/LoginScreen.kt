@@ -113,7 +113,7 @@ fun LoginScreen(
                     Text(
                         text = stringResource(id = R.string.forgot_password),
                         fontSize = integerResource(id = R.integer.smallText).sp,
-                        color = Color(0xFFBE4A4A),
+                        color = Color(0xFFC02525),
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier
                             .clickable { navController.navigate(Screen.ForgotPass.route) }

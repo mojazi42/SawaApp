@@ -8,4 +8,7 @@ interface CommunityRepository {
     suspend fun createCommunity(community: Community, imageUri: Uri): Result<Unit>
     suspend fun fetchCommunities(userId: String): Result<List<Community>>
     suspend fun getCommunityById(communityId: String): Result<Community> // added function to fetch a community by its ID
+    suspend fun joinCommunity(communityId: String, userId: String): Result<Unit>
+    suspend fun leaveCommunity(communityId: String, userId: String): Result<Unit>
+
 }

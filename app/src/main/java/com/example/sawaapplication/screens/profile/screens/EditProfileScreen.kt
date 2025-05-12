@@ -42,14 +42,19 @@ import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+import com.example.sawaapplication.screens.profile.vm.ThemeViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.theme.Red
 import com.example.sawaapplication.ui.theme.firstOrange
+import com.example.sawaapplication.utils.LocaleHelper
 
 @Composable
 fun EditProfileScreen(
     navController: NavController,
+    isDarkTheme: Boolean,
+    changeAppTheme: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
+    themeViewModel: ThemeViewModel = hiltViewModel(),
     notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -72,7 +77,7 @@ fun EditProfileScreen(
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    var isDarkTheme by remember { mutableStateOf(false) }
+    val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
     var isArabic by remember { mutableStateOf(false) }
     val imagePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
@@ -170,12 +175,16 @@ fun EditProfileScreen(
                     fontSize = 16.sp,
                 )
 
-                IconSwitch(
-                    checked = isDarkTheme,
-                    onCheckedChange = { isDarkTheme = !isDarkTheme },
-                    iconOn = Icons.Default.DarkMode,
-                    iconOff = Icons.Default.LightMode,
-                    modifier = Modifier.size(width = 50.dp, height = 30.dp)
+//                IconSwitch(
+//                    checked = isDarkTheme,
+//                    onCheckedChange = { changeAppTheme() },
+//                    iconOn = Icons.Default.DarkMode,
+//                    iconOff = Icons.Default.LightMode,
+//                    modifier = Modifier.size(width = 50.dp, height = 30.dp)
+//                )
+                SettingsThemeSwitches(
+                    isDark = isDarkTheme,
+                    onCheckedChange = { changeAppTheme() }
                 )
             }
         }
@@ -206,7 +215,8 @@ fun EditProfileScreen(
                 )
                 SettingsSwitches(
                     isArabic = isArabic,
-                    onLanguageToggle = { isArabic = !isArabic }
+                    onLanguageToggle = { themeViewModel.toggleLanguage()
+                        LocaleHelper.changeLanguage(context)}
                 )
             }
         }

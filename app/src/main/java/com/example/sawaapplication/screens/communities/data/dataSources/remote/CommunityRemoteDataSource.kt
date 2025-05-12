@@ -55,5 +55,22 @@ class CommunityRemoteDataSource @Inject constructor(
             Result.failure(e)
         }
     }
+    suspend fun joinCommunity(communityId: String, userId: String): Result<Unit> {
+        return try {
+            val docRef = firestore.collection("Community").document(communityId)
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(docRef)
+                val members = snapshot.get("members") as? List<String> ?: emptyList()
+                if (!members.contains(userId)) {
+                    val updatedMembers = members + userId
+                    transaction.update(docRef, "members", updatedMembers)
+                }
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }
 

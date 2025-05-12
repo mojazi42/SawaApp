@@ -49,6 +49,7 @@
     <string name="name">الاسم</string>
     <string name="language">اللغة</string>
     <string name="darkMode">الوضع الليلي</string>
+    <string name="post">نشر</string>
 
     <string name="notification">الإشعارات</string>
 

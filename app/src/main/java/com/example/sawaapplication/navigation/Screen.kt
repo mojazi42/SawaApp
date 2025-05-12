@@ -19,4 +19,10 @@ sealed class Screen(val route: String) {
     @Serializable data object EditProfile : Screen("editProfile")
     @Serializable data object Chat : Screen("chat")
     @Serializable data object Chats : Screen("chats")
+    //    @Serializable
+//    data object CreateNewEvent : Screen("create_event/{communityId}") {
+//        fun passCommunityId(communityId: String): String {
+//            return "create_event/$communityId"
+//        }
+    //  }
 }
