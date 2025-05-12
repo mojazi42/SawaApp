@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.sawaapplication.screens.communities.domain.model.Community
 import com.example.sawaapplication.screens.communities.domain.useCases.JoinCommunityUseCase
+import com.example.sawaapplication.screens.communities.domain.useCases.LeaveCommunityUseCase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
@@ -22,6 +23,7 @@ class ExploreCommunityViewModel @Inject constructor(
 ) : ViewModel() {
     val currentUserId = firebaseAuth.currentUser?.uid ?: ""
 
+    @Inject lateinit var leaveCommunityUseCase: LeaveCommunityUseCase
 
 
     var searchText by mutableStateOf("")
@@ -79,6 +81,17 @@ class ExploreCommunityViewModel @Inject constructor(
             }
         }
     }
+    fun leaveCommunity(communityId: String, userId: String) {
+        viewModelScope.launch {
+            val result = leaveCommunityUseCase(communityId, userId)
+            result.onSuccess {
+                fetchCommunities() // Refresh data
+            }.onFailure {
+                _error.value = "Failed to leave community: ${it.message}"
+            }
+        }
+    }
+
 
 
 

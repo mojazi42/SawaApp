@@ -48,6 +48,23 @@ class CommunityRepositoryImpl @Inject constructor(
     override suspend fun joinCommunity(communityId: String, userId: String): Result<Unit> {
         return remoteDataSource.joinCommunity(communityId, userId)
     }
+    override suspend fun leaveCommunity(communityId: String, userId: String): Result<Unit> {
+        return try {
+            val communityRef = firestore.collection("Community").document(communityId)
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(communityRef)
+                val members = snapshot.get("members") as? MutableList<String> ?: mutableListOf()
+                if (userId in members) {
+                    members.remove(userId)
+                    transaction.update(communityRef, "members", members)
+                }
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 
 }
 
