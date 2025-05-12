@@ -45,7 +45,7 @@ fun TopBar(
     title: String,
     showNotificationIcon: Boolean = false,
     showLogoCenter: Boolean = false,
-    imageUrl: String?,
+    imageUrl: String? = null,
     hasUnread: Boolean = false,
     onProfileClick: () -> Unit = {},
     onNotificationClick: () -> Unit = {},
@@ -200,7 +200,7 @@ fun getTopBar(
                                 imageVector = Icons.Outlined.ArrowCircleLeft,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(integerResource(id = R.integer.bottomBarIconSize).dp)
+                                modifier = Modifier.size(28.dp)
                             )
                         }
                     },
@@ -208,6 +208,24 @@ fun getTopBar(
                 )
             }
         }
+        Screen.Profile.route -> {
+            {
+                TopBar(
+                    title = "",
+                    navIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
 
         Screen.Chats.route -> {
             {
