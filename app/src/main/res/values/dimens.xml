@@ -151,5 +151,6 @@
     <integer name="descriptionBoxHeight">120</integer>
 
     <!--PostCard-->
+    <integer name="communityBoxSize">150</integer>
 
 </resources>
