@@ -16,15 +16,18 @@ import com.example.sawaapplication.screens.communities.domain.model.Community
 import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCreatedCommunitiesUseCase
 import kotlinx.coroutines.Job
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sawaapplication.screens.communities.domain.useCases.GetCommunityByIdUseCase
+import com.example.sawaapplication.screens.post.domain.model.Post
+import com.example.sawaapplication.screens.post.domain.repository.PostRepository
 import com.google.firebase.auth.FirebaseAuth
-
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
     private val createCommunityUseCase: CreateCommunityUseCase,
     private val getUserCreatedCommunitiesUseCase: GetUserCreatedCommunitiesUseCase,
-    private val getCommunityByIdUseCase: GetCommunityByIdUseCase, // Injected use case to fetch community by ID
+    private val getCommunityByIdUseCase: GetCommunityByIdUseCase,
+    private val postRepository: PostRepository,
     firebaseAuth: FirebaseAuth,
 ) : ViewModel() {
 
@@ -56,6 +59,14 @@ class CommunityViewModel @Inject constructor(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
+    //Fetching the posts in side community
+    private val _communityPosts = MutableStateFlow<List<Post>>(emptyList())
+    val communityPosts: StateFlow<List<Post>> = _communityPosts
+
+
+
+
 
     // Creates a new community, uploads its image, and updates state
     fun createCommunity(
@@ -116,6 +127,16 @@ class CommunityViewModel @Inject constructor(
                 _error.value = "Failed to load community detail: ${exception.message}"
             }
             _loading.value = false
+        }
+    }
+    fun fetchPostsForCommunity(communityId: String) {
+        viewModelScope.launch {
+            val result = postRepository.getPostsForCommunity(communityId)
+            result.onSuccess { posts ->
+                _communityPosts.value = posts
+            }.onFailure { exception ->
+                Log.e("CommunityViewModel", "Failed to fetch posts: ${exception.message}")
+            }
         }
     }
 

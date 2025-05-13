@@ -49,5 +49,23 @@ class EventInCommunityRemote @Inject constructor(
             Log.e("Firebase", "Error creating event: ${e.message}")
         }
     }
+    suspend fun fetchEventsFromCommunity(communityId: String): Result<List<Event>> {
+        return try {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("Community")
+                .document(communityId)
+                .collection("event")
+                .get()
+                .await()
+
+            val events = snapshot.documents.mapNotNull { document ->
+                document.toObject(Event::class.java)
+            }
+            Result.success(events)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }
 
