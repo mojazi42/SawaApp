@@ -35,14 +35,15 @@ fun ExploreCommunityCardList(
                 joinButton = {
                     JoinButton(
                         isJoined = isJoined,
-                        onClick = { onJoinClick(community.id) }
+                        onClick = {
+                            if (isJoined) onLeaveClick(community.id)
+                            else onJoinClick(community.id)
+                        }
                     )
                 },
                 onClick = {
-                    if (isJoined) onLeaveClick(community.id)
-                    else onJoinClick(community.id)
+                    onCommunityClick(community.id)
                 }
-
             )
 
             HorizontalDivider(
