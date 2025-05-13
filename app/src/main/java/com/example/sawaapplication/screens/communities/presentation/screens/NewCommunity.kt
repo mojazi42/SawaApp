@@ -135,7 +135,7 @@ fun NewCommunity(navController: NavController) {
 
         Box(
             modifier = Modifier
-                .size(150.dp)
+                .size(integerResource(R.integer.communityBoxSize).dp)
                 .clip(CircleShape)
                 .clickable {
                     if (photoPermissionState.status.isGranted) {
