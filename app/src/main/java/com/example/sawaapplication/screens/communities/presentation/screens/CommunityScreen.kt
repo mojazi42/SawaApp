@@ -1,15 +1,19 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +32,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -40,19 +45,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.theme.Gray
@@ -102,12 +113,13 @@ fun CommunityScreen(
     navController: NavHostController
 ) {
     val uiState = FakeCommunityUiState
-    var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Posts", "Events")
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
     LaunchedEffect(communityId) {
         Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
         viewModel.fetchCommunityDetail(communityId)
     }
+    var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
 
     Scaffold(
@@ -122,7 +134,7 @@ fun CommunityScreen(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
                 title = {},
-                windowInsets = WindowInsets(0)
+                windowInsets = WindowInsets(integerResource(R.integer.zero))
             )
         },
         floatingActionButton = {
@@ -131,11 +143,11 @@ fun CommunityScreen(
                     // FAB for Posts tab
                     FloatingActionButton(
                         onClick = { navController.navigate("create_post/$communityId") },
-                        modifier = Modifier.size(56.dp),
+                        modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
                         shape = CircleShape,
                         containerColor = PrimaryOrange,
                         contentColor = white,
-                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                        elevation = FloatingActionButtonDefaults.elevation(integerResource(R.integer.floatingActionButtonElevation).dp)
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = "Add Post")
                     }
@@ -144,11 +156,11 @@ fun CommunityScreen(
                     // FAB for Events tab
                     FloatingActionButton(
                         onClick = { navController.navigate("create_event/$communityId") },
-                        modifier = Modifier.size(56.dp),
+                        modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
                         shape = CircleShape,
                         containerColor = PrimaryOrange,
                         contentColor = white,
-                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                        elevation = FloatingActionButtonDefaults.elevation(integerResource(R.integer.floatingActionButtonElevation).dp)
                     ) {
                         Icon(Icons.Default.Event, contentDescription = "Add Event")
                     }
@@ -156,25 +168,25 @@ fun CommunityScreen(
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-        contentWindowInsets = WindowInsets(0)
+        contentWindowInsets = WindowInsets(integerResource(R.integer.zero))
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = innerPadding,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.lazyColumnSpacedBy).dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
                 AsyncImage(
                     model = communityDetail?.image,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(integerResource(R.integer.itemSpacerSize).dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
                 communityDetail?.let {
                     Text(
                         text = it.name,
@@ -187,29 +199,89 @@ fun CommunityScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
                 communityDetail?.let {
                     Text(
                         text = it.description,
                         style = MaterialTheme.typography.bodyMedium,
                         color = black,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 32.dp)
+                        modifier = Modifier.padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
                     )
                 }
-                Spacer(Modifier.height(20.dp))
-                Button(
-                    onClick = { /* TODO: Handle Join */ },
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
-                    elevation = ButtonDefaults.buttonElevation(4.dp)
-                ) {
-                    Icon(Icons.Default.PersonAdd, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Join Community", style = MaterialTheme.typography.bodyLarge)
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
+
+                if(!joined) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(integerResource(R.integer.padding).dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        //Un-joined button
+                        OutlinedButton(
+                            onClick = {
+                                joined = !joined
+                            /* TODO: Handle Join */
+                            },
+                            shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            border = BorderStroke(integerResource(R.integer.buttonStroke).dp, PrimaryOrange),
+                            contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, vertical = integerResource(R.integer.buttonPaddingV).dp),
+                            elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
+                            modifier = Modifier.weight(1f).wrapContentSize()
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.unjoind),
+                                contentDescription = "nu-join icon",
+                                tint = PrimaryOrange,
+                                modifier = Modifier
+                                    .size(integerResource(R.integer.iconSize).dp),
+                                )
+                            Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                            Text(stringResource(R.string.joined))
+                        }
+
+                        //Go to chat button
+                        OutlinedButton(
+                            onClick = { /* TODO: Handle Join */ },
+                            shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                            border = BorderStroke(integerResource(R.integer.buttonStroke).dp,PrimaryOrange),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, integerResource(R.integer.buttonPaddingV).dp),
+                            elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
+                            modifier = Modifier.weight(1f).wrapContentSize()
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.chats),
+                                contentDescription = "chat icon",
+                                tint = PrimaryOrange,
+                                modifier = Modifier
+                                    .size(integerResource(R.integer.iconSize).dp),
+                            )
+                            Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                            Text(stringResource(R.string.chat))
+                        }
+                    }
+                }else {
+                    Button(
+                        onClick = {
+                            joined = !joined
+                            /* TODO: Handle Join */
+                        },
+                        shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
+                        contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, vertical = integerResource(R.integer.buttonPaddingV).dp),
+                        elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
+                    ) {
+                        Icon(Icons.Default.PersonAdd, contentDescription = null)
+                        Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                        Text(stringResource(R.string.joinCommunity), style = MaterialTheme.typography.bodyLarge)
+                    }
                 }
-                Spacer(Modifier.height(24.dp))
+
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
                 TabRow(
                     selectedTabIndex = selectedTab,
@@ -218,7 +290,7 @@ fun CommunityScreen(
                         TabRowDefaults.Indicator(
                             Modifier
                                 .tabIndicatorOffset(positions[selectedTab])
-                                .height(3.dp),
+                                .height(integerResource(R.integer.tabRowHeight).dp),
                             color = PrimaryOrange
                         )
                     }
@@ -237,7 +309,7 @@ fun CommunityScreen(
                         )
                     }
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH3ed).dp))
             }
 
             if (selectedTab == 0) {
