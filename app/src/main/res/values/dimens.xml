@@ -147,4 +147,9 @@
     <integer name="massageFontSize">14</integer>
     <integer name="createTimeFontSize">14</integer>
 
+    <!--NewCommunity-->
+    <integer name="descriptionBoxHeight">120</integer>
+
+    <!--PostCard-->
+
 </resources>
