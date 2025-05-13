@@ -6,7 +6,7 @@ data class Event(
     val title: String = "",
     val description: String = "",
     val date: String = "",
-    val location: GeoPoint,
+    val location: GeoPoint = GeoPoint(0.0, 0.0),
     val memberLimit: Int = 0,
     val createdBy: String ="",
     val imageUri:String = ""

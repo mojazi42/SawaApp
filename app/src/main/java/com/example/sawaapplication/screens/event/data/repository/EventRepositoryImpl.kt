@@ -12,4 +12,9 @@ class EventRepositoryImpl  @Inject constructor(
     override suspend fun createEventInCommunity(communityId: String,event: Event,imageUri: Uri) {
         return remoteDataSource.createEventInCommunity(communityId,event,imageUri)
     }
+
+    override suspend fun fetchEventsFromCommunity(communityId: String): Result<List<Event>> {
+        return remoteDataSource.fetchEventsFromCommunity(communityId)
+    }
+
 }

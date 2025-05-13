@@ -5,4 +5,5 @@ import com.example.sawaapplication.screens.event.domain.model.Event
 
 interface EventRepository {
     suspend fun createEventInCommunity(communityId: String,event: Event,imageUri: Uri)
+    suspend fun fetchEventsFromCommunity(communityId: String): Result<List<Event>>
 }
