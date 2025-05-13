@@ -39,6 +39,8 @@ class CreateEventViewModel @Inject constructor(
     val success = mutableStateOf(false)
     val error = mutableStateOf<String?>(null)
     var isMapVisible by mutableStateOf(false)
+    private var hasAskedForLocationPermission by mutableStateOf(false)
+    private var hasAskedForPhotoPermission by mutableStateOf(false)
 
 
     val membersLimit: Int?
@@ -85,36 +87,10 @@ class CreateEventViewModel @Inject constructor(
             }
         }
     }
-    // check if location permission is requested
-//    fun shouldRequestLocation(): Boolean {
-//        val alreadyRequested = locationPrefs.hasRequested()
-//        if (!alreadyRequested) {
-//            locationPrefs.markAsRequested()
-//            return true
-//        }
-//        return false
-//    }
-//    // check if photo permission is requested
-//    fun shouldRequestPhoto(): Boolean {
-//        val alreadyRequested = photoPrefs.hasRequested()
-//        if (!alreadyRequested) {
-//            photoPrefs.markAsRequested()
-//            return true
-//        }
-//        return false
-//    }
-
-    var hasAskedForLocationPermission by mutableStateOf(false)
-    var hasAskedForPhotoPermission by mutableStateOf(false)
 
     fun shouldRequestLocation(): Boolean = !hasAskedForLocationPermission
     fun shouldRequestPhoto(): Boolean = !hasAskedForPhotoPermission
 
-    fun markLocationPermissionRequested() {
-        hasAskedForLocationPermission = true
-    }
-
-    fun markPhotoPermissionRequested() {
-        hasAskedForPhotoPermission = true
-    }
+    fun markLocationPermissionRequested() = locationPrefs.markAsRequested()
+    fun markPhotoPermissionRequested() = photoPrefs.markAsRequested()
 }
