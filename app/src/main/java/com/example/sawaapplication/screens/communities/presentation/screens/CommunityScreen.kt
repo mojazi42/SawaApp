@@ -46,14 +46,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -66,6 +67,9 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
+import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
+import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
 import com.example.sawaapplication.ui.theme.black
@@ -103,6 +107,7 @@ private val FakeCommunityUiState = CommunityUiState(
         )
     )
 )
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
@@ -112,6 +117,8 @@ fun CommunityScreen(
     onClick: () -> Unit,
     navController: NavHostController
 ) {
+    val context = LocalContext.current
+    val fetchEventViewModel: FetchEventViewModel = hiltViewModel()
     val uiState = FakeCommunityUiState
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
@@ -119,16 +126,18 @@ fun CommunityScreen(
         Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
         viewModel.fetchCommunityDetail(communityId)
         viewModel.fetchPostsForCommunity(communityId)
+        fetchEventViewModel.loadEvents(communityId)
     }
     val posts by viewModel.communityPosts.collectAsState()
+    var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
-
+    val events by fetchEventViewModel.events.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick =  {navController.navigate(Screen.Community.route)}) {
+                    IconButton(onClick = { navController.navigate(Screen.Community.route) }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -154,6 +163,7 @@ fun CommunityScreen(
                         Icon(Icons.Default.Edit, contentDescription = "Add Post")
                     }
                 }
+
                 1 -> {
                     // FAB for Events tab
                     FloatingActionButton(
@@ -213,7 +223,7 @@ fun CommunityScreen(
                 }
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
-                if(!joined) {
+                if (!joined) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -225,14 +235,22 @@ fun CommunityScreen(
                         OutlinedButton(
                             onClick = {
                                 joined = !joined
-                            /* TODO: Handle Join */
+                                /* TODO: Handle Join */
                             },
                             shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            border = BorderStroke(integerResource(R.integer.buttonStroke).dp, PrimaryOrange),
-                            contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, vertical = integerResource(R.integer.buttonPaddingV).dp),
+                            border = BorderStroke(
+                                integerResource(R.integer.buttonStroke).dp,
+                                PrimaryOrange
+                            ),
+                            contentPadding = PaddingValues(
+                                horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                                vertical = integerResource(R.integer.buttonPaddingV).dp
+                            ),
                             elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
-                            modifier = Modifier.weight(1f).wrapContentSize()
+                            modifier = Modifier
+                                .weight(1f)
+                                .wrapContentSize()
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.unjoind),
@@ -240,7 +258,7 @@ fun CommunityScreen(
                                 tint = PrimaryOrange,
                                 modifier = Modifier
                                     .size(integerResource(R.integer.iconSize).dp),
-                                )
+                            )
                             Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
                             Text(stringResource(R.string.joined))
                         }
@@ -249,11 +267,19 @@ fun CommunityScreen(
                         OutlinedButton(
                             onClick = { /* TODO: Handle Join */ },
                             shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
-                            border = BorderStroke(integerResource(R.integer.buttonStroke).dp,PrimaryOrange),
+                            border = BorderStroke(
+                                integerResource(R.integer.buttonStroke).dp,
+                                PrimaryOrange
+                            ),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, integerResource(R.integer.buttonPaddingV).dp),
+                            contentPadding = PaddingValues(
+                                horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                                integerResource(R.integer.buttonPaddingV).dp
+                            ),
                             elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
-                            modifier = Modifier.weight(1f).wrapContentSize()
+                            modifier = Modifier
+                                .weight(1f)
+                                .wrapContentSize()
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.chats),
@@ -266,7 +292,7 @@ fun CommunityScreen(
                             Text(stringResource(R.string.chat))
                         }
                     }
-                }else {
+                } else {
                     Button(
                         onClick = {
                             joined = !joined
@@ -274,12 +300,18 @@ fun CommunityScreen(
                         },
                         shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
-                        contentPadding = PaddingValues(horizontal = integerResource(R.integer.buttonPaddingH).dp, vertical = integerResource(R.integer.buttonPaddingV).dp),
+                        contentPadding = PaddingValues(
+                            horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                            vertical = integerResource(R.integer.buttonPaddingV).dp
+                        ),
                         elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
                     ) {
                         Icon(Icons.Default.PersonAdd, contentDescription = null)
                         Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
-                        Text(stringResource(R.string.joinCommunity), style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            stringResource(R.string.joinCommunity),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
 
@@ -326,8 +358,25 @@ fun CommunityScreen(
 
                 }
             } else {
-                item {
-                    EventCardScreen(navController = navController, communityId = communityId)
+//                item {
+//                    EventCardScreen(navController = navController, communityId = communityId)
+//                }
+                items(events) { event ->
+                    EventCard(
+                        image = event.imageUri,
+                        title = event.title,
+                        description = event.description,
+                        location = context.getCityNameFromGeoPoint(event.location),
+                        participants = event.memberLimit,
+                        community = "Name",
+                        time = "3:20",
+                        joined = true,
+                        onJoinClick = {joinedevent = !joinedevent},
+                        showCancelButton = true,
+                        modifier =  Modifier.padding(4.dp)
+                    )
+
+
                 }
             }
         }
