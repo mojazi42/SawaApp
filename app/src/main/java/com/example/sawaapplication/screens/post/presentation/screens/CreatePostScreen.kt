@@ -1,6 +1,8 @@
 package com.example.sawaapplication.screens.post.presentation.screens
 
+import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddAPhoto
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -26,12 +29,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -40,19 +46,53 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.post.presentation.vmModels.CreatePostViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CreatePostScreen(
     navController: NavController,
     communityId : String
 ) {
+    val context = LocalContext.current
     val viewModel: CreatePostViewModel = hiltViewModel()
     val imageUri by remember { derivedStateOf { viewModel.imageUri } }
+
+    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         viewModel.imageUri = uri
+
+    }
+
+    // Photo Permission Dialog
+    if (showPhotoPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoPermissionDialog = false },
+            title = { Text("Photo Permission") },
+            text = { Text("We need access to your photos so you can add an image for the event.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.markPhotoPermissionRequested()
+                    photoPermissionState.launchPermissionRequest()
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Deny")
+                }
+            }
+        )
     }
 
     LaunchedEffect(communityId) {
@@ -111,7 +151,17 @@ fun CreatePostScreen(
                 imageVector = Icons.Outlined.AddAPhoto,
                 contentDescription = "Add photo",
                 modifier = Modifier
-                    .clickable { imagePickerLauncher.launch("image/*") }
+                    .clickable {
+                        if (photoPermissionState.status.isGranted) {
+                            imagePickerLauncher.launch("image/*")
+                        } else {
+                            if (viewModel.shouldRequestPhoto()) {
+                                showPhotoPermissionDialog = true
+                            } else {
+                                Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
                     .padding(8.dp),
                 tint = Color.Gray
             )
