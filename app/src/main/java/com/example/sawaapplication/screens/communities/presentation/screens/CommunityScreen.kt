@@ -118,7 +118,9 @@ fun CommunityScreen(
     LaunchedEffect(communityId) {
         Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
         viewModel.fetchCommunityDetail(communityId)
+        viewModel.fetchPostsForCommunity(communityId)
     }
+    val posts by viewModel.communityPosts.collectAsState()
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
 
@@ -313,8 +315,15 @@ fun CommunityScreen(
             }
 
             if (selectedTab == 0) {
-                items(uiState.posts) { post ->
-                    PostCard(post)
+                items(posts) { post ->
+                    PostCard(
+                        post = PostUiModel(
+                            username = post.userId,
+                            userAvatarUrl = "",
+                            postImageUrl = post.imageUri
+                        )
+                    )
+
                 }
             } else {
                 item {
