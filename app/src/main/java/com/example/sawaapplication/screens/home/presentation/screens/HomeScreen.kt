@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -99,7 +98,7 @@ fun MyEventsTab() {
             val imagePainter = painterResource(id = R.drawable.first)
 
             EventCard(
-                image = imagePainter,
+                image = imagePainter.toString(),
                 community = "Saudi Innovation Community",
                 title = "Fine art between past and present",
                 description = "World Art Day, which falls on April 15, celebrates artists and their contributions...",
