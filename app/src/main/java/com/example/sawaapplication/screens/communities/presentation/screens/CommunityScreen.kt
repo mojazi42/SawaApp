@@ -74,6 +74,7 @@ import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
+import com.google.firebase.auth.FirebaseAuth
 
 data class PostUiModel(
     val username: String,
@@ -113,6 +114,7 @@ private val FakeCommunityUiState = CommunityUiState(
 fun CommunityScreen(
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
+    eventViewModel: FetchEventViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
     onClick: () -> Unit,
     navController: NavHostController
@@ -120,6 +122,7 @@ fun CommunityScreen(
     val context = LocalContext.current
     val fetchEventViewModel: FetchEventViewModel = hiltViewModel()
     val uiState = FakeCommunityUiState
+    val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
     LaunchedEffect(communityId) {
@@ -370,8 +373,22 @@ fun CommunityScreen(
                         participants = event.memberLimit,
                         community = "Name",
                         time = "3:20",
-                        joined = true,
-                        onJoinClick = {joinedevent = !joinedevent},
+                        joined = event.joinedUsers.contains(userId),
+                        onJoinClick = {
+                            if (event.joinedUsers.contains(userId)) {
+                                eventViewModel.leaveEvent(
+                                    communityId = communityId,
+                                    eventId = event.id,
+                                    userId = userId
+                                )
+                            } else {
+                                eventViewModel.joinEvent(
+                                    communityId = communityId,
+                                    eventId = event.id,
+                                    userId = userId
+                                )
+                            }
+                                      },
                         showCancelButton = true,
                         modifier =  Modifier.padding(4.dp)
                     )
