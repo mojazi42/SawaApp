@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import android.util.Log
+import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.example.sawaapplication.core.sharedPreferences.LocationSharedPreference
 import com.example.sawaapplication.core.sharedPreferences.PhotoSharedPreference
 import com.google.firebase.firestore.GeoPoint
@@ -22,8 +23,7 @@ import kotlinx.coroutines.Job
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
     private val createEventUseCase: CreateEventUseCase,
-    private val locationPrefs: LocationSharedPreference,
-    private val photoPrefs: PhotoSharedPreference
+    private val permissionHandler: PermissionHandler
 ) : ViewModel() {
 
     var communityId by mutableStateOf<String?>("")
@@ -88,9 +88,9 @@ class CreateEventViewModel @Inject constructor(
         }
     }
 
-    fun shouldRequestLocation(): Boolean = !hasAskedForLocationPermission
-    fun shouldRequestPhoto(): Boolean = !hasAskedForPhotoPermission
+    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
+    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 
-    fun markLocationPermissionRequested() = locationPrefs.markAsRequested()
-    fun markPhotoPermissionRequested() = photoPrefs.markAsRequested()
+    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
+    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 }
