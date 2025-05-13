@@ -81,4 +81,7 @@ class FirebaseAuthDataSource @Inject constructor(
         }
 
     }
+    fun getCurrentUserId(): String? {
+        return FirebaseAuth.getInstance().currentUser?.uid
+    }
 }
