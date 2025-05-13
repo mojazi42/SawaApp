@@ -27,15 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
@@ -50,20 +46,19 @@ import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 
 @Composable
 fun EventCard(
-    image: Painter,
+    image: String,
     community: String,
     title: String,
     description: String,
     location: String,
     time: String,
     participants: Int,
-    joined: Boolean,                       // <-- Add this
+    joined: Boolean,
     onJoinClick: () -> Unit,
     showCancelButton: Boolean = false,
+    joinedUsers: List<String> = emptyList(),
     modifier: Modifier = Modifier
 ) {
-    val profileViewModel: ProfileViewModel = hiltViewModel()
-    val imageUrl by profileViewModel.profileImageUrl.collectAsState()
 
     OutlinedCard(
         modifier = modifier
@@ -83,8 +78,8 @@ fun EventCard(
         Column {
             Row {
                 Image(
-                    painter = if (imageUrl != null)
-                        rememberAsyncImagePainter(imageUrl)
+                    painter = if (image != null)
+                        rememberAsyncImagePainter(image)
                     else
                         painterResource(id = R.drawable.ic_launcher_background),
                     contentDescription = "Profile image",
@@ -175,11 +170,12 @@ fun EventCard(
                     )
                     Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
                     Text(
-                        text = "$participants",
+                        text = "${participants}/${joinedUsers.size}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
+
             }
         }
     }

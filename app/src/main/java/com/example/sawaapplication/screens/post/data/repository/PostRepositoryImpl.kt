@@ -7,9 +7,14 @@ import com.example.sawaapplication.screens.post.domain.repository.PostRepository
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
-    private val remoteDataSource: PostsInCommunityRemote
-): PostRepository {
+    private val remoteDataSource: PostsInCommunityRemote,
+) : PostRepository {
+
+    override suspend fun getPostsForCommunity(communityId: String): Result<List<Post>> {
+        return remoteDataSource.getPostsForCommunity(communityId)
+    }
+
     override suspend fun createPostInCommunity(communityId: String, post: Post, imageUri: Uri?) {
-        return remoteDataSource.createPostInCommunity(communityId, post, imageUri)
+        remoteDataSource.createPostInCommunity(communityId, post, imageUri)
     }
 }

@@ -60,4 +60,23 @@ class PostsInCommunityRemote @Inject constructor(
         }
     }
 
-}
+        suspend fun getPostsForCommunity(communityId: String): Result<List<Post>> {
+            return try {
+                val snapshot = firestore.collection("Community")
+                    .document(communityId)
+                    .collection("posts")
+                    .get()
+                    .await()
+
+                val posts = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(Post::class.java)?.copy(id = doc.id)
+                }
+
+                Result.success(posts)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+

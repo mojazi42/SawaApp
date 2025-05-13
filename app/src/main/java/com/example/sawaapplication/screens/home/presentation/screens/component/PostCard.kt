@@ -1,7 +1,8 @@
 package com.example.sawaapplication.screens.home.presentation.screens.component
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,14 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,138 +30,146 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
-import com.example.sawaapplication.R
-import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+import coil.compose.AsyncImage
+import com.example.sawaapplication.screens.post.domain.model.Post
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PostCard(
-    community: String,
-    name: String,
-    username: String,
-    time: String,
-    text: String,
-    likes: Int,
-    profileImage: Painter,
+    post: Post,
+    communityName: String,
+    userName: String,
+    userImage: String,
     onClick: () -> Unit,
+    onLikeClick: (Post) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isLiked by remember { mutableStateOf(false) }
-    var likeCount by remember { mutableStateOf(likes) }
+    // State to track if the post is liked
+//    var isLiked by remember { mutableStateOf(false) }
+    var isLiked by remember { mutableStateOf(post.likes > 0) }
 
-    val profileViewModel: ProfileViewModel = hiltViewModel()
-    val imageUrl by profileViewModel.profileImageUrl.collectAsState()
+    // Set icon color based on like state
+    val likeIconColor = if (isLiked) Color.Red else Color.Gray
 
-    Column(
+    val formattedDate = remember(post.createdAt) {
+        try {
+            val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+            val date = parser.parse(post.createdAt)
+            val formatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+            formatter.format(date ?: Date())
+        } catch (e: Exception) {
+            "Unknown date"
+        }
+    }
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(integerResource(id = R.integer.smallSpace).dp)
+            .padding(horizontal = 8.dp)
     ) {
-        Text(
-            text = community,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.Gray,
-            modifier = Modifier.padding(start = integerResource(id=R.integer.homeCommunityNamePostPadding).dp)
-        )
+        Column(modifier = Modifier.padding(16.dp)) {
 
-        Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
-
-        Row(
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier
-                .padding(start = integerResource(id = R.integer.extraSmallSpace).dp)
-                .fillMaxWidth()
-        ) {
-            Image(
-                painter = if (imageUrl != null)
-                    rememberAsyncImagePainter(imageUrl)
-                else
-                    painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Profile image",
-                contentScale = ContentScale.Crop,
-
+            Box(
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .size(integerResource(id = R.integer.homePostProfileImage).dp)
-            )
-
-            Spacer(modifier = Modifier.width(integerResource(id=R.integer.smallSpace).dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-
-                    ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(integerResource(id = R.integer.smallerSpace).dp))
-                        Text(
-                            text = "@$username",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-
-                    Text(
-                        text = "• $time",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                    .padding(start = 8.dp)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Gray,
+                        shape = RoundedCornerShape(4.dp)
                     )
-                }
-
-                Spacer(modifier = Modifier.height(integerResource(id=R.integer.extraSmallSpace).dp))
-
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
                 Text(
-                    text = text,
-                    style = MaterialTheme.typography.bodySmall,
-                    //maxLines = 3,
-                    //overflow = TextOverflow.Ellipsis
+                    text = communityName,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(start = integerResource(id = R.integer.smallerSpace).dp)
-                    .align(Alignment.Bottom),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Row with user image + name + date
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        isLiked = !isLiked
-                        likeCount = if (isLiked) likeCount + 1 else likeCount - 1
-                    }
-                ) {
-                    Icon(
-                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Like",
-                        tint = if (isLiked) Color.Red else Color.Gray,
-                        modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
+                if (userImage.isNotBlank()) {
+                    AsyncImage(
+                        model = userImage,
+                        contentDescription = "User Profile Image",
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
                     )
-                    Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "$likeCount",
+                        text = userName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "Posted on $formattedDate",
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.Gray
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Post content
+            Text(
+                text = post.content,
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            // Post image (optional)
+            if (post.imageUri.isNotBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                AsyncImage(
+                    model = post.imageUri,
+                    contentDescription = "Post Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Likes count
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${post.likes} Likes",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+
+                IconButton(onClick = {
+                    // Toggle the like status
+                    isLiked = !isLiked
+                    onLikeClick(post) // Notify the viewModel to update the like count in FireStore
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Like",
+                        tint = likeIconColor // Change the tint based on like state
                     )
                 }
             }
