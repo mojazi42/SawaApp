@@ -32,7 +32,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
@@ -44,12 +43,12 @@ fun PostCard(post: PostUiModel) {
 
     Card(
         Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(integerResource(R.integer.postCardRoundedCornerShape).dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = white),
         elevation = CardDefaults.cardElevation(integerResource(R.integer.postCardElevation).dp)
     ) {
         Column {
-            Column(Modifier.padding(integerResource(R.integer.postCardPadding).dp)) {
+            Column(Modifier.padding(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
                         model = post.userAvatarUrl,
@@ -63,6 +62,17 @@ fun PostCard(post: PostUiModel) {
 
                 Spacer(Modifier.height(integerResource(R.integer.smallerSpace).dp))
 
+                // ✅ Show text content if not blank
+                if (post.content.isNotBlank()) {
+                    Text(
+                        text = post.content,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = black
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                // ✅ Show image if not blank
                 if (post.postImageUrl.isNotBlank()) {
                     AsyncImage(
                         model = post.postImageUrl,
@@ -73,16 +83,10 @@ fun PostCard(post: PostUiModel) {
                             .clip(RoundedCornerShape(integerResource(R.integer.chatRoundedCornerShape).dp)),
                         contentScale = ContentScale.Crop
                     )
-                } else {
-                    Text(
-                        text = "This is a text-only post by ${post.username}.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = black
-                    )
                 }
             }
 
-
+            // Like section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start,
