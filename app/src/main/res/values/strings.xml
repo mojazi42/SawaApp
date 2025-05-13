@@ -75,4 +75,16 @@
     <!-- Chats Screen-->
     <string name="chats">Chats</string>
 
+    <!-- Event Card Screen-->
+    <string name="upcomingEvents">Upcoming Events</string>
+
+    <!--NewCommunity-->
+    <string name="communityCreated">Community Created</string>
+    <string name="uploadImage">Please upload an image</string>
+    <string name="tapToUploadImage">Tap to upload\nimage</string>
+    <string name="communityName">Community Name</string>
+    <string name="newCommDescription">Description</string>
+
+    <!--PostCard-->
+
 </resources>

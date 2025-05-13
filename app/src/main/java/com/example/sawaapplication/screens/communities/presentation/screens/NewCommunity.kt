@@ -37,10 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -59,11 +62,11 @@ fun NewCommunity(navController: NavController) {
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
     var showPhotoPermissionDialog by remember { mutableStateOf(false) }
 
+    val communityCreated = stringResource(R.string.communityCreated)
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         viewModel.imageUri = uri
-
     }
 
     // Photo Permission Dialog
@@ -93,16 +96,15 @@ fun NewCommunity(navController: NavController) {
 
     if (success) {
         LaunchedEffect(success) {
-            Toast.makeText(context, "Community Created!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, communityCreated, Toast.LENGTH_SHORT).show()
             navController.popBackStack()
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(integerResource(R.integer.padding).dp),
+        verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.mediumSpace).dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -110,12 +112,13 @@ fun NewCommunity(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(onClick = { navController.popBackStack() }) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
+            val uploadImage = stringResource(R.string.uploadImage)
             Button(
                 onClick = {
                     if (viewModel.imageUri == null) {
-                        Toast.makeText(context, "Please upload an image", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, uploadImage, Toast.LENGTH_SHORT).show()
                     } else {
                         viewModel.createCommunity(
                             name = viewModel.name,
@@ -126,7 +129,7 @@ fun NewCommunity(navController: NavController) {
                     }
                 }
             ) {
-                Text("Create")
+                Text(stringResource(R.string.create))
             }
         }
 
@@ -148,8 +151,6 @@ fun NewCommunity(navController: NavController) {
                 .background(Color.LightGray)
                 .align(Alignment.CenterHorizontally),
             contentAlignment = Alignment.Center,
-
-
             ) {
             if (viewModel.imageUri != null) {
                 Image(
@@ -159,7 +160,7 @@ fun NewCommunity(navController: NavController) {
                     contentScale = ContentScale.Crop
                 )
             } else {
-                Text("Tap to upload\nimage", textAlign = TextAlign.Center)
+                Text(stringResource(R.string.tapToUploadImage), textAlign = TextAlign.Center)
             }
         }
 
@@ -167,7 +168,7 @@ fun NewCommunity(navController: NavController) {
         OutlinedTextField(
             value = viewModel.name,
             onValueChange = { viewModel.name = it },
-            label = { Text("Community Name") },
+            label = { Text(stringResource(R.string.communityName)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -175,10 +176,10 @@ fun NewCommunity(navController: NavController) {
         OutlinedTextField(
             value = viewModel.description,
             onValueChange = { viewModel.description = it },
-            label = { Text("Description") },
+            label = { Text(stringResource(R.string.newCommDescription)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp),
+                .height(integerResource(R.integer.descriptionBoxHeight).dp),
             maxLines = 5
         )
     }

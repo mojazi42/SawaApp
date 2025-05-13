@@ -41,7 +41,5 @@ fun ExploreScreen(
                 viewModel.leaveCommunity(communityId, viewModel.currentUserId)
             }
         )
-
-
     }
 }
