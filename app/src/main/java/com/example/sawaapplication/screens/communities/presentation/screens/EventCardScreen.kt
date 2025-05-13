@@ -15,7 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -50,16 +52,16 @@ fun EventCardScreen(navController: NavHostController, communityId: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(integerResource(R.integer.padding).dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Upcoming Events",
+            text = stringResource(R.string.upcomingEvents),
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             color = PrimaryOrange
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(integerResource(R.integer.mediumSpace).dp))
 
         events.forEachIndexed { index, event ->
             EventCard(
@@ -74,7 +76,7 @@ fun EventCardScreen(navController: NavHostController, communityId: String) {
                 onJoinClick = { joinStates[index] = !joinStates[index] },
                 showCancelButton = false
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(integerResource(R.integer.smallerSpace).dp))
         }
     }
 }
