@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
 /*import com.example.sawaapplication.screens.chat.domain.model.Message
 import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel*/
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
@@ -60,10 +59,11 @@ import java.util.Locale
 @Composable
 fun ChatScreen(
     communityId: String,
-    //viewModel: ChatViewModel = hiltViewModel(),
+//    viewModel: ChatViewModel = hiltViewModel(),
     navController: NavController
 ) {}
-  /*  val profileViewModel: ProfileViewModel = hiltViewModel()
+/*
+    val profileViewModel: ProfileViewModel = hiltViewModel()
     val profileImageUrl by profileViewModel.profileImageUrl.collectAsState()
 
     val communityViewModel: CommunityViewModel = hiltViewModel()
@@ -108,16 +108,16 @@ fun ChatScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp)
+                .padding(top = integerResource(R.integer.topBarPadding).dp)
                 .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
         ) {
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(integerResource(R.integer.topBarSpaceH).dp))
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     Icons.Outlined.ArrowCircleLeft,
                     contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(integerResource(R.integer.chatTopBarIconSize).dp)
                 )
             }
             communityName?.let {
@@ -126,7 +126,7 @@ fun ChatScreen(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 21.dp)
+                    modifier = Modifier.padding(start = integerResource(R.integer.textStartPadding).dp)
                 )
             }
         }
@@ -135,7 +135,7 @@ fun ChatScreen(
         LazyColumn(
             modifier = Modifier.weight(1f),
             state = listState,
-            contentPadding = PaddingValues(bottom = 16.dp)
+            contentPadding = PaddingValues(bottom = integerResource(R.integer.textFontSize).dp)
         ) {
             items(messages) { message ->
                 val senderInfo = senderInfoMap[message.senderId]
@@ -151,7 +151,7 @@ fun ChatScreen(
         // Input Row
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = integerResource(R.integer.inputRowPaddingH).dp)
         ) {
             CustomTextField(
                 value = messageText,
@@ -159,11 +159,11 @@ fun ChatScreen(
                 modifier = Modifier.weight(1f),
                 label = "Type your message"
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(integerResource(R.integer.extraSmallSpace).dp))
 
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(integerResource(R.integer.boxSize).dp)
                     .clip(CircleShape)
                     .background(firstOrange)
                     .clickable {
@@ -188,7 +188,7 @@ fun ChatScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(integerResource(R.integer.chatScreenSpacer).dp))
     }
 }
 
@@ -203,32 +203,32 @@ fun ChatBubble(message: Message, isCurrentUser: Boolean, image: String?, userNam
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(integerResource(R.integer.rowColumnPadding).dp),
         horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(integerResource(R.integer.horizontalArrangementSpace).dp)
         ) {
             if (!isCurrentUser) {
                 AsyncImage(
                     model = image,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(integerResource(R.integer.imageSize).dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
                 )
             }
             Column(
                 horizontalAlignment = if (isCurrentUser) Alignment.End else Alignment.Start,
-                modifier = Modifier.widthIn(max = 290.dp)
+                modifier = Modifier.widthIn(max = integerResource(R.integer.columnMaxSize).dp)
             ) {
                 if (userName != null) {
                     Text(
                         userName,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 12.sp,
+                        fontSize = integerResource(R.integer.userNameFontSize).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
                         textAlign = if (isCurrentUser) TextAlign.End else TextAlign.Start,
                         modifier = Modifier
@@ -238,41 +238,44 @@ fun ChatBubble(message: Message, isCurrentUser: Boolean, image: String?, userNam
 
                 Column(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(integerResource(R.integer.chatRoundedCornerShape).dp))
                         .background(if (isCurrentUser) Color(0xFFFD7B4D) else Color(0xFFD6D6D6))
-                        .padding(8.dp)
+                        .padding(integerResource(R.integer.rowColumnPadding).dp)
                 ) {
                     Text(
                         message.text,
                         color =
                         if (isCurrentUser) white else black,
-                        fontSize = 14.sp,
+                        fontSize = integerResource(R.integer.massageFontSize).sp,
                     )
+
+                    val createTimeFontSize = integerResource(R.integer.createTimeFontSize).sp
+                    val extraSmallSpace = integerResource(R.integer.createTimeFontSize).dp
                     // Show the formatted time below the message
                     formattedTime?.let {
                         Text(
                             text = it,
                             color = if (isCurrentUser) white else black,
                             style = MaterialTheme.typography.bodySmall,
-                            fontSize = 10.sp,
+                            fontSize = createTimeFontSize,
                             modifier = Modifier
-                                .padding(top = 4.dp)
+                                .padding(top = extraSmallSpace)
                                 .align(if (isCurrentUser) Alignment.Start else Alignment.End ),
                         )
                     }
                 }
             }
-
             if (isCurrentUser) {
                 AsyncImage(
                     model = image,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(integerResource(R.integer.imageSize).dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
             }
         }
     }
-}*/
+}
+*/
