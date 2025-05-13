@@ -46,53 +46,47 @@ fun PostCard(post: PostUiModel) {
         colors = CardDefaults.cardColors(containerColor = white),
         elevation = CardDefaults.cardElevation(integerResource(R.integer.postCardElevation).dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            // 1) Avatar + Username
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = post.userAvatarUrl,
-                    contentDescription = "${post.username} avatar",
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = post.username,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = black
-                )
-            }
+        Column {
+            Column(Modifier.padding(12.dp)) {
+                // User info
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AsyncImage(
+                        model = post.userAvatarUrl,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp).clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(post.username, style = MaterialTheme.typography.bodyMedium, color = black)
+                }
 
-            Spacer(Modifier.height(8.dp))
-
-            // 2) Text content (if any)
-            if (post.content.isNotBlank()) {
-                Text(
-                    text = post.content,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = black,
-                    modifier = Modifier.fillMaxWidth()
-                )
                 Spacer(Modifier.height(8.dp))
-            }
-            // 3) Image (if any)
-            if (post.postImageUrl.isNotBlank()) {
-                AsyncImage(
-                    model = post.postImageUrl,
-                    contentDescription = "Post image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.height(8.dp))
+
+                // ✅ Show text content if not blank
+                if (post.content.isNotBlank()) {
+                    Text(
+                        text = post.content,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = black
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                // ✅ Show image if not blank
+                if (post.postImageUrl.isNotBlank()) {
+                    AsyncImage(
+                        model = post.postImageUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
 
-
-            // 4) Like button + count
+            // Like section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start,
@@ -103,17 +97,12 @@ fun PostCard(post: PostUiModel) {
                     likeCount += if (isLiked) 1 else -1
                 }) {
                     Icon(
-                        imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = if (isLiked) "Unlike" else "Like",
+                        imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Like",
                         tint = if (isLiked) MaterialTheme.colorScheme.error else Gray
                     )
                 }
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = "$likeCount",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Gray
-                )
+                Text("$likeCount", style = MaterialTheme.typography.bodySmall, color = Gray)
             }
         }
     }
