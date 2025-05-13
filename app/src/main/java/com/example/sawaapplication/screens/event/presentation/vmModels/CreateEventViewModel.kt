@@ -15,13 +15,15 @@ import java.util.Date
 import javax.inject.Inject
 import android.util.Log
 import com.example.sawaapplication.core.sharedPreferences.LocationSharedPreference
+import com.example.sawaapplication.core.sharedPreferences.PhotoSharedPreference
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.Job
 
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
     private val createEventUseCase: CreateEventUseCase,
-    private val locationPrefs: LocationSharedPreference
+    private val locationPrefs: LocationSharedPreference,
+    private val photoPrefs: PhotoSharedPreference
 ) : ViewModel() {
 
     var communityId by mutableStateOf<String?>("")
@@ -83,12 +85,36 @@ class CreateEventViewModel @Inject constructor(
             }
         }
     }
-    fun shouldRequestLocation(): Boolean { // check if the permission is requested
-        val alreadyRequested = locationPrefs.hasRequested()
-        if (!alreadyRequested) {
-            locationPrefs.markAsRequested()
-            return true
-        }
-        return false
+    // check if location permission is requested
+//    fun shouldRequestLocation(): Boolean {
+//        val alreadyRequested = locationPrefs.hasRequested()
+//        if (!alreadyRequested) {
+//            locationPrefs.markAsRequested()
+//            return true
+//        }
+//        return false
+//    }
+//    // check if photo permission is requested
+//    fun shouldRequestPhoto(): Boolean {
+//        val alreadyRequested = photoPrefs.hasRequested()
+//        if (!alreadyRequested) {
+//            photoPrefs.markAsRequested()
+//            return true
+//        }
+//        return false
+//    }
+
+    var hasAskedForLocationPermission by mutableStateOf(false)
+    var hasAskedForPhotoPermission by mutableStateOf(false)
+
+    fun shouldRequestLocation(): Boolean = !hasAskedForLocationPermission
+    fun shouldRequestPhoto(): Boolean = !hasAskedForPhotoPermission
+
+    fun markLocationPermissionRequested() {
+        hasAskedForLocationPermission = true
+    }
+
+    fun markPhotoPermissionRequested() {
+        hasAskedForPhotoPermission = true
     }
 }

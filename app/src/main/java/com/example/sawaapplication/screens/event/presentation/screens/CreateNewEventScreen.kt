@@ -1,7 +1,8 @@
 package com.example.sawaapplication.screens.event.presentation.screens
 
-import android.content.Context
+import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -21,10 +22,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.outlined.AddAPhoto
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,22 +57,17 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.event.presentation.vmModels.CreateEventViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
-import java.text.DateFormat
-import java.util.Date
-import android.widget.Toast
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.ui.platform.LocalContext
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.firebase.firestore.GeoPoint
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.android.gms.maps.model.LatLng
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.GeoPoint
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
+import java.text.DateFormat
+import java.util.Date
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -78,37 +78,23 @@ fun CreateNewEventScreen(
 ) {
     val context = LocalContext.current
     val success = viewModel.success.value
-    val locationPermissionState = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    val communityID = viewModel.communityId
 
+    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     var pickedLocation by remember { mutableStateOf<LatLng?>(null) }
 
-    LaunchedEffect(communityId) {
-        viewModel.communityId = communityId
-    }
-    LaunchedEffect(success) {
-        if (success) {
-            Toast.makeText(context, "Event Created!", Toast.LENGTH_SHORT).show()
-            navController.popBackStack()
-            viewModel.success.value = false
-        }
-    }
-
+    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         viewModel.imageUri = uri
     }
+
     var showDatePicker by remember { mutableStateOf(false) }
-    val communityID = viewModel.communityId
     val formattedDate = viewModel.eventDate?.let {
         DateFormat.getDateInstance().format(Date(it))
     } ?: ""
-
-    LaunchedEffect(Unit) {
-        if (viewModel.shouldRequestLocation()) {
-            locationPermissionState.launchPermissionRequest()
-        }
-    }
 
     var showPermissionDialog by remember { mutableStateOf(false) }
 
@@ -120,6 +106,7 @@ fun CreateNewEventScreen(
             text = { Text("We need your location to pick the event location. Would you like to allow access?") },
             confirmButton = {
                 TextButton(onClick = {
+                    viewModel.markLocationPermissionRequested()
                     locationPermissionState.launchPermissionRequest()
                     showPermissionDialog = false
                 }) {
@@ -132,6 +119,41 @@ fun CreateNewEventScreen(
                 }
             }
         )
+    }
+    // Photo Permission Dialog
+    if (showPhotoPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoPermissionDialog = false },
+            title = { Text("Photo Permission") },
+            text = { Text("We need access to your photos so you can add an image for the event.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.markPhotoPermissionRequested()
+                    photoPermissionState.launchPermissionRequest()
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Deny")
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(communityId,success) {
+        viewModel.communityId = communityId
+
+        if (success) {
+            Toast.makeText(context, "Event Created!", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+            viewModel.success.value = false
+        }
+
     }
 
     Column(
@@ -184,7 +206,17 @@ fun CreateNewEventScreen(
                 modifier = Modifier
                     .size(integerResource(R.integer.imageBoxSize).dp)
                     .clip(RoundedCornerShape(integerResource(R.integer.RoundedCornerShape).dp))
-                    .clickable { imagePickerLauncher.launch("image/*") }
+                    .clickable {
+                        if (photoPermissionState.status.isGranted) {
+                            imagePickerLauncher.launch("image/*")
+                        } else {
+                            if (viewModel.shouldRequestPhoto()) {
+                                showPhotoPermissionDialog = true
+                            } else {
+                                Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
                     .background(Color.LightGray)
                     .align(Alignment.CenterHorizontally),
                 contentAlignment = Alignment.Center,
@@ -236,8 +268,10 @@ fun CreateNewEventScreen(
                         modifier = Modifier.clickable {
                             if (locationPermissionState.status.isGranted) {
                                 viewModel.isMapVisible = true
-                            } else {
+                            } else if (viewModel.shouldRequestLocation()) {
                                 showPermissionDialog = true
+                            } else {
+                                Toast.makeText(context, "Please grant location access in settings.", Toast.LENGTH_LONG).show()
                             }
                         }
                     )
@@ -272,6 +306,7 @@ fun CreateNewEventScreen(
                 }
             }
             }
+
 
             //event date
             CustomTextField(
