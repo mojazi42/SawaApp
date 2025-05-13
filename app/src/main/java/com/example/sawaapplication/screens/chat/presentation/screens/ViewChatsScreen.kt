@@ -1,8 +1,8 @@
 package com.example.sawaapplication.screens.chat.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,72 +33,82 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.sawaapplication.screens.chat.domain.model.ChatUserInfo
 import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ViewChatsScreen(
     navController: NavController,
 ) {
-
     val chatViewModel: ChatViewModel = hiltViewModel()
     val communityViewModel: CommunityViewModel = hiltViewModel()
 
     val communityList by communityViewModel.createdCommunities.collectAsState()
+    val loading by communityViewModel.loading.collectAsState()
+    val error by communityViewModel.error.collectAsState()
 
     val lastMessages by chatViewModel.lastMessageMap.collectAsState()
-
     val currentUserId = chatViewModel.currentUserId
 
+    // Fetch communities
     LaunchedEffect(currentUserId) {
         currentUserId?.let {
             communityViewModel.fetchCreatedCommunities(it)
         }
     }
 
+    // Fetch last messages when communities are fetched
     LaunchedEffect(communityList) {
-        Log.d("ViewChatsScreen", "Fetching last messages for ${communityList.size} communities")
         communityList.forEach { community ->
-            Log.d("ViewChatsScreen", "Fetching for community: ${community.id}")
             chatViewModel.fetchLastMessageForCommunity(community.id)
         }
     }
 
-    if (communityList.isNotEmpty()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(communityList) { community ->
-                val lastMessagePair = lastMessages[community.id]
-                val lastMessageText = lastMessagePair?.first ?: "No messages yet"
-                val senderName = lastMessagePair?.second?.name ?: "Unknown"
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            loading -> {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
 
-                ChatCard(
-                    imageUrl = community.image,
-                    title = community.name,
-                    lastMessage = "$senderName: $lastMessageText",
-                    modifier = Modifier.clickable {
-                        navController.navigate("chat/${community.id}")
-                    }
+            error != null -> {
+                Text(
+                    text = error ?: "Unknown error",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
-        }
-    } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(50.dp), color = MaterialTheme.colorScheme.primary
-            )
+
+            communityList.isEmpty() -> {
+                Text(
+                    text = "You have not joined any communities.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(communityList) { community ->
+                        val lastMessagePair = lastMessages[community.id]
+                        val lastMessageText = lastMessagePair?.first ?: "No messages yet"
+                        val senderName = lastMessagePair?.second?.name ?: "Unknown"
+
+                        ChatCard(
+                            imageUrl = community.image,
+                            title = community.name,
+                            lastMessage = "$senderName: $lastMessageText",
+                            modifier = Modifier.clickable {
+                                navController.navigate("chat/${community.id}")
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
-
 @Composable
 fun ChatCard(
     imageUrl: String,
