@@ -17,6 +17,7 @@ import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCr
 import kotlinx.coroutines.Job
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.example.sawaapplication.screens.communities.domain.useCases.GetCommunityByIdUseCase
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.example.sawaapplication.screens.post.domain.repository.PostRepository
@@ -28,6 +29,7 @@ class CommunityViewModel @Inject constructor(
     private val getUserCreatedCommunitiesUseCase: GetUserCreatedCommunitiesUseCase,
     private val getCommunityByIdUseCase: GetCommunityByIdUseCase,
     private val postRepository: PostRepository,
+    private val permissionHandler: PermissionHandler,
     firebaseAuth: FirebaseAuth,
 ) : ViewModel() {
 
@@ -93,6 +95,13 @@ class CommunityViewModel @Inject constructor(
             }
         }
     }
+
+    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
+    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
+
+    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
+    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
+
 
     // Fetches communities where the current user is a member
     fun fetchCreatedCommunities(userId: String) {
