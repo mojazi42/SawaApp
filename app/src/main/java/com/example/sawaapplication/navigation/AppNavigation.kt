@@ -154,6 +154,14 @@ fun AppNavigation(
                 MyCommunitiesScreen(navController)
             }
 
+            composable(Screen.EditProfile.route) {
+                EditProfileScreen(
+                    navController = navController,
+                    isDarkTheme = isDarkTheme,
+                    changeAppTheme = changeAppTheme
+                )
+            }
+
             // ViewChatsScreen for listing chats
             composable(
                 route = Screen.Chats.route,
@@ -176,7 +184,6 @@ fun AppNavigation(
                     navController = navController
                 )
             }
-
 
             composable(
                 route = "community_screen/{communityId}",
