@@ -153,30 +153,31 @@ fun AppNavigation(
             composable(Screen.Community.route) {
                 MyCommunitiesScreen(navController)
             }
-            composable(Screen.EditProfile.route) {
-                EditProfileScreen(
-                    navController = navController,
-                    isDarkTheme = isDarkTheme,
-                    changeAppTheme = changeAppTheme
-                )
-            }
 
-            composable(Screen.Chat.route) {
-                ChatScreen(
-                    communityId = "test_community",
-                    //viewModel = hiltViewModel(),
-                    navController = navController
-                )
-
-            }
-
-            composable(Screen.Chats.route) {
+            // ViewChatsScreen for listing chats
+            composable(
+                route = Screen.Chats.route,
+                arguments = listOf(navArgument("communityId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 ViewChatsScreen(
                     navController = navController,
-                    communityId = "test_community",
-
-                    )
+                    communityId = communityId
+                )
             }
+
+            // ChatScreen for a specific community
+            composable(
+                route = "chat/{communityId}",
+                arguments = listOf(navArgument("communityId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                ChatScreen(
+                    communityId = communityId,
+                    navController = navController
+                )
+            }
+
 
             composable(
                 route = "community_screen/{communityId}",

@@ -8,6 +8,9 @@ import com.example.sawaapplication.core.sharedPreferences.TokenProvider
 import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
 import com.example.sawaapplication.screens.authentication.data.repository.AuthRepositoryImpl
 import com.example.sawaapplication.screens.authentication.domain.repository.AuthRepository
+import com.example.sawaapplication.screens.chat.data.dataSources.remote.MassageRemoteDataSource
+import com.example.sawaapplication.screens.chat.data.repository.MessageRepositoryImpl
+import com.example.sawaapplication.screens.chat.domain.repository.MessageRepository
 import com.example.sawaapplication.screens.communities.data.dataSources.remote.CommunityRemoteDataSource
 import com.example.sawaapplication.screens.communities.data.repository.CommunityRepositoryImpl
 import com.example.sawaapplication.screens.communities.domain.repository.CommunityRepository
@@ -49,6 +52,7 @@ object AppModule {
             firebaseAuth
         )
     }
+
     @Provides
     fun provideFirebaseFirestore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
@@ -141,5 +145,12 @@ object AppModule {
     ): LocationSharedPreference {
         return LocationSharedPreference(context)
     }
-}
 
+    @Provides
+    fun provideMassagesRepository(
+        remoteDataSource: MassageRemoteDataSource
+    ): MessageRepository {
+        return MessageRepositoryImpl(remoteDataSource)
+    }
+
+}

@@ -46,8 +46,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-/*import com.example.sawaapplication.screens.chat.domain.model.Message
-import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel*/
+import com.example.sawaapplication.screens.chat.domain.model.Message
+import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
@@ -60,20 +60,20 @@ import java.util.Locale
 @Composable
 fun ChatScreen(
     communityId: String,
-    //viewModel: ChatViewModel = hiltViewModel(),
     navController: NavController
-) {}
-  /*  val profileViewModel: ProfileViewModel = hiltViewModel()
+) {
+    val profileViewModel: ProfileViewModel = hiltViewModel()
     val profileImageUrl by profileViewModel.profileImageUrl.collectAsState()
 
     val communityViewModel: CommunityViewModel = hiltViewModel()
     val communityDetails by communityViewModel.communityDetail.collectAsState()
     val communityName = communityDetails?.name
 
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    val currentUserId = currentUser?.uid ?: ""
-    val messages by viewModel.messages.collectAsState()
-    val senderInfoMap by viewModel.senderInfo.collectAsState()
+    val chatViewModel: ChatViewModel = hiltViewModel()
+    val currentUserId = chatViewModel.currentUserId
+
+    val messages by chatViewModel.messages.collectAsState()
+    val senderInfoMap by chatViewModel.senderInfo.collectAsState()
 
     var messageText by remember { mutableStateOf("") }
 
@@ -81,7 +81,7 @@ fun ChatScreen(
 
     // Observe messages and community details
     LaunchedEffect(communityId) {
-        viewModel.observeMessages(communityId)
+        chatViewModel.observeMessages(communityId)
         communityViewModel.fetchCommunityDetail(communityId)
     }
 
@@ -89,7 +89,7 @@ fun ChatScreen(
     LaunchedEffect(messages) {
         val senderIds = messages.map { it.senderId }.distinct()
         senderIds.forEach { senderId ->
-            viewModel.fetchSenderInfo(senderId)
+            chatViewModel.fetchSenderInfo(senderId)
         }
     }
 
@@ -169,11 +169,13 @@ fun ChatScreen(
                     .clickable {
                         if (messageText.isNotBlank()) {
                             profileImageUrl?.let { profileImage ->
-                                viewModel.sendMessage(
-                                    communityId = communityId,
-                                    messageText = messageText,
-                                    senderId = currentUserId,
-                                )
+                                if (currentUserId != null) {
+                                    chatViewModel.sendMessage(
+                                        communityId = communityId,
+                                        messageText = messageText,
+                                        senderId = currentUserId,
+                                    )
+                                }
                             }
                             messageText = ""
                         }
@@ -275,4 +277,4 @@ fun ChatBubble(message: Message, isCurrentUser: Boolean, image: String?, userNam
             }
         }
     }
-}*/
+}
