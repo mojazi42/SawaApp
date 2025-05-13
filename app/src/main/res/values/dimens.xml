@@ -148,9 +148,14 @@
     <integer name="createTimeFontSize">14</integer>
 
     <!--NewCommunity-->
+    <integer name="communityBoxSize">150</integer>
     <integer name="descriptionBoxHeight">120</integer>
 
     <!--PostCard-->
-    <integer name="communityBoxSize">150</integer>
+    <integer name="postCardRoundedCornerShape">16</integer>
+    <integer name="postCardElevation">4</integer>
+    <integer name="postCardPadding">12</integer>
+    <integer name="postCardImageSize">36</integer>
+    <integer name="postCardImageHeight">180</integer>
 
 </resources>
