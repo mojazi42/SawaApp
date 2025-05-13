@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,9 +48,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.screens.chat.domain.model.Message
 import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel
-import com.example.sawaapplication.R
-/*import com.example.sawaapplication.screens.chat.domain.model.Message
-import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel*/
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
@@ -280,3 +278,4 @@ fun ChatBubble(message: Message, isCurrentUser: Boolean, image: String?, userNam
         }
     }
 }
+

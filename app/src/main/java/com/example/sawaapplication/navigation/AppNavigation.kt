@@ -162,7 +162,6 @@ fun AppNavigation(
                 val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 ViewChatsScreen(
                     navController = navController,
-                    communityId = communityId
                 )
             }
 
