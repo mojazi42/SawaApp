@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetAllPostsUseCase @Inject constructor(
     private val repository: PostRepository
 ) {
-    suspend operator fun invoke(): Result<List<Post>> {
-        return repository.getAllPosts()
-    }
+//    suspend operator fun invoke(): Result<List<Post>> {
+//        return repository.getAllPosts()
+//    }
 }

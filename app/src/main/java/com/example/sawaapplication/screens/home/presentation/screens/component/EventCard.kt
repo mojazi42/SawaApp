@@ -53,7 +53,7 @@ fun EventCard(
     location: String,
     time: String,
     participants: Int,
-    joined: Boolean,                       // <-- Add this
+    joined: Boolean,
     onJoinClick: () -> Unit,
     showCancelButton: Boolean = false,
     joinedUsers: List<String> = emptyList(),

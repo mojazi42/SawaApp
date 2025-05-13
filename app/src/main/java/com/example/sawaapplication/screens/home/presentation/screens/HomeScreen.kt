@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -132,14 +131,14 @@ fun MyEventsTab() {
     ) {
         items(eventsCount) { index ->
             // Composable call inside the proper scope
-            val imagePainter = painterResource(id = R.drawable.first)
+//            val imagePainter = painterResource(id = R.drawable.first)
 
             EventCard(
-                image = imagePainter,
+                image = "",
                 community = "Saudi Innovation Community",
                 title = "Fine art between past and present",
                 description = "World Art Day, which falls on April 15, celebrates artists and their contributions...",
-                location = "Madinah",
+                location = "Madina",
                 time = "16 Feb 25 • 06:00 PM-10:00 PM",
                 participants = 12,
                 joined = joinedStates[index],
