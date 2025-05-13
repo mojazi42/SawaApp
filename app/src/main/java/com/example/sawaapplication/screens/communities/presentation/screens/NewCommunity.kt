@@ -93,7 +93,6 @@ fun NewCommunity(navController: NavController) {
             }
         )
     }
-
     if (success) {
         LaunchedEffect(success) {
             Toast.makeText(context, communityCreated, Toast.LENGTH_SHORT).show()
