@@ -56,10 +56,9 @@ fun EventCard(
     joined: Boolean,                       // <-- Add this
     onJoinClick: () -> Unit,
     showCancelButton: Boolean = false,
+    joinedUsers: List<String> = emptyList(),
     modifier: Modifier = Modifier
 ) {
-    val profileViewModel: ProfileViewModel = hiltViewModel()
-    val imageUrl by profileViewModel.profileImageUrl.collectAsState()
 
     OutlinedCard(
         modifier = modifier
@@ -79,8 +78,8 @@ fun EventCard(
         Column {
             Row {
                 Image(
-                    painter = if (imageUrl != null)
-                        rememberAsyncImagePainter(imageUrl)
+                    painter = if (image != null)
+                        rememberAsyncImagePainter(image)
                     else
                         painterResource(id = R.drawable.ic_launcher_background),
                     contentDescription = "Profile image",
