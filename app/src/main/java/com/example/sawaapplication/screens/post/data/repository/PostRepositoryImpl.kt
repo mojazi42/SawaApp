@@ -12,4 +12,8 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun createPostInCommunity(communityId: String, post: Post, imageUri: Uri?) {
         return remoteDataSource.createPostInCommunity(communityId, post, imageUri)
     }
+
+    override suspend fun getAllPosts(): Result<List<Post>> {
+        return remoteDataSource.getAllPostsFromAllCommunities()
+    }
 }

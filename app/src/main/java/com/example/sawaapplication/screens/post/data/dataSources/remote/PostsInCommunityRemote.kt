@@ -60,4 +60,20 @@ class PostsInCommunityRemote @Inject constructor(
         }
     }
 
+    suspend fun getAllPostsFromAllCommunities(): Result<List<Post>> {
+        return try {
+            val postList = mutableListOf<Post>()
+            val communities = firestore.collection("Community").get().await()
+
+            for (community in communities.documents) {
+                val postsSnapshot = community.reference.collection("posts").get().await()
+                val posts = postsSnapshot.toObjects(Post::class.java)
+                postList.addAll(posts)
+            }
+
+            Result.success(postList)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
