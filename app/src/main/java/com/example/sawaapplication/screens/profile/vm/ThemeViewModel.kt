@@ -2,7 +2,7 @@ package com.example.sawaapplication.screens.profile.vm
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.sawaapplication.core.SharedPreferences.LanguageManager
+import com.example.sawaapplication.core.sharedpreferences.LanguageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

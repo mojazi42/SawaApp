@@ -130,4 +130,21 @@
     <integer name="iconSize">20</integer>
     <integer name="tabRowHeight">4</integer>
 
+    <!--ChatScreen-->
+    <integer name="topBarPadding">12</integer>
+    <integer name="topBarSpaceH">8</integer>
+    <integer name="chatTopBarIconSize">28</integer>
+    <integer name="textStartPadding">21</integer>
+    <integer name="inputRowPaddingH">16</integer>
+    <integer name="boxSize">36</integer>
+    <integer name="chatScreenSpacer">20</integer>
+    <integer name="rowColumnPadding">8</integer>
+    <integer name="horizontalArrangementSpace">8</integer>
+    <integer name="imageSize">36</integer>
+    <integer name="columnMaxSize">290</integer>
+    <integer name="userNameFontSize">12</integer>
+    <integer name="chatRoundedCornerShape">12</integer>
+    <integer name="massageFontSize">14</integer>
+    <integer name="createTimeFontSize">14</integer>
+
 </resources>

@@ -49,5 +49,61 @@ class EventInCommunityRemote @Inject constructor(
             Log.e("Firebase", "Error creating event: ${e.message}")
         }
     }
-}
 
+    suspend fun fetchEventsFromCommunity(communityId: String): Result<List<Event>> {
+        return try {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("Community")
+                .document(communityId)
+                .collection("event")
+                .get()
+                .await()
+
+            val events = snapshot.documents.mapNotNull { document ->
+                document.toObject(Event::class.java)?.copy(id = document.id) // <-- include doc ID
+            }
+
+            Result.success(events)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun joinEvent(communityId: String, eventId: String, userId: String): Result<Unit> {
+        return try {
+            val eventRef = firestore.collection("Community")
+                .document(communityId)
+                .collection("event")
+                .document(eventId)
+
+            // Use arrayUnion to avoid duplicate entries
+            eventRef.update(
+                "joinedUsers",
+                com.google.firebase.firestore.FieldValue.arrayUnion(userId)
+            ).await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun leaveEvent(communityId: String, eventId: String, userId: String): Result<Unit> {
+        return try {
+            val eventRef = firestore.collection("Community")
+                .document(communityId)
+                .collection("event")
+                .document(eventId)
+
+            eventRef.update(
+                "joinedUsers",
+                com.google.firebase.firestore.FieldValue.arrayRemove(userId)
+            ).await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+}
