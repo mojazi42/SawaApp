@@ -39,8 +39,6 @@ class CreateEventViewModel @Inject constructor(
     val success = mutableStateOf(false)
     val error = mutableStateOf<String?>(null)
     var isMapVisible by mutableStateOf(false)
-    private var hasAskedForLocationPermission by mutableStateOf(false)
-    private var hasAskedForPhotoPermission by mutableStateOf(false)
 
 
     val membersLimit: Int?
