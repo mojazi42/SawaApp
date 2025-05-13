@@ -170,11 +170,12 @@ fun EventCard(
                     )
                     Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
                     Text(
-                        text = "$participants",
+                        text = "${participants}/${joinedUsers.size}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
+
             }
         }
     }
