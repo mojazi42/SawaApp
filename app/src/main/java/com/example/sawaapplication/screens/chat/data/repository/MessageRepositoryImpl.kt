@@ -14,12 +14,24 @@ class MessageRepositoryImpl @Inject constructor(
         remoteDataSource.sendMessage(communityId, message.text,  message.senderId)
     }
 
-    override fun observeMessages(communityId: String): Flow<List<Message>> {
-        return remoteDataSource.observeMessages(communityId)
+    override fun observeMessages(communityId: String, currentUserId: String): Flow<List<Message>> {
+        return remoteDataSource.observeMessages(communityId, currentUserId)
     }
 
     override suspend fun getLastMessageAndSender(communityId: String): Pair<String, ChatUserInfo>? {
         return remoteDataSource.getLastMessageAndSender(communityId)
+    }
+
+    override fun fetchUnreadMessages(communityId: String, userId: String, onResult: (Int) -> Unit) {
+        remoteDataSource.fetchUnreadMessages(communityId, userId, onResult)
+    }
+
+    override suspend fun markMessagesAsRead(communityId: String, userId: String){
+        remoteDataSource.markMessagesAsRead(communityId, userId)
+    }
+
+    override suspend fun getSenderInfo(userId: String): ChatUserInfo? {
+        return remoteDataSource.getSenderInfo(userId)
     }
 }
 
