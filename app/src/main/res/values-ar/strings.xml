@@ -76,15 +76,15 @@
     <!-- Chats Screen-->
     <string name="chats">المحادثات</string>
 
-    <!-- Event Card Screen-->
-    <string name="upcomingEvents">الأحداث القادمة</string>
-
     <!--NewCommunity-->
     <string name="communityCreated">تم إنشاء المجتمع</string>
     <string name="uploadImage">يرجا رفع صورة</string>
     <string name="tapToUploadImage">انقر لرفع صورة</string>
     <string name="communityName">إسم المجتمع</string>
     <string name="newCommDescription">الوصف</string>
+
+    <!-- Event Card Screen-->
+    <string name="upcomingEvents">الأحداث القادمة</string>
 
     <!--CreateNewEventScreen-->
     <string name="locationPermission">الوصول للموقع</string>
