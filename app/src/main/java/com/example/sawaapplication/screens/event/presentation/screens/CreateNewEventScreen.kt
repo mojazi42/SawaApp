@@ -188,7 +188,7 @@ fun CreateNewEventScreen(
             ) { Text(stringResource(R.string.create)) }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(integerResource(R.integer.mediumSpace).dp))
 
         Text(
             stringResource(R.string.newEvent),
