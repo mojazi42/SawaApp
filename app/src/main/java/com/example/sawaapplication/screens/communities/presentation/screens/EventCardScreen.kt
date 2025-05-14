@@ -65,7 +65,7 @@ fun EventCardScreen(navController: NavHostController, communityId: String) {
 
         events.forEachIndexed { index, event ->
             EventCard(
-                image = event.image,
+                image = event.image.toString(),
                 community = event.community,
                 title = event.title,
                 description = event.description,
