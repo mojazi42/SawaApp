@@ -26,6 +26,7 @@ class MassageRemoteDataSource @Inject constructor(
             val messageMap = mapOf(
                 "text" to messageText,
                 "senderId" to senderId,
+                "readBy" to mapOf(senderId to true),  // Mark as read by sender
                 "createdAt" to FieldValue.serverTimestamp()
             )
 
@@ -41,18 +42,22 @@ class MassageRemoteDataSource @Inject constructor(
         }
     }
 
-    fun observeMessages(communityId: String): Flow<List<Message>> = callbackFlow {
+    fun observeMessages(communityId: String, currentUserId: String): Flow<List<Message>> = callbackFlow {
         val listener = firestore.collection("Community")
             .document(communityId)
             .collection("messages")
             .orderBy("createdAt", Query.Direction.ASCENDING)
-
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
                     return@addSnapshotListener
                 }
-                val messages = snapshot?.toObjects(Message::class.java) ?: emptyList()
+
+                val messages = snapshot?.documents?.mapNotNull { doc ->
+                    val message = doc.toObject(Message::class.java)
+                    message?.copy(id = doc.id)
+                } ?: emptyList()
+
                 trySend(messages)
             }
 
@@ -93,4 +98,54 @@ class MassageRemoteDataSource @Inject constructor(
                     }
                 }
         }
+
+    fun fetchUnreadMessages(
+        communityId: String,
+        userId: String,
+        onResult: (Int) -> Unit
+    ) {
+        firestore.collection("Community")
+            .document(communityId)
+            .collection("messages")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) return@addSnapshotListener
+
+                val unreadCount = snapshot.documents.count { doc ->
+                    val readBy = doc.get("readBy") as? Map<*, *> ?: emptyMap<String, Boolean>()
+                    readBy[userId] != true
+                }
+
+                onResult(unreadCount)
+            }
+    }
+    suspend fun markMessagesAsRead(communityId: String, userId: String) {
+        val snapshot = firestore.collection("Community")
+            .document(communityId)
+            .collection("messages")
+            .get()
+            .await()
+
+        snapshot.documents.forEach { doc ->
+            val readBy = doc.get("readBy") as? Map<String, Boolean> ?: emptyMap()
+            if (readBy[userId] != true) {
+                doc.reference.update("readBy.$userId", true)
+            }
+        }
+    }
+    suspend fun getSenderInfo(userId: String): ChatUserInfo? {
+        return try {
+            val doc = FirebaseFirestore.getInstance()
+                .collection("User")
+                .document(userId)
+                .get()
+                .await()
+
+            val name = doc.getString("name")
+            val image = doc.getString("image")
+            ChatUserInfo(name, image)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }
