@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -85,6 +86,7 @@ fun CreateNewEventScreen(
 
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
     var showPhotoPermissionDialog by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -305,71 +307,99 @@ fun CreateNewEventScreen(
                     }
                 }
             }
-            }
+        }
 
 
-            //event date
-            CustomTextField(
-                value = formattedDate,
-                onValueChange = {},
-                label = stringResource(id = R.string.eventDate),
-                readOnly = true,
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Pick date",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { showDatePicker = true }
-                    )
-                }
-            )
-            if (showDatePicker) {
-                DatePickerModal(
-                    onDateSelected = {
-                        viewModel.eventDate = it
-                        showDatePicker = false
-                    },
-                    onDismiss = { showDatePicker = false }
+        //event date
+        CustomTextField(
+            value = formattedDate,
+            onValueChange = {},
+            label = stringResource(id = R.string.eventDate),
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Pick date",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { showDatePicker = true }
                 )
             }
-
-            //event member limit
-            CustomTextField(
-                value = viewModel.membersLimitInput,
-                onValueChange = { viewModel.membersLimitInput = it },
-                label = stringResource(R.string.eventMembersLimit),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+        if (showDatePicker) {
+            DatePickerModal(
+                onDateSelected = {
+                    viewModel.eventDate = it
+                    showDatePicker = false
+                },
+                onDismiss = { showDatePicker = false }
             )
-            // Google Map to pick location
-            if (viewModel.isMapVisible) {
-                AlertDialog(
-                    onDismissRequest = { viewModel.isMapVisible = false }
+        }
+     //event time
+        CustomTextField(
+            value = viewModel.eventTime,
+            onValueChange = { viewModel.eventTime = it },
+            label = stringResource(id = R.string.eventTime),
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Timer,
+                    contentDescription = "Pick Time",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { showTimePicker = true }
+                )
+            }
+        )
+
+        if (showTimePicker) {
+            TimePickerModal(
+                onTimeSelected = { hour, minute ->
+                    val second = 0
+                    val formatted = String.format("%02d:%02d:%02d", hour, minute, second)
+                    viewModel.eventTime = formatted
+                    showTimePicker = false
+                },
+                onDismiss = { showTimePicker = false }
+            )
+        }
+
+        //event member limit
+        CustomTextField(
+            value = viewModel.membersLimitInput,
+            onValueChange = { viewModel.membersLimitInput = it },
+            label = stringResource(R.string.eventMembersLimit),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+        // Google Map to pick location
+        if (viewModel.isMapVisible) {
+            AlertDialog(
+                onDismissRequest = { viewModel.isMapVisible = false }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
                 ) {
-                    Box(
+                    GoogleMap(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White)
-                    ) {
-                        GoogleMap(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            onMapClick = { latLng ->
-                                pickedLocation = latLng
-                                viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
-                                viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
-                                viewModel.isMapVisible = false  // Close the map after selecting location
-                            },
-                            cameraPositionState = rememberCameraPositionState {
-                                position = CameraPosition.fromLatLngZoom(
-                                    pickedLocation ?: LatLng(24.7136, 46.6753), 5f
-                                )
-                            }
-                        )
-                    }
+                            .fillMaxSize(),
+                        onMapClick = { latLng ->
+                            pickedLocation = latLng
+                            viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
+                            viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
+                            viewModel.isMapVisible =
+                                false
+                        },
+                        cameraPositionState = rememberCameraPositionState {
+                            position = CameraPosition.fromLatLngZoom(
+                                pickedLocation ?: LatLng(24.7136, 46.6753), 5f
+                            )
+                        }
+                    )
                 }
             }
-
         }
+
     }
+}
