@@ -62,17 +62,6 @@ fun PostCard(post: PostUiModel) {
 
                 Spacer(Modifier.height(integerResource(R.integer.smallerSpace).dp))
 
-                // ✅ Show text content if not blank
-                if (post.content.isNotBlank()) {
-                    Text(
-                        text = post.content,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = black
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                // ✅ Show image if not blank
                 if (post.postImageUrl.isNotBlank()) {
                     AsyncImage(
                         model = post.postImageUrl,
@@ -83,10 +72,16 @@ fun PostCard(post: PostUiModel) {
                             .clip(RoundedCornerShape(integerResource(R.integer.chatRoundedCornerShape).dp)),
                         contentScale = ContentScale.Crop
                     )
+                } else {
+                    Text(
+                        text = "This is a text-only post by ${post.username}.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = black
+                    )
                 }
             }
 
-            // Like section
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start,
