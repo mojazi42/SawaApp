@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.post.domain.model.Post
-import com.example.sawaapplication.screens.post.domain.useCases.GetAllPostsUseCase
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,10 +18,9 @@ import kotlinx.coroutines.tasks.await
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getAllPostsUseCase: GetAllPostsUseCase
+    private val firebaseAuth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) : ViewModel() {
-
-    private val firestore = FirebaseFirestore.getInstance()
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     val posts: StateFlow<List<Post>> = _posts
@@ -35,31 +34,64 @@ class HomeViewModel @Inject constructor(
     private val _communityNames = MutableStateFlow<Map<String, String>>(emptyMap())
     val communityNames: StateFlow<Map<String, String>> = _communityNames
 
-    private val _userNames = MutableStateFlow<Map<String, String>>(emptyMap())
-    val userNames: StateFlow<Map<String, String>> = _userNames
-
     private val _userDetails = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
     val userDetails: StateFlow<Map<String, Pair<String, String>>> = _userDetails
 
-    // Map Post object to its Firestore document ID
+    // Map Post object to its FireStore document ID
     private val _postDocumentIds = MutableStateFlow<Map<Post, String>>(emptyMap())
     val postDocumentIds: StateFlow<Map<Post, String>> = _postDocumentIds
 
+    private suspend fun getUserCommunityIds(userId: String): List<String> {
+        return try {
+            val snapshot = firestore.collection("Community").get().await()
+            snapshot.documents
+                .filter { doc ->
+                    val members = doc.get("members") as? List<*> ?: emptyList<Any>()
+                    userId in members
+                }
+                .map { it.id } // FireStore document ID is the communityId
+        } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error fetching user communities: ${e.message}")
+            emptyList()
+        }
+    }
 
     fun fetchAllPosts() {
         viewModelScope.launch {
             _loading.value = true
             try {
-                val snapshot = firestore.collectionGroup("posts").get().await()
+                val currentUserId = firebaseAuth.currentUser?.uid
+
+                if (currentUserId == null) {
+                    _error.value = "User not logged in"
+                    _loading.value = false
+                    return@launch
+                }
+
+                val userCommunityIds = getUserCommunityIds(currentUserId)
+
+                if (userCommunityIds.isEmpty()) {
+                    _posts.value = emptyList()
+                    return@launch
+                }
 
                 val postsList = mutableListOf<Post>()
                 val docIdMap = mutableMapOf<Post, String>()
 
-                for (doc in snapshot.documents) {
-                    val post = doc.toObject(Post::class.java)
-                    if (post != null) {
-                        postsList.add(post)
-                        docIdMap[post] = doc.id
+                userCommunityIds.forEach { communityId ->
+                    val postSnapshot = firestore
+                        .collection("Community")
+                        .document(communityId)
+                        .collection("posts")
+                        .get()
+                        .await()
+
+                    for (doc in postSnapshot.documents) {
+                        val post = doc.toObject(Post::class.java)
+                        if (post != null) {
+                            postsList.add(post)
+                            docIdMap[post] = doc.id
+                        }
                     }
                 }
 
@@ -71,6 +103,7 @@ class HomeViewModel @Inject constructor(
 
                 fetchCommunityNames(communityIds)
                 fetchUserDetails(userIds)
+
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
