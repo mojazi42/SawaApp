@@ -86,6 +86,17 @@
     <string name="communityName">إسم المجتمع</string>
     <string name="newCommDescription">الوصف</string>
 
-    <!--PostCard-->
+    <!--CreateNewEventScreen-->
+    <string name="locationPermission">الوصول للموقع</string>
+    <string name="askLocationPermission">نحتاج للوصوول للموقع، لتحديد موقع الحدث، هل تسمح بالوصول للموقع؟</string>
+    <string name="allow">سماح</string>
+    <string name="deny">رفض</string>
+    <string name="photoPermission">الوصول للصور</string>
+    <string name="askPhotoPermission">نحتاج للوصوول للصور، لإضافة صورة للحدث، هل تسمح بالوصول للصور؟</string>
+    <string name="eventCreated">تم إنشاء الحدث</string>
+    <string name="askPhotoPermissionFromSettings">يرجا السماح بالوصول للصور من الاعدادات</string>
+    <string name="askLocationPermissionFromSettings">يرجا السماح بالوصول للموقع من الاعدادات</string>
+    <string name="locationIsNeeded">نحتاج الوصول للموقع لاختيار موقع الحدث</string>
+
 
 </resources>

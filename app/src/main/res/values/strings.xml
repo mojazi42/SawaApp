@@ -86,5 +86,15 @@
     <string name="newCommDescription">Description</string>
 
     <!--PostCard-->
+    <string name="locationPermission">Location Permission</string>
+    <string name="askLocationPermission">We need your location to pick the event location. Would you like to allow access?</string>
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+    <string name="photoPermission">Photo Permission</string>
+    <string name="askPhotoPermission">We need access to photos to add a photo to the event. Would you like to allow access?</string>
+    <string name="eventCreated">Event Created!</string>
+    <string name="askPhotoPermissionFromSettings">Please allow photo access in settings</string>
+    <string name="askLocationPermissionFromSettings">Please allow location access in settings</string>
+    <string name="locationIsNeeded">Location permission is needed to pick your event location.</string>
 
 </resources>

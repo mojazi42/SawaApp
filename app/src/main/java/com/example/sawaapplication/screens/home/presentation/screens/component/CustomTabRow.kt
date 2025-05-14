@@ -31,7 +31,7 @@ fun CustomTabRow(
             TabRowDefaults.Indicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                 color = firstOrange,
-                height = 3.dp
+                height = integerResource(R.integer.extraSmallSpace).dp
             )
         },
     ) {

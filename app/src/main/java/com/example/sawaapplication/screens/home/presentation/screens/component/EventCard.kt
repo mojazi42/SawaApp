@@ -72,7 +72,7 @@ fun EventCard(
             defaultElevation = integerResource(id = R.integer.homeScreenCardElevation).dp
         ),
         border = BorderStroke(
-            1.dp, MaterialTheme.colorScheme.secondaryContainer
+            integerResource(R.integer.stroke).dp, MaterialTheme.colorScheme.secondaryContainer
         ),
     ) {
         Column {
@@ -103,7 +103,7 @@ fun EventCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.Gray,
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(integerResource(R.integer.spacer).dp))
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyLarge,
@@ -114,18 +114,16 @@ fun EventCard(
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
-                        fontSize = 10.sp,
+                        fontSize = integerResource(R.integer.titleSize).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis
-
                     )
                     JoinButton(
                         joined = joined,
                         onJoinClick = onJoinClick,
                         showCancel = showCancelButton
                     )
-
                 }
             }
 
@@ -175,7 +173,6 @@ fun EventCard(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-
             }
         }
     }
@@ -220,5 +217,3 @@ fun JoinButton(
         )
     }
 }
-
-
