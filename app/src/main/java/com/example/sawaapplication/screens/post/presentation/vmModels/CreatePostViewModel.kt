@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.example.sawaapplication.screens.post.domain.useCases.CreatePostUseCase
 import com.google.firebase.auth.FirebaseAuth
@@ -18,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val createPostUseCase: CreatePostUseCase,
-    private val firebaseAuth: FirebaseAuth
+    private val permissionHandler: PermissionHandler
 ) : ViewModel(){
 
     var communityId by mutableStateOf<String?>("")
@@ -73,5 +74,8 @@ class CreatePostViewModel @Inject constructor(
             }
         }
     }
+
+    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
+    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 
 }

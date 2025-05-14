@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.profile.screens
 
+import android.Manifest
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,7 +37,11 @@ import com.example.sawaapplication.screens.profile.vm.ThemeViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.theme.Red
 import com.example.sawaapplication.ui.theme.firstOrange
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditProfileScreen(
     navController: NavController,
@@ -54,6 +59,42 @@ fun EditProfileScreen(
     var name by remember { mutableStateOf(nameState ?: "") }
     var about by remember { mutableStateOf(aboutState ?: "") }
 
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+
+    }
+
+    // Photo Permission Dialog
+    if (showPhotoPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoPermissionDialog = false },
+            title = { Text("Photo Permission") },
+            text = { Text("We need access to your photos so you can add an image for the event.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.markPhotoPermissionRequested()
+                    photoPermissionState.launchPermissionRequest()
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Deny")
+                }
+            }
+        )
+    }
+
     // LaunchedEffect is used here to synchronize the ViewModel state (nameState, aboutState)
     // into the local editable form fields (name, about).
     // This ensures that whenever the ViewModel data updates (e.g., after FireStore loads),
@@ -64,16 +105,16 @@ fun EditProfileScreen(
         about = aboutState ?: ""
     }
 
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+//    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
 
     val isArabic by themeViewModel.isArabic.collectAsState()
 
-    val imagePickerLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-            imageUri = it
-        }
+//    val imagePickerLauncher =
+//        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+//            imageUri = it
+//        }
 
     val logOutViewModel: LogOutViewModel = hiltViewModel()
 
@@ -87,7 +128,17 @@ fun EditProfileScreen(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .clickable { imagePickerLauncher.launch("image/*") },
+                .clickable {
+                    if (photoPermissionState.status.isGranted) {
+                        imagePickerLauncher.launch("image/*")
+                    } else {
+                        if (viewModel.shouldRequestPhoto()) {
+                            showPhotoPermissionDialog = true
+                        } else {
+                            Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
             contentAlignment = Alignment.Center
         ) {
             when {

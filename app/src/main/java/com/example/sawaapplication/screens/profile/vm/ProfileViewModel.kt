@@ -12,12 +12,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.net.Uri
+import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.google.firebase.storage.FirebaseStorage
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firebaseAuthDataSource: FirebaseAuthDataSource
+    private val firebaseAuthDataSource: FirebaseAuthDataSource,
+    private val permissionHandler: PermissionHandler
 ) : ViewModel() {
 
     private val _userName = MutableStateFlow<String?>(null)
@@ -130,4 +132,7 @@ class ProfileViewModel @Inject constructor(
             }
             .addOnFailureListener { onFailure(it) }
     }
+
+    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
+    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 }

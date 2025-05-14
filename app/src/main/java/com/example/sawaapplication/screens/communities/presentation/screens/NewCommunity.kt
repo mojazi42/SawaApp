@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.Manifest
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -20,6 +21,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -40,9 +42,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun NewCommunity(navController: NavController) {
     val context = LocalContext.current
@@ -50,12 +56,39 @@ fun NewCommunity(navController: NavController) {
     val success by viewModel.success.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         viewModel.imageUri = uri
 
+    }
+
+    // Photo Permission Dialog
+    if (showPhotoPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoPermissionDialog = false },
+            title = { Text("Photo Permission") },
+            text = { Text("We need access to your photos so you can add an image for the event.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.markPhotoPermissionRequested()
+                    photoPermissionState.launchPermissionRequest()
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Deny")
+                }
+            }
+        )
     }
 
     if (success) {
@@ -101,7 +134,17 @@ fun NewCommunity(navController: NavController) {
             modifier = Modifier
                 .size(150.dp)
                 .clip(CircleShape)
-                .clickable { imagePickerLauncher.launch("image/*") }
+                .clickable {
+                    if (photoPermissionState.status.isGranted) {
+                        imagePickerLauncher.launch("image/*")
+                    } else {
+                        if (viewModel.shouldRequestPhoto()) {
+                            showPhotoPermissionDialog = true
+                        } else {
+                            Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
                 .background(Color.LightGray)
                 .align(Alignment.CenterHorizontally),
             contentAlignment = Alignment.Center,
