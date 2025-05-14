@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
@@ -42,14 +41,13 @@ fun PostCard(post: PostUiModel) {
     var likeCount by remember { mutableStateOf(21) }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = white),
         elevation = CardDefaults.cardElevation(integerResource(R.integer.postCardElevation).dp)
     ) {
         Column {
             Column(Modifier.padding(12.dp)) {
-                // User info
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
                         model = post.userAvatarUrl,
@@ -63,17 +61,6 @@ fun PostCard(post: PostUiModel) {
 
                 Spacer(Modifier.height(8.dp))
 
-                // ✅ Show text content if not blank
-                if (post.content.isNotBlank()) {
-                    Text(
-                        text = post.content,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = black
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                // ✅ Show image if not blank
                 if (post.postImageUrl.isNotBlank()) {
                     AsyncImage(
                         model = post.postImageUrl,
@@ -84,10 +71,16 @@ fun PostCard(post: PostUiModel) {
                             .clip(RoundedCornerShape(12.dp)),
                         contentScale = ContentScale.Crop
                     )
+                } else {
+                    Text(
+                        text = "This is a text-only post by ${post.username}.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = black
+                    )
                 }
             }
 
-            // Like section
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start,
