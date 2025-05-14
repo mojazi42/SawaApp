@@ -104,20 +104,20 @@ fun CreateNewEventScreen(
     if (showPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionDialog = false },
-            title = { Text("Location Permission") },
-            text = { Text("We need your location to pick the event location. Would you like to allow access?") },
+            title = { Text(stringResource(R.string.locationPermission)) },
+            text = { Text(stringResource(R.string.askLocationPermission)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markLocationPermissionRequested()
                     locationPermissionState.launchPermissionRequest()
                     showPermissionDialog = false
                 }) {
-                    Text("Allow")
+                    Text(stringResource(R.string.allow))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPermissionDialog = false }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.deny))
                 }
             }
         )
@@ -126,32 +126,33 @@ fun CreateNewEventScreen(
     if (showPhotoPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPhotoPermissionDialog = false },
-            title = { Text("Photo Permission") },
-            text = { Text("We need access to your photos so you can add an image for the event.") },
+            title = { Text(stringResource(R.string.photoPermission)) },
+            text = { Text(stringResource(R.string.askPhotoPermission)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markPhotoPermissionRequested()
                     photoPermissionState.launchPermissionRequest()
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Allow")
+                    Text(stringResource(R.string.allow))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.deny))
                 }
             }
         )
     }
 
-    LaunchedEffect(communityId,success) {
+    val eventCreated = stringResource(R.string.eventCreated)
+    LaunchedEffect(communityId, success) {
         viewModel.communityId = communityId
 
         if (success) {
-            Toast.makeText(context, "Event Created!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, eventCreated, Toast.LENGTH_SHORT).show()
             navController.popBackStack()
             viewModel.success.value = false
         }
@@ -190,19 +191,20 @@ fun CreateNewEventScreen(
             ) { Text(stringResource(R.string.create)) }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(integerResource(R.integer.mediumSpace).dp))
 
         Text(
             stringResource(R.string.newEvent),
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            fontSize = integerResource(R.integer.newEventTextSize).sp,
         )
 
         Column(
-            modifier = Modifier.padding(28.dp),
+            modifier = Modifier.padding(integerResource(R.integer.newEventTextSize).dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            val askPhotoPermissionFromSettings =
+                stringResource(R.string.askPhotoPermissionFromSettings)
             //event image
             Box(
                 modifier = Modifier
@@ -215,7 +217,11 @@ fun CreateNewEventScreen(
                             if (viewModel.shouldRequestPhoto()) {
                                 showPhotoPermissionDialog = true
                             } else {
-                                Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    context,
+                                    askPhotoPermissionFromSettings,
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }
@@ -257,6 +263,8 @@ fun CreateNewEventScreen(
             )
 
             //event location
+            val askLocationPermissionFromSettings =
+                stringResource(R.string.askLocationPermissionFromSettings)
             CustomTextField(
                 value = viewModel.locationText,
                 onValueChange = {},
@@ -273,13 +281,18 @@ fun CreateNewEventScreen(
                             } else if (viewModel.shouldRequestLocation()) {
                                 showPermissionDialog = true
                             } else {
-                                Toast.makeText(context, "Please grant location access in settings.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    context,
+                                    askLocationPermissionFromSettings,
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     )
                 }
             )
 
+            val locationIsNeeded = stringResource(R.string.locationIsNeeded)
             when {
                 locationPermissionState.status.isGranted -> {
 
@@ -290,7 +303,7 @@ fun CreateNewEventScreen(
                     LaunchedEffect(Unit) {
                         Toast.makeText(
                             context,
-                            "Location permission is needed to pick your event location.",
+                            locationIsNeeded,
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -301,7 +314,7 @@ fun CreateNewEventScreen(
                     LaunchedEffect(Unit) {
                         Toast.makeText(
                             context,
-                            "Please grant location access in settings.",
+                            askLocationPermissionFromSettings,
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -377,8 +390,8 @@ fun CreateNewEventScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .padding(integerResource(R.integer.googleMapPadding).dp)
+                        .clip(RoundedCornerShape(integerResource(R.integer.googleMapPaddingRounded).dp))
                         .background(Color.White)
                 ) {
                     GoogleMap(
@@ -389,7 +402,7 @@ fun CreateNewEventScreen(
                             viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
                             viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
                             viewModel.isMapVisible =
-                                false
+                                false  // Close the map after selecting location
                         },
                         cameraPositionState = rememberCameraPositionState {
                             position = CameraPosition.fromLatLngZoom(
@@ -400,6 +413,5 @@ fun CreateNewEventScreen(
                 }
             }
         }
-
     }
 }

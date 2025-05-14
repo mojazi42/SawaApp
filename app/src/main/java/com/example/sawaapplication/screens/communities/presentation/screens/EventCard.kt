@@ -11,10 +11,12 @@
 //import androidx.compose.runtime.Composable
 //import androidx.compose.ui.Alignment
 //import androidx.compose.ui.Modifier
+//import androidx.compose.ui.res.integerResource
 //import androidx.compose.ui.text.font.FontWeight
 //import androidx.compose.ui.text.style.TextAlign
 //import androidx.compose.ui.unit.dp
 //import androidx.navigation.NavHostController
+//import com.example.sawaapplication.R
 //import com.example.sawaapplication.ui.theme.PrimaryOrange
 //
 //@Composable
@@ -22,7 +24,7 @@
 //    Column(
 //        Modifier
 //            .fillMaxWidth()
-//            .padding(16.dp),
+//            .padding(integerResource(R.integer.padding).dp),
 //        horizontalAlignment = Alignment.CenterHorizontally
 //    ) {
 //        Text(
@@ -30,13 +32,13 @@
 //            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
 //            color = PrimaryOrange
 //        )
-//        Spacer(Modifier.height(16.dp))
+//        Spacer(Modifier.height(integerResource(R.integer.mediumSpace).dp))
 //        Text(
 //            " Hackathon 2024 - May 12th\n📍 Riyadh Innovation Hub",
 //            style = MaterialTheme.typography.bodyMedium,
 //            textAlign = TextAlign.Center
 //        )
-//        Spacer(Modifier.height(8.dp))
+//        Spacer(Modifier.height(integerResource(R.integer.smallerSpace).dp))
 //        Text(
 //            "🚀 Startup Pitch - June 3rd\n📍 Jeddah Business Center",
 //            style = MaterialTheme.typography.bodyMedium,

@@ -147,4 +147,25 @@
     <integer name="massageFontSize">14</integer>
     <integer name="createTimeFontSize">14</integer>
 
+    <!--NewCommunity-->
+    <integer name="communityBoxSize">150</integer>
+    <integer name="descriptionBoxHeight">120</integer>
+
+    <!--PostCard-->
+    <integer name="postCardRoundedCornerShape">16</integer>
+    <integer name="postCardElevation">4</integer>
+    <integer name="postCardPadding">12</integer>
+    <integer name="postCardImageSize">36</integer>
+    <integer name="postCardImageHeight">180</integer>
+
+    <!--CreateNewEventScreen-->
+    <integer name="newEventTextSize">20</integer>
+    <integer name="googleMapPadding">16</integer>
+    <integer name="googleMapPaddingRounded">16</integer>
+
+
+    <!--EventCard-->
+    <integer name="stroke">1</integer>
+    <integer name="spacer">2</integer>
+    <integer name="titleSize">10</integer>
 </resources>

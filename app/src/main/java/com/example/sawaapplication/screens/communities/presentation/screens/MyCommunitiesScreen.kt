@@ -30,7 +30,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun MyCommunitiesScreen(
     navController: NavController,
-    viewModel: CommunityViewModel = hiltViewModel()
+    viewModel: CommunityViewModel = hiltViewModel(),
 ) {
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
@@ -51,10 +51,10 @@ fun MyCommunitiesScreen(
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(integerResource(id= R.integer.smallerSpace).dp),
-            verticalArrangement = Arrangement.spacedBy(integerResource(id= R.integer.smallerSpace).dp),
-            horizontalArrangement = Arrangement.spacedBy(integerResource(id= R.integer.smallerSpace).dp),
-            modifier = Modifier.padding(vertical = integerResource(id= R.integer.largerSpace).dp)
+            contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
+            verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+            horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+            modifier = Modifier.padding(vertical = integerResource(id = R.integer.largerSpace).dp)
         ) {
             items(communities) { community ->
                 MyCommunitiesCard(
@@ -73,6 +73,6 @@ fun MyCommunitiesScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(integerResource(R.integer.mediumSpace).dp)
-            )
+        )
     }
 }

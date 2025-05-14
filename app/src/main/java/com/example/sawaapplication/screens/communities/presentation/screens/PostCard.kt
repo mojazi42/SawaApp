@@ -29,8 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
@@ -42,24 +44,24 @@ fun PostCard(post: PostUiModel) {
 
     Card(
         Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(integerResource(R.integer.postCardRoundedCornerShape).dp),
         colors = CardDefaults.cardColors(containerColor = white),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(integerResource(R.integer.postCardElevation).dp)
     ) {
         Column {
-            Column(Modifier.padding(12.dp)) {
+            Column(Modifier.padding(integerResource(R.integer.postCardPadding).dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
                         model = post.userAvatarUrl,
                         contentDescription = null,
-                        modifier = Modifier.size(36.dp).clip(CircleShape),
+                        modifier = Modifier.size(integerResource(R.integer.postCardImageSize).dp).clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(integerResource(R.integer.smallerSpace).dp))
                     Text(post.username, style = MaterialTheme.typography.bodyMedium, color = black)
                 }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(integerResource(R.integer.smallerSpace).dp))
 
                 if (post.postImageUrl.isNotBlank()) {
                     AsyncImage(
@@ -67,8 +69,8 @@ fun PostCard(post: PostUiModel) {
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(180.dp)
-                            .clip(RoundedCornerShape(12.dp)),
+                            .height(integerResource(R.integer.postCardImageHeight).dp)
+                            .clip(RoundedCornerShape(integerResource(R.integer.chatRoundedCornerShape).dp)),
                         contentScale = ContentScale.Crop
                     )
                 } else {
