@@ -63,6 +63,7 @@
     <string name="eventMembersLimit">Number of Attendance</string>
     <string name="ok">OK</string>
     <string name="eventDate">Event Date</string>
+    <string name="eventTime">Event Time</string>
     <string name="eventLocation">Event Location</string>
 
     <!--CommunityScreen-->

@@ -67,6 +67,7 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
@@ -366,34 +367,36 @@ fun CommunityScreen(
 //                }
                 items(events) { event ->
                     communityDetail?.let {
-                        EventCard(
-                            image = event.imageUri,
-                            title = event.title,
-                            description = event.description,
-                            location = context.getCityNameFromGeoPoint(event.location),
-                            participants = event.memberLimit,
-                            joinedUsers = event.joinedUsers,
-                            community = it.name,
-                            time = "3:20",
-                            joined = event.joinedUsers.contains(userId),
-                            onJoinClick = {
-                                if (event.joinedUsers.contains(userId)) {
-                                    eventViewModel.leaveEvent(
-                                        communityId = communityId,
-                                        eventId = event.id,
-                                        userId = userId
-                                    )
-                                } else {
-                                    eventViewModel.joinEvent(
-                                        communityId = communityId,
-                                        eventId = event.id,
-                                        userId = userId
-                                    )
-                                }
-                            },
-                            showCancelButton = true,
-                            modifier =  Modifier.padding(4.dp)
-                        )
+                        event.time?.let { it1 -> formatTimestampToTimeString(it1) }?.let { it2 ->
+                            EventCard(
+                                image = event.imageUri,
+                                title = event.title,
+                                description = event.description,
+                                location = context.getCityNameFromGeoPoint(event.location),
+                                participants = event.memberLimit,
+                                joinedUsers = event.joinedUsers,
+                                community = it.name,
+                                time = it2,
+                                joined = event.joinedUsers.contains(userId),
+                                onJoinClick = {
+                                    if (event.joinedUsers.contains(userId)) {
+                                        eventViewModel.leaveEvent(
+                                            communityId = communityId,
+                                            eventId = event.id,
+                                            userId = userId
+                                        )
+                                    } else {
+                                        eventViewModel.joinEvent(
+                                            communityId = communityId,
+                                            eventId = event.id,
+                                            userId = userId
+                                        )
+                                    }
+                                },
+                                showCancelButton = true,
+                                modifier =  Modifier.padding(4.dp)
+                            )
+                        }
                     }
 
 

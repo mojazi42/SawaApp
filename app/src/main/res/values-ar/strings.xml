@@ -64,6 +64,7 @@
     <string name="eventMembersLimit">عدد للحضور</string>
     <string name="ok">تم</string>
     <string name="eventDate">تاريخ الحدث</string>
+    <string name="eventTime">وقت الحدث</string>
     <string name="eventLocation">مكان الحدث</string>
 
     <!--CommunityScreen-->
