@@ -18,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,12 +32,13 @@ import com.example.sawaapplication.screens.home.presentation.screens.component.E
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.mutableIntStateOf
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Posts", "My Events")
 
     Box(modifier = Modifier.fillMaxSize()) {
