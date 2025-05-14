@@ -9,7 +9,7 @@ import javax.inject.Inject
 class ObserveMessagesUseCase @Inject constructor(
     private val repository: MessageRepository
 ) {
-    operator fun invoke(communityId: String): Flow<List<Message>> {
-        return repository.observeMessages(communityId)
+    operator fun invoke(communityId: String, currentUserId: String): Flow<List<Message>> {
+        return repository.observeMessages(communityId, currentUserId)
     }
 }
