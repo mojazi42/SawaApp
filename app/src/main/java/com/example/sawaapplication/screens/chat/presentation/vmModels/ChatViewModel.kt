@@ -26,7 +26,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val sendMessageUseCase: SendMessageUseCase,
     private val observeMessagesUseCase: ObserveMessagesUseCase,
     private val getLastMessageWithSenderUseCase: GetLastMessageWithSenderUseCase,
