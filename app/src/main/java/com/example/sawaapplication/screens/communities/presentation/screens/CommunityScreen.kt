@@ -362,44 +362,39 @@ fun CommunityScreen(
 
                 }
             } else {
-//                item {
-//                    EventCardScreen(navController = navController, communityId = communityId)
-//                }
                 items(events) { event ->
                     communityDetail?.let {
-                        event.time?.let { it1 -> formatTimestampToTimeString(it1) }?.let { it2 ->
-                            EventCard(
-                                image = event.imageUri,
-                                title = event.title,
-                                description = event.description,
-                                location = context.getCityNameFromGeoPoint(event.location),
-                                participants = event.memberLimit,
-                                joinedUsers = event.joinedUsers,
-                                community = it.name,
-                                time = it2,
-                                joined = event.joinedUsers.contains(userId),
-                                onJoinClick = {
-                                    if (event.joinedUsers.contains(userId)) {
-                                        eventViewModel.leaveEvent(
-                                            communityId = communityId,
-                                            eventId = event.id,
-                                            userId = userId
-                                        )
-                                    } else {
-                                        eventViewModel.joinEvent(
-                                            communityId = communityId,
-                                            eventId = event.id,
-                                            userId = userId
-                                        )
-                                    }
-                                },
-                                showCancelButton = true,
-                                modifier =  Modifier.padding(4.dp)
-                            )
-                        }
+                        val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+
+                        EventCard(
+                            image = event.imageUri,
+                            title = event.title,
+                            description = event.description,
+                            location = context.getCityNameFromGeoPoint(event.location),
+                            participants = event.memberLimit,
+                            joinedUsers = event.joinedUsers,
+                            community = it.name,
+                            time = timeFormatted,
+                            joined = event.joinedUsers.contains(userId),
+                            onJoinClick = {
+                                if (event.joinedUsers.contains(userId)) {
+                                    eventViewModel.leaveEvent(
+                                        communityId = communityId,
+                                        eventId = event.id,
+                                        userId = userId
+                                    )
+                                } else {
+                                    eventViewModel.joinEvent(
+                                        communityId = communityId,
+                                        eventId = event.id,
+                                        userId = userId
+                                    )
+                                }
+                            },
+                            showCancelButton = true,
+                            modifier = Modifier.padding(4.dp)
+                        )
                     }
-
-
                 }
             }
         }
