@@ -73,17 +73,14 @@ import com.example.sawaapplication.screens.event.presentation.screens.formatTime
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
+import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
 import com.google.firebase.auth.FirebaseAuth
 
-data class PostUiModel(
-    val username: String,
-    val userAvatarUrl: String = "",
-    val postImageUrl: String = ""
-)
+
 
 data class CommunityUiState(
     val logoUrl: String,
@@ -373,9 +370,10 @@ fun CommunityScreen(
                 items(posts) { post ->
                     PostCard(
                         post = PostUiModel(
-                            username = post.userId,
-                            userAvatarUrl = "",
-                            postImageUrl = post.imageUri
+                            username = post.username,
+                            userAvatarUrl = post.userAvatarUrl,
+                            postImageUrl = post.postImageUrl,
+                            content = post.content
                         )
                     )
 
