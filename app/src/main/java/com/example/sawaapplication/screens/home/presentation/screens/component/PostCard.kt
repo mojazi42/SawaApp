@@ -44,8 +44,8 @@ import java.util.Locale
 @Composable
 fun PostCard(
     post: Post,
-    communityName: String,
-    userName: String,
+    communityName: String = "",
+    userName: String = "",
     userImage: String,
     onClick: () -> Unit,
     onLikeClick: (Post) -> Unit,
@@ -124,7 +124,10 @@ fun PostCard(
                     Text(
                         text = userName,
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                        }
                     )
                     Text(
                         text = "Posted on $formattedDate",
