@@ -2,7 +2,10 @@ package com.example.sawaapplication.screens.profile.vm
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.example.sawaapplication.core.sharedPreferences.ThemeManager
 import com.example.sawaapplication.core.sharedpreferences.LanguageManager
+//import com.example.sawaapplication.core.sharedPreferences.ThemeManager
+//import com.example.sawaapplication.core.sharedpreferences.LanguageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +17,7 @@ class ThemeViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _isDarkTheme = MutableStateFlow(false)
+    private val _isDarkTheme = MutableStateFlow(ThemeManager.getSavedTheme(context))
     val isDarkTheme: StateFlow<Boolean> = _isDarkTheme
 
     private val _isArabic = MutableStateFlow(false)
@@ -23,10 +26,15 @@ class ThemeViewModel @Inject constructor(
     init {
         val lang = LanguageManager.getSavedLanguage(context)
         _isArabic.value = lang == "ar"
+
+        val theme = ThemeManager.getSavedTheme(context)
+        _isDarkTheme.value = theme == true
     }
 
     fun toggleTheme() {
-        _isDarkTheme.value = !_isDarkTheme.value
+        val newTheme = !_isDarkTheme.value
+        _isDarkTheme.value = newTheme
+        ThemeManager.saveTheme(context,newTheme)
     }
 
     fun toggleLanguage() {
