@@ -17,7 +17,7 @@ class ThemeViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _isDarkTheme = MutableStateFlow(false)
+    private val _isDarkTheme = MutableStateFlow(ThemeManager.getSavedTheme(context))
     val isDarkTheme: StateFlow<Boolean> = _isDarkTheme
 
     private val _isArabic = MutableStateFlow(false)
@@ -32,8 +32,8 @@ class ThemeViewModel @Inject constructor(
     }
 
     fun toggleTheme() {
-        val newTheme = if (_isDarkTheme.value) false else true
-        _isDarkTheme.value = !_isDarkTheme.value
+        val newTheme = !_isDarkTheme.value
+        _isDarkTheme.value = newTheme
         ThemeManager.saveTheme(context,newTheme)
     }
 
