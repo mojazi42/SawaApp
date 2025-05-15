@@ -367,22 +367,6 @@ fun CreateNewEventScreen(
                 showDatePicker = false
             }, onDismiss = { showDatePicker = false })
         }
-        //event time
-        CustomTextField(
-            value = viewModel.eventTime,
-            onValueChange = { viewModel.eventTime = it },
-            label = stringResource(id = R.string.eventTime),
-            readOnly = true,
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Timer,
-                    contentDescription = "Pick Time",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { showTimePicker = true }
-                )
-            }
-        )
-
         if (showTimePicker) {
             TimePickerModal(onTimeSelected = { hour, minute ->
                 val second = 0
