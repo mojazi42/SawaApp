@@ -109,4 +109,7 @@
     <string name="noNotifications">No notifications.</string>
     <string name="systemNotification">System Notification</string>
 
+    <!--CreatePostScreen-->
+    <string name="postContentPlaceholder">Share your Idea</string>
+
 </resources>
