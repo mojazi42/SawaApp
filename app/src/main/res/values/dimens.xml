@@ -185,4 +185,10 @@
     <integer name="lazyColumnArrangement">14</integer>
     <integer name="lazyColumnHorizontalDividerThickness">1</integer>
 
+    <!--fun NotificationCard-->
+    <integer name="boxBorderWidth">1</integer>
+    <integer name="profileImageSizeLeft">45</integer>
+    <integer name="actionTimeSpacer">6</integer>
+    <integer name="profileImageSizeRight">60</integer>
+
 </resources>
