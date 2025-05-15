@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
+import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
 import com.example.sawaapplication.R
