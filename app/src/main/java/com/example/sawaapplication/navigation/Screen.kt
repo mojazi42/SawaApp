@@ -17,5 +17,19 @@ sealed class Screen(val route: String) {
     @Serializable data object NewCommunity : Screen("new_community")
     @Serializable data object NewPost : Screen("")
     @Serializable data object EditProfile : Screen("editProfile")
+    @Serializable data object Chats : Screen("chats/{communityId}")
 
+    @Serializable data object GroupMembers : Screen("groupMembers/{communityId}")
+
+    @Serializable
+    data object UserAccount : Screen("profile/{userId}") {
+        fun createRoute(userId: String) = "profile/$userId"
+    }
+
+    //    @Serializable
+//    data object CreateNewEvent : Screen("create_event/{communityId}") {
+//        fun passCommunityId(communityId: String): String {
+//            return "create_event/$communityId"
+//        }
+    //  }
 }

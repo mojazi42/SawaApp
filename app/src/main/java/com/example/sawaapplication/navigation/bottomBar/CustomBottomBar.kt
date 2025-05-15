@@ -1,55 +1,77 @@
 package com.example.sawaapplication.navigation.bottomBar
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Dashboard
-import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.material.icons.rounded.GridView
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun CustomBottomBar(
     selectedIndex: Int,
-    onItemSelected: (Int) -> Unit,
-    navController: NavController
+    onItemSelected: (Int) -> Unit
 ) {
-    val items = listOf(
-        Icons.Default.Home,
-        Icons.Default.Dashboard,
-        Icons.Default.Notifications,
-        Icons.Default.Groups,
-        Icons.Default.Person
-    )
-
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 4.dp,
-        modifier = Modifier.height(80.dp)
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.background
     ) {
-        items.forEachIndexed { index, icon ->
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                contentAlignment = Alignment.Center
-            ) {
-                IconButton(onClick = { onItemSelected(index) }) {
+        navigationItems.forEachIndexed { index, item ->
+            NavigationBarItem(
+                selected = selectedIndex == index,
+                onClick = {
+                    onItemSelected(index)
+                },
+                icon = {
                     Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = if (selectedIndex == index) MaterialTheme.colorScheme.primary else Color.Gray
+                        imageVector = item.icon,
+                        contentDescription = item.title
                     )
-                }
-            }
+                },
+                label = {
+                    Text(
+                        text = item.title,
+                        color = if (selectedIndex == index)
+                           MaterialTheme.colorScheme.primary
+                        else Color.Gray
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor =  MaterialTheme.colorScheme.background,
+                    indicatorColor = MaterialTheme.colorScheme.primary
+                )
+            )
         }
     }
 }
 
+data class NavigationItem(
+    val title: String,
+    val icon: ImageVector,
+)
+
+val navigationItems = listOf(
+    NavigationItem(
+        title = "Home",
+        icon = Icons.Filled.Home,
+    ),
+    NavigationItem(
+        title = "Explore",
+        icon = Icons.Rounded.GridView,
+    ),
+    NavigationItem (
+        title = "Communities",
+        icon = Icons.Default.Group,
+    ),
+    NavigationItem(
+        title = "Chats",
+        icon = Icons.Filled.ChatBubble,
+    )
+)

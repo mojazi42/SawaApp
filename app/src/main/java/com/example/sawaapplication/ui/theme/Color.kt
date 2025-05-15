@@ -8,7 +8,6 @@ val Gray = Color(0x59000000)
 val DarkContainer = Color(0xFF2B2B2B)
 val LightContainer = Color(0xFFFFFFFF)
 
-
 val  LightBorder = Color(0x26000000)
 val DarkBorder = Color(0xFF818181)
 
@@ -26,5 +25,11 @@ val white = Color(0XFFFFFFFF)
 
 val darkGray = Color(0xFF5E5E5E)
 val lightGray = Color(0xFFA4A4A4)
+val Red = Color(0xFFB22626)
+
+
+
+
+
 
 

@@ -34,12 +34,11 @@
     <integer name="smallText">16</integer>
 
     <!--Button-->
-    <integer name="buttonHeight">52</integer>
-    <integer name="buttonRoundCornerShape">20</integer>
-    <integer name="roundedCornerShape">12</integer>
+    <integer name="buttonHeight">72</integer>
+    <integer name="buttonRoundCornerShape">40</integer>
+    <integer name="roundedCornerShape">22</integer>
     <integer name="buttonWidth">244</integer>
     <integer name="floatingButton">36</integer>
-
 
     <!--Custom Card Dimensions-->
     <integer name="cardPadding">8</integer>
@@ -68,6 +67,7 @@
     <integer name="smallTextFontSize">14</integer>
     <integer name="smallerTextFontSize">12</integer>
     <integer name="onboardingImage">300</integer>
+    <integer name="homeScreenFontSize">10</integer>
 
     <!--Logo-->
     <integer name="logoHeight">80</integer>
@@ -93,5 +93,108 @@
     <!--Notification Dimensions-->
     <integer name="belowTitle">24</integer>
 
+    <!--Bottom Bar-->
+    <integer name="bottomBarHeight">76</integer>
+    <integer name="bottomBarIconSize">45</integer>
+    <integer name="bottomBarIconSmallSize">40</integer>
+
+    <!--Top Bar-->
+    <integer name="topBarIconSize">36</integer>
+
+    <!--Home Screen-->
+    <integer name="homeScreenHorizontalPadding">16</integer>
+    <integer name="homeScreenVerticalPadding">8</integer>
+    <integer name="homeScreenRoundedCornerShape">16</integer>
+    <integer name="homeScreenCardElevation">4</integer>
+    <integer name="homeScreenEventImageSize">140</integer>
+    <integer name="homeScreenIconSize">16</integer>
+    <integer name="homeCommunityNamePostPadding">64</integer>
+    <integer name="homePostProfileImage">48</integer>
+    <integer name="homeScreenTopPadding">56</integer>
+    <integer name="homeScreenBottomPadding">12</integer>
+
+    <!--CommunityScreen-->
+    <integer name="floatingActionButtonSize">56</integer>
+    <integer name="floatingActionButtonElevation">8</integer>
+    <integer name="lazyColumnSpacedBy">16</integer>
+    <integer name="itemSpacerH">24</integer>
+    <integer name="itemSpacerSize">100</integer>
+    <integer name="itemSpacerH2nd">16</integer>
+    <integer name="communityDetailHorizontalPadding">32</integer>
+    <integer name="itemSpacerH3ed">8</integer>
+    <integer name="roundedCornerShapeCircle">50</integer>
+    <integer name="buttonStroke">1</integer>
+    <integer name="buttonPaddingH">24</integer>
+    <integer name="buttonPaddingV">12</integer>
+    <integer name="buttonElevation">4</integer>
+    <integer name="iconSize">20</integer>
+    <integer name="tabRowHeight">4</integer>
+
+    <!--ChatScreen-->
+    <integer name="topBarPadding">12</integer>
+    <integer name="topBarSpaceH">8</integer>
+    <integer name="chatTopBarIconSize">28</integer>
+    <integer name="textStartPadding">21</integer>
+    <integer name="inputRowPaddingH">16</integer>
+    <integer name="boxSize">36</integer>
+    <integer name="chatScreenSpacer">20</integer>
+    <integer name="rowColumnPadding">8</integer>
+    <integer name="horizontalArrangementSpace">8</integer>
+    <integer name="imageSize">36</integer>
+    <integer name="columnMaxSize">290</integer>
+    <integer name="userNameFontSize">12</integer>
+    <integer name="chatRoundedCornerShape">12</integer>
+    <integer name="massageFontSize">14</integer>
+    <integer name="createTimeFontSize">14</integer>
+
+    <!--NewCommunity-->
+    <integer name="communityBoxSize">150</integer>
+    <integer name="descriptionBoxHeight">120</integer>
+
+    <!--PostCard-->
+    <integer name="postCardRoundedCornerShape">16</integer>
+    <integer name="postCardElevation">4</integer>
+    <integer name="postCardPadding">12</integer>
+    <integer name="postCardImageSize">36</integer>
+    <integer name="postCardImageHeight">180</integer>
+
+    <!--CreateNewEventScreen-->
+    <integer name="newEventTextSize">20</integer>
+    <integer name="googleMapPadding">16</integer>
+    <integer name="googleMapPaddingRounded">16</integer>
+
+    <!--EventCard-->
+    <integer name="stroke">1</integer>
+    <integer name="spacer">2</integer>
+    <integer name="titleSize">10</integer>
+
+    <!--PostCard-->
+    <integer name="cardRoundedCornerShape">12</integer>
+    <integer name="cardElevation">4</integer>
+    <integer name="cardHorizontalPadding">8</integer>
+    <integer name="cardBorder">1</integer>
+    <integer name="boxRoundedCornerShape">4</integer>
+    <integer name="asyncImageSize">36</integer>
+    <integer name="postAsyncImageSize">180</integer>
+    <integer name="postImageRoundedCornerShape">8</integer>
+
+    <!--PostsTab-->
+    <integer name="lazyColumnPaddingTop">72</integer>
+    <integer name="lazyColumnPaddingStartEnd">16</integer>
+    <integer name="lazyColumnPaddingButton">56</integer>
+    <integer name="lazyColumnArrangement">14</integer>
+    <integer name="lazyColumnHorizontalDividerThickness">1</integer>
+
+    <!--fun NotificationCard-->
+    <integer name="boxBorderWidth">1</integer>
+    <integer name="profileImageSizeLeft">45</integer>
+    <integer name="actionTimeSpacer">6</integer>
+    <integer name="profileImageSizeRight">60</integer>
+
+    <!--CreatePostScreen-->
+    <integer name="communityImageSize">48</integer>
+    <integer name="postContentSize">200</integer>
+    <integer name="postContentRoundedCornerShape">8</integer>
+    <integer name="postSelectedImageRoundedCornerShape">12</integer>
 
 </resources>

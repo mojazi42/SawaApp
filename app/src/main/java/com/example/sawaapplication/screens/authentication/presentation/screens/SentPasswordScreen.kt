@@ -28,7 +28,7 @@ fun SentPasswordScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(integerResource(R.integer.padding).dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = CenterHorizontally
     ) {
@@ -43,7 +43,7 @@ fun SentPasswordScreen() {
             )
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(integerResource(R.integer.extraSmallSpace).dp))
 
         CustomCard(
             modifier = Modifier
@@ -53,7 +53,7 @@ fun SentPasswordScreen() {
                 )
         ) {
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(integerResource(R.integer.extraLargeSpace).dp),
                 horizontalAlignment = CenterHorizontally
             ) {
 

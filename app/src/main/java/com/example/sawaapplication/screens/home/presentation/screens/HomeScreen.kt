@@ -1,106 +1,192 @@
 package com.example.sawaapplication.screens.home.presentation.screens
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.home.presentation.screens.component.CustomTabRow
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
+import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.navigation.NavController
+import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
+import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.res.stringResource
 
 @Composable
-fun HomeScreen(
-    navController: NavController
+fun HomeScreen(navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    val searchText by remember {  mutableStateOf("") }
-    val tabs = listOf("Posts", "My Events")
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        CustomTabRow(
-            tabs = tabs,
-            selectedTabIndex = selectedTabIndex,
-            onTabSelected = { selectedTabIndex = it }
-
-        )
-
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = {  },
-            placeholder = { Text("Search") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon"
-                )
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(25.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
 
         when (selectedTabIndex) {
-            0 -> PostsTab()
-            1 -> MyEventsTab()
+            0 -> PostsTab(viewModel,navController)
+            1 -> MyEventsTab() // implement if needed
         }
-    }
-}
 
-@Composable
-fun PostsTab() {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(15) { index ->
-            PostCard(
-                community = "Coffee Community",
-                name = "Shouq Albdrani",
-                username = "shouq.bd1",
-                time = "8h",
-                text = "Coffee Lovers: You can only bring one item to a remote island to help you perfect your coffee ritual. What do you bring? Grinder? French Press? Beans? Tell me why! #CoffeeTal",
-                likes = 0,
-                profileImage = painterResource(id = R.drawable.first),
-                onClick = {  }
-            )
-
-        }
-    }
-}
-
-@Composable
-fun MyEventsTab() {
-    LazyColumn {
-        items(2) {
-            var isJoined by remember { mutableStateOf(true) }
-            EventCard(
-                image = painterResource(id = R.drawable.first),
-                community = "Saudi Innovation Community",
-                title = "Fine art between past and present",
-                description = "World Art Day, which falls on April 15, celebrates artists and their contributions...",
-                location = "Madinah",
-                time = "16 Feb 25 • 06:00 PM-10:00 PM",
-                joined = isJoined,
-                participants = 12,
-                onJoinClick = { isJoined = !isJoined }
+        // Top transparent tab row
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .align(Alignment.TopCenter)
+                .zIndex(1f)
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
+        ) {
+            CustomTabRow(
+                tabs = tabs,
+                selectedTabIndex = selectedTabIndex,
+                onTabSelected = { selectedTabIndex = it }
             )
         }
     }
 }
 
+@Composable
+fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
+    val posts by viewModel.posts.collectAsState()
+    val loading by viewModel.loading.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val communityNames by viewModel.communityNames.collectAsState()
+    val userDetails by viewModel.userDetails.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllPosts()
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+
+            error != null -> Text(
+                text = error ?: stringResource(R.string.unknownError),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            else ->
+                LazyColumn(
+                    contentPadding = PaddingValues(
+                        top = integerResource(R.integer.lazyColumnPaddingTop).dp,
+                        start = integerResource(R.integer.lazyColumnPaddingStartEnd).dp,
+                        end = integerResource(R.integer.lazyColumnPaddingStartEnd).dp,
+                        bottom = integerResource(R.integer.lazyColumnPaddingButton).dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.lazyColumnArrangement).dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                items(posts) { post ->
+                    val communityName = communityNames[post.communityId] ?: stringResource(R.string.unknown)
+                    val (userName, userImage) = userDetails[post.userId] ?: (stringResource(R.string.unknown) to "")
+                    PostCard(
+                        post,
+                        communityName,
+                        userName,
+                        userImage,
+                        onClick = {},
+                        onLikeClick = { viewModel.likePost(post) },
+                        navController = navController,
+                        onUserImageClick = { viewModel.likePost(post) }
+                    )
+
+                    HorizontalDivider(
+                        thickness = integerResource(R.integer.lazyColumnHorizontalDividerThickness).dp,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        modifier = Modifier.padding(vertical = integerResource(R.integer.smallerSpace).dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MyEventsTab(
+    viewModel: HomeViewModel = hiltViewModel(),
+    eventViewModel: FetchEventViewModel = hiltViewModel()
+) {
+    val events by viewModel.joinedEvents.collectAsState()
+    val loading by viewModel.loading.collectAsState()
+
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val joinResult by eventViewModel.joinResult.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchJoinedEvents()
+    }
+
+    // Refresh the list after a successful cancel
+    LaunchedEffect(joinResult) {
+        if (joinResult?.isSuccess == true) {
+            viewModel.fetchJoinedEvents()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+
+            events.isEmpty() -> Text(
+                "No joined events",
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            else -> LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(top = 72.dp, bottom = 56.dp)
+            ) {
+                items(events) { event ->
+                    EventCard(
+                        image = event.imageUri,
+                        title = event.title,
+                        description = event.description,
+                        location = event.location.toString(),
+                        time = event.time.toString(),
+                        participants = event.joinedUsers.size,
+                        community = "Community", // Replace with resolved name if needed
+                        joined = true,
+                        onJoinClick = {
+                            eventViewModel.leaveEvent(
+                                communityId = event.communityId,
+                                eventId = event.id,
+                                userId = userId
+                            )
+                        },
+                        showCancelButton = true,
+                        joinedUsers = event.joinedUsers,
+                        date = event.date,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+        }
+    }
+}

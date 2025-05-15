@@ -12,12 +12,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.net.Uri
+import com.example.sawaapplication.core.permissions.PermissionHandler
+import com.example.sawaapplication.screens.profile.domain.model.User
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firebaseAuthDataSource: FirebaseAuthDataSource
+    private val firebaseAuthDataSource: FirebaseAuthDataSource,
+    private val permissionHandler: PermissionHandler,
+    private val firestore: FirebaseFirestore
 ) : ViewModel() {
 
     private val _userName = MutableStateFlow<String?>(null)
@@ -47,27 +52,28 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateAboutMe(newAboutMe: String){
+    fun updateAboutMe(newAboutMe: String) {
         viewModelScope.launch {
             firebaseAuthDataSource.updateUserInfo(newAboutMe)
             _aboutMe.value = newAboutMe
         }
     }
-    fun updateName(newName: String){
+
+    fun updateName(newName: String) {
         viewModelScope.launch {
             firebaseAuthDataSource.updateUserName(newName)
             _userName.value = newName
         }
     }
 
-    private fun fetchAboutMe(userId : String) {
+    private fun fetchAboutMe(userId: String) {
         val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
 
-        // Start a real-time Firestore listener on the user document to track 'aboutMe' updates
+        // Start a real-time FireStore listener on the user document to track 'aboutMe' updates
         userRef.addSnapshotListener { documentSnapshot, error ->
 
             if (error != null) {
-                Log.e("ProfileViewModel", "Firestore error: ", error)
+                Log.e("ProfileViewModel", "FireStore error: ", error)
                 return@addSnapshotListener
             }
 
@@ -75,7 +81,7 @@ class ProfileViewModel @Inject constructor(
             if (documentSnapshot != null && documentSnapshot.exists()) {
                 val about = documentSnapshot.getString("aboutMe")
 
-                //  Update the StateFlow with the latest value from Firestore
+                //  Update the StateFlow with the latest value from FireStore
                 // This triggers recomposition in the UI if it's collecting aboutMe
                 _aboutMe.value = about
             }
@@ -85,12 +91,12 @@ class ProfileViewModel @Inject constructor(
     private fun fetchUserName(userId: String) {
         val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
 
-        // Changed from .get() to addSnapshotListener for real-time Firestore updates
-        // Now directly updates _userName.value when Firestore document changes
+        // Changed from .get() to addSnapshotListener for real-time FireStore updates
+        // Now directly updates _userName.value when FireStore document changes
         userRef.addSnapshotListener { documentSnapshot, error ->
             if (error != null) {
-                Log.e("ProfileViewModel", "Firestore error (fetchUserName): ", error)
-                return@addSnapshotListener // early return if Firestore listener throws an error
+                Log.e("ProfileViewModel", "FireStore error (fetchUserName): ", error)
+                return@addSnapshotListener // early return if FireStore listener throws an error
             }
 
             if (documentSnapshot != null && documentSnapshot.exists()) {
@@ -129,5 +135,25 @@ class ProfileViewModel @Inject constructor(
             }
             .addOnFailureListener { onFailure(it) }
     }
-
+    private val _selectedUser = MutableStateFlow<User?>(null)
+    val selectedUser: StateFlow<User?> = _selectedUser
+    fun fetchUserById(userId: String) {
+        viewModelScope.launch {
+            try {
+                val snapshot = firestore.collection("User").document(userId).get().await()
+                if (snapshot.exists()) {
+                    val user = snapshot.toObject(User::class.java)
+                    _selectedUser.value = user
+                    Log.d("HomeViewModel", "successfully fetching user: ")
+                } else {
+                    _selectedUser.value = null
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error fetching user: ${e.message}")
+                _selectedUser.value = null
+            }
+        }
+    }
+    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
+    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 }

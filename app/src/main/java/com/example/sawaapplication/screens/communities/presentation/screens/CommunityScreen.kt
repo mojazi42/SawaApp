@@ -1,33 +1,86 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
-import com.example.sawaapplication.ui.theme.*
+import com.example.sawaapplication.screens.communities.presentation.vmModels.ExploreCommunityViewModel
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
+import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
+import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
+import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
+import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
+import com.example.sawaapplication.screens.post.domain.model.PostUiModel
+import com.example.sawaapplication.ui.theme.Gray
+import com.example.sawaapplication.ui.theme.PrimaryOrange
+import com.example.sawaapplication.ui.theme.black
+import com.example.sawaapplication.ui.theme.white
+import com.google.firebase.auth.FirebaseAuth
 
-data class PostUiModel(
-    val username: String,
-    val userAvatarUrl: String = "",
-    val postImageUrl: String = ""
-)
+
 
 data class CommunityUiState(
     val logoUrl: String,
@@ -59,86 +112,230 @@ private val FakeCommunityUiState = CommunityUiState(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
+    communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
-    onBackPressed: () -> Unit
+    eventViewModel: FetchEventViewModel = hiltViewModel(),
+    joinCommunityViewModel: ExploreCommunityViewModel = hiltViewModel(),
+    onBackPressed: () -> Unit,
+    onClick: () -> Unit,
+    navController: NavHostController
 ) {
+    val context = LocalContext.current
+    val fetchEventViewModel: FetchEventViewModel = hiltViewModel()
     val uiState = FakeCommunityUiState
-    var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Posts", "Events")
+    val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
+    LaunchedEffect(communityId) {
+        Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
+        viewModel.fetchCommunityDetail(communityId)
+        viewModel.fetchPostsForCommunity(communityId)
+        fetchEventViewModel.loadEvents(communityId)
+    }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(500)
+        viewModel.fetchCommunityDetail(communityId)
+    }
+    val posts by viewModel.communityPosts.collectAsState()
+    var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
+    var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
+    val communityDetail by viewModel.communityDetail.collectAsState()
+    //val events by eventViewModel.events.collectAsState()
+    val isUserJoined = communityDetail?.members?.contains(userId) == true
+    val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
 
+    LaunchedEffect(hasJoinedOrLeft) {
+        if (hasJoinedOrLeft) {
+            viewModel.fetchCommunityDetail(communityId)
+            // Reset the flag so it doesn't re-trigger
+            joinCommunityViewModel.resetJoinLeaveState()
+        }
+    }
+
+    val events by fetchEventViewModel.events.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
+                    IconButton(onClick = { navController.navigate(Screen.Community.route) }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = white),
-                title = {}
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
+                title = {},
+                windowInsets = WindowInsets(integerResource(R.integer.zero))
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier.size(56.dp),
-                shape = CircleShape,
-                containerColor = PrimaryOrange,
-                contentColor = white,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Post")
+            when (selectedTab) {
+                0 -> {
+                    // FAB for Posts tab
+                    FloatingActionButton(
+                        onClick = { navController.navigate("create_post/$communityId") },
+                        modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(integerResource(R.integer.floatingActionButtonElevation).dp)
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = "Add Post")
+                    }
+                }
+
+                1 -> {
+                    // FAB for Events tab
+                    FloatingActionButton(
+                        onClick = { navController.navigate("create_event/$communityId") },
+                        modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
+                        shape = CircleShape,
+                        containerColor = PrimaryOrange,
+                        contentColor = white,
+                        elevation = FloatingActionButtonDefaults.elevation(integerResource(R.integer.floatingActionButtonElevation).dp)
+                    ) {
+                        Icon(Icons.Default.Event, contentDescription = "Add Event")
+                    }
+                }
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.End,
+        contentWindowInsets = WindowInsets(integerResource(R.integer.zero))
     ) { innerPadding ->
         LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             contentPadding = innerPadding,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.lazyColumnSpacedBy).dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
                 AsyncImage(
-                    model = uiState.logoUrl,
+                    model = communityDetail?.image,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, PrimaryOrange, CircleShape),
+                        .size(integerResource(R.integer.itemSpacerSize).dp)
+                        .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.name,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = black
+                    )
+                }
                 Text(
-                    text = uiState.communityName,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = black
-                )
-                Text(
-                    text = "${uiState.membersCount} Members",
+                    text = "${communityDetail?.members?.size ?: 0} Members",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray
                 )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = uiState.communityDescription,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 32.dp)
-                )
-                Spacer(Modifier.height(20.dp))
-                Button(
-                    onClick = { /* TODO: Handle Join */ },
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
-                    elevation = ButtonDefaults.buttonElevation(4.dp)
-                ) {
-                    Icon(Icons.Default.PersonAdd, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Join Community", style = MaterialTheme.typography.bodyLarge)
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = black,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
+                    )
                 }
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
+
+                if (isUserJoined) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(integerResource(R.integer.padding).dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        //Un-joined button
+                        OutlinedButton(
+                            onClick = {
+                                joinCommunityViewModel.leaveCommunity(communityId, userId)
+                                viewModel.fetchCommunityDetail(communityId)
+                            },
+                            shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            border = BorderStroke(
+                                integerResource(R.integer.buttonStroke).dp,
+                                PrimaryOrange
+                            ),
+                            contentPadding = PaddingValues(
+                                horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                                vertical = integerResource(R.integer.buttonPaddingV).dp
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .wrapContentSize()
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.unjoind),
+                                contentDescription = "nu-join icon",
+                                tint = PrimaryOrange,
+                                modifier = Modifier
+                                    .size(integerResource(R.integer.iconSize).dp),
+                            )
+                            Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                            Text(stringResource(R.string.joined))
+                        }
+
+                        //Go to chat button
+                        OutlinedButton(
+                            onClick = { /* TODO: Handle Join */ },
+                            shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                            border = BorderStroke(
+                                integerResource(R.integer.buttonStroke).dp,
+                                PrimaryOrange
+                            ),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            contentPadding = PaddingValues(
+                                horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                                integerResource(R.integer.buttonPaddingV).dp
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .wrapContentSize()
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.chats),
+                                contentDescription = "chat icon",
+                                tint = PrimaryOrange,
+                                modifier = Modifier
+                                    .size(integerResource(R.integer.iconSize).dp),
+                            )
+                            Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                            Text(stringResource(R.string.chat))
+                        }
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            joinCommunityViewModel.joinCommunity(communityId, userId)
+                            viewModel.fetchCommunityDetail(communityId)
+                        },
+                        shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
+                        contentPadding = PaddingValues(
+                            horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                            vertical = integerResource(R.integer.buttonPaddingV).dp
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
+                    ) {
+                        Icon(Icons.Default.PersonAdd, contentDescription = null)
+                        Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                        Text(
+                            stringResource(R.string.joinCommunity),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
                 TabRow(
                     selectedTabIndex = selectedTab,
@@ -147,7 +344,7 @@ fun CommunityScreen(
                         TabRowDefaults.Indicator(
                             Modifier
                                 .tabIndicatorOffset(positions[selectedTab])
-                                .height(3.dp),
+                                .height(integerResource(R.integer.tabRowHeight).dp),
                             color = PrimaryOrange
                         )
                     }
@@ -166,16 +363,56 @@ fun CommunityScreen(
                         )
                     }
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH3ed).dp))
             }
 
             if (selectedTab == 0) {
-                items(uiState.posts) { post ->
-                    PostCard(post)
+                items(posts) { post ->
+                    PostCard(
+                        post = PostUiModel(
+                            username = post.username,
+                            userAvatarUrl = post.userAvatarUrl,
+                            postImageUrl = post.postImageUrl,
+                            content = post.content
+                        )
+                    )
+
                 }
             } else {
-                item {
-                    EventCard()
+                items(events) { event ->
+                    communityDetail?.let {
+                        val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+                        val formattedDate = formatDateString(event.date)
+                        EventCard(
+                            image = event.imageUri,
+                            title = event.title,
+                            description = event.description,
+                            location = context.getCityNameFromGeoPoint(event.location),
+                            participants = event.memberLimit,
+                            joinedUsers = event.joinedUsers,
+                            community = it.name,
+                            time = timeFormatted,
+                            date = formattedDate,
+                            joined = event.joinedUsers.contains(userId),
+                            onJoinClick = {
+                                if (event.joinedUsers.contains(userId)) {
+                                    eventViewModel.leaveEvent(
+                                        communityId = communityId,
+                                        eventId = event.id,
+                                        userId = userId
+                                    )
+                                } else {
+                                    eventViewModel.joinEvent(
+                                        communityId = communityId,
+                                        eventId = event.id,
+                                        userId = userId
+                                    )
+                                }
+                            },
+                            showCancelButton = true,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
                 }
             }
         }

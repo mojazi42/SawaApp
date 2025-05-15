@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.communities.presentation.screens.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,15 +36,17 @@ import com.example.sawaapplication.ui.theme.white
 
 @Composable
 fun MyCommunitiesCard(
-    community: Community
+    community: Community,
+    onClick: () -> Unit
 ) {
-    val memberCount = community.members.size
+    val memberCount = community.members.size // Count members from list size
 
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(integerResource(id=R.integer.cardHeightMyCommunity).dp)
-            .padding(vertical = integerResource(id = R.integer.extraSmallSpace).dp),
+            .padding(vertical = integerResource(id = R.integer.extraSmallSpace).dp)
+            .clickable { onClick() }, // Added click behavior to trigger navigation
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),

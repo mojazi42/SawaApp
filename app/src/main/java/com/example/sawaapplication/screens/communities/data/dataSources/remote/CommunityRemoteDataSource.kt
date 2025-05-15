@@ -47,11 +47,30 @@ class CommunityRemoteDataSource @Inject constructor(
             val snapshot = FirebaseFirestore.getInstance().collection("Community")
                 .whereArrayContains("members", userId).get().await()
 
-            val communities = snapshot.documents.mapNotNull { it.toObject(Community::class.java) }
+            val communities = snapshot.documents.mapNotNull { document ->
+                document.toObject(Community::class.java)?.copy(id = document.id) // added `.copy(id = document.id)` to set Firestore document ID into the model
+            }
             Result.success(communities)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+    suspend fun joinCommunity(communityId: String, userId: String): Result<Unit> {
+        return try {
+            val docRef = firestore.collection("Community").document(communityId)
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(docRef)
+                val members = snapshot.get("members") as? List<String> ?: emptyList()
+                if (!members.contains(userId)) {
+                    val updatedMembers = members + userId
+                    transaction.update(docRef, "members", updatedMembers)
+                }
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }
 

@@ -11,38 +11,46 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.sawaapplication.R
+import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.screens.communities.domain.model.Community
+import androidx.compose.foundation.lazy.items
 
 @Composable
-fun ExploreCommunityCardList(communities: List<String>) {
-
+fun ExploreCommunityCardList(
+    communities: List<Community>,
+    currentUserId: String,
+    onCommunityClick: (String) -> Unit,
+    onJoinClick: (String) -> Unit,
+    onLeaveClick: (String) -> Unit
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(communities.size) { index ->
-            var isJoined by remember { mutableStateOf(false) }
+        items(communities, key = { it.id }) { community ->
+            val isJoined = currentUserId in community.members
+
             CommunityCard(
-                communityName = "Saudi Community",
-                communityMember = 2500000,
-                communityImage = painterResource(id = R.drawable.saudi_logo),
+                communityName = community.name,
+                communityMember = community.members.size,
+                communityImage = rememberAsyncImagePainter(community.image),
                 joinButton = {
                     JoinButton(
                         isJoined = isJoined,
-                        onClick = { isJoined = !isJoined }
+                        onClick = {
+                            if (isJoined) onLeaveClick(community.id)
+                            else onJoinClick(community.id)
+                        }
                     )
                 },
                 onClick = {
-                    // Handle card click
+                    onCommunityClick(community.id)
                 }
             )
 
-            if (index < 5) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    thickness = 1.dp,
-                    color = Color.LightGray
-                )
-            }
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                thickness = 1.dp,
+                color = Color.LightGray
+            )
         }
     }
 }

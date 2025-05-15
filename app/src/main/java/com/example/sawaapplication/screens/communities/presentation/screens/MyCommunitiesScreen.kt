@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,7 +30,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun MyCommunitiesScreen(
     navController: NavController,
-    viewModel: CommunityViewModel = hiltViewModel()
+    viewModel: CommunityViewModel = hiltViewModel(),
 ) {
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
@@ -50,13 +51,21 @@ fun MyCommunitiesScreen(
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(integerResource(id= R.integer.smallerSpace).dp),
-            verticalArrangement = Arrangement.spacedBy(integerResource(id= R.integer.smallerSpace).dp),
-            horizontalArrangement = Arrangement.spacedBy(integerResource(id= R.integer.smallerSpace).dp),
-            modifier = Modifier.padding(vertical = integerResource(id= R.integer.largerSpace).dp)
+            contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
+            verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+            horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+            modifier = Modifier.padding(vertical = integerResource(id = R.integer.largerSpace).dp)
         ) {
             items(communities) { community ->
-                MyCommunitiesCard(community = community)
+                MyCommunitiesCard(
+                    community = community,
+                    onClick = {
+                        // Added debug log to confirm the community ID being navigated to
+                        Log.d("DEBUG", "Navigating to community id: ${community.id}")
+                        // Navigate to the CommunityScreen using the community ID
+                        navController.navigate("community_screen/${community.id}")
+                    }
+                )
             }
         }
         FloatingButton(
@@ -64,6 +73,6 @@ fun MyCommunitiesScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(integerResource(R.integer.mediumSpace).dp)
-            )
+        )
     }
 }

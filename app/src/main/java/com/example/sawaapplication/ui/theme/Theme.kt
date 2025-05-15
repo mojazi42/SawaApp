@@ -20,6 +20,7 @@ private val DarkColorScheme = darkColorScheme(
     primaryContainer = DarkContainer,//Community Card Color
     secondaryContainer = DarkBorder, //Community Card border
     onSecondaryContainer = lightGray,
+    onPrimaryContainer= lightGray,
     )
 
 private val LightColorScheme = lightColorScheme(
@@ -49,7 +50,7 @@ private val LightColorScheme = lightColorScheme(
 fun SawaApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
