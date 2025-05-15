@@ -163,9 +163,19 @@
     <integer name="googleMapPadding">16</integer>
     <integer name="googleMapPaddingRounded">16</integer>
 
-
     <!--EventCard-->
     <integer name="stroke">1</integer>
     <integer name="spacer">2</integer>
     <integer name="titleSize">10</integer>
+
+    <!--PostCard-->
+    <integer name="cardRoundedCornerShape">12</integer>
+    <integer name="cardElevation">4</integer>
+    <integer name="cardHorizontalPadding">8</integer>
+    <integer name="cardBorder">1</integer>
+    <integer name="boxRoundedCornerShape">4</integer>
+    <integer name="asyncImageSize">36</integer>
+    <integer name="postAsyncImageSize">180</integer>
+    <integer name="postImageRoundedCornerShape">8</integer>
+
 </resources>

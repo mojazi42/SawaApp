@@ -31,11 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.post.domain.model.Post
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -72,25 +75,25 @@ fun PostCard(
     }
 
     Card(
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(integerResource(R.integer.cardRoundedCornerShape).dp),
+        elevation = CardDefaults.cardElevation(integerResource(R.integer.cardElevation).dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = integerResource(R.integer.cardHorizontalPadding).dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(integerResource(R.integer.padding).dp)) {
 
             Box(
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = integerResource(R.integer.smallerSpace).dp)
                     .border(
-                        width = 1.dp,
+                        width = integerResource(R.integer.cardBorder).dp,
                         color = Color.Gray,
-                        shape = RoundedCornerShape(4.dp)
+                        shape = RoundedCornerShape(integerResource(R.integer.boxRoundedCornerShape).dp)
                     )
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .padding(horizontal = integerResource(R.integer.smallerSpace).dp, vertical = integerResource(R.integer.extraSmallSpace).dp)
             ) {
                 Text(
                     text = communityName,
@@ -99,7 +102,7 @@ fun PostCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(integerResource(R.integer.smallerSpace).dp))
 
             // Row with user image + name + date
             Row(
@@ -111,14 +114,14 @@ fun PostCard(
                         model = userImage,
                         contentDescription = "User Profile Image",
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(integerResource(R.integer.asyncImageSize).dp)
                             .clip(CircleShape)
                             .clickable {
                                 navController.navigate(Screen.UserAccount.createRoute(userId = post.userId)) }
 
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -130,14 +133,14 @@ fun PostCard(
                         }
                     )
                     Text(
-                        text = "Posted on $formattedDate",
+                        text = "${stringResource(R.string.postedOn)} $formattedDate",
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.Gray
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
 
             // Post content
             Text(
@@ -147,29 +150,28 @@ fun PostCard(
 
             // Post image (optional)
             if (post.imageUri.isNotBlank()) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
                 AsyncImage(
                     model = post.imageUri,
                     contentDescription = "Post Image",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(8.dp))
-
+                        .height(integerResource(R.integer.postAsyncImageSize).dp)
+                        .clip(RoundedCornerShape(integerResource(R.integer.postImageRoundedCornerShape).dp))
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
 
             // Likes count
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${post.likes} Likes",
+                    text = "${post.likes} ${stringResource(R.string.like)}",
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = integerResource(R.integer.smallerSpace).dp)
                 )
 
                 IconButton(onClick = {
