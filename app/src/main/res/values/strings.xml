@@ -99,6 +99,10 @@
 
     <!--PostCard-->
     <string name="postedOn">Posted on</string>
+    <string name="like">Like</string>
+
+    <!--HomeScreen-->
     <string name="unknownError">Unknown error</string>
+    <string name="unknown">Unknown</string>
 
 </resources>

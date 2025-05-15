@@ -178,4 +178,11 @@
     <integer name="postAsyncImageSize">180</integer>
     <integer name="postImageRoundedCornerShape">8</integer>
 
+    <!--PostsTab-->
+    <integer name="lazyColumnPaddingTop">72</integer>
+    <integer name="lazyColumnPaddingStartEnd">16</integer>
+    <integer name="lazyColumnPaddingButton">56</integer>
+    <integer name="lazyColumnArrangement">14</integer>
+    <integer name="lazyColumnHorizontalDividerThickness">1</integer>
+
 </resources>
