@@ -30,8 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.black
