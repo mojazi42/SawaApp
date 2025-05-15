@@ -106,10 +106,6 @@
     <string name="unknownError">Unknown error</string>
     <string name="unknown">Unknown</string>
 
-    <!--HomeScreen-->
-    <string name="unknownError">Unknown error</string>
-    <string name="unknown">Unknown</string>
-
     <!--NotificationScreen-->
     <string name="noNotifications">No notifications.</string>
     <string name="systemNotification">System Notification</string>
