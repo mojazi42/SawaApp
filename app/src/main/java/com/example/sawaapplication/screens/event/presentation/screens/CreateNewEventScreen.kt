@@ -122,8 +122,7 @@ fun CreateNewEventScreen(
                 TextButton(onClick = { showPermissionDialog = false }) {
                     Text(stringResource(R.string.deny))
                 }
-            }
-        )
+            })
     }
     // Photo Permission Dialog
     if (showPhotoPermissionDialog) {
@@ -146,8 +145,7 @@ fun CreateNewEventScreen(
                 }) {
                     Text(stringResource(R.string.deny))
                 }
-            }
-        )
+            })
     }
 
     val eventCreated = stringResource(R.string.eventCreated)
@@ -236,9 +234,7 @@ fun CreateNewEventScreen(
                                 showPhotoPermissionDialog = true
                             } else {
                                 Toast.makeText(
-                                    context,
-                                    askPhotoPermissionFromSettings,
-                                    Toast.LENGTH_LONG
+                                    context, askPhotoPermissionFromSettings, Toast.LENGTH_LONG
                                 ).show()
                             }
                         }
@@ -300,14 +296,43 @@ fun CreateNewEventScreen(
                                 showPermissionDialog = true
                             } else {
                                 Toast.makeText(
-                                    context,
-                                    askLocationPermissionFromSettings,
-                                    Toast.LENGTH_LONG
+                                    context, askLocationPermissionFromSettings, Toast.LENGTH_LONG
                                 ).show()
                             }
-                        }
-                    )
-                }
+                        })
+                })
+            //event date
+            CustomTextField(
+                value = formattedDate,
+                onValueChange = {},
+                label = stringResource(id = R.string.eventDate),
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Pick date",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { showDatePicker = true })
+                })
+            //event time
+            CustomTextField(
+                value = viewModel.eventTime,
+                onValueChange = { viewModel.eventTime = it },
+                label = stringResource(id = R.string.eventTime),
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Timer,
+                        contentDescription = "Pick Time",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { showTimePicker = true })
+                })
+            //event member limit
+            CustomTextField(
+                value = viewModel.membersLimitInput,
+                onValueChange = { viewModel.membersLimitInput = it },
+                label = stringResource(R.string.eventMembersLimit),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
             val locationIsNeeded = stringResource(R.string.locationIsNeeded)
@@ -320,9 +345,7 @@ fun CreateNewEventScreen(
                     // Display rationale if the user has previously denied permission
                     LaunchedEffect(Unit) {
                         Toast.makeText(
-                            context,
-                            locationIsNeeded,
-                            Toast.LENGTH_LONG
+                            context, locationIsNeeded, Toast.LENGTH_LONG
                         ).show()
                     }
                 }
@@ -331,39 +354,18 @@ fun CreateNewEventScreen(
                     // Handle if permission is permanently denied allow from settings
                     LaunchedEffect(Unit) {
                         Toast.makeText(
-                            context,
-                            askLocationPermissionFromSettings,
-                            Toast.LENGTH_LONG
+                            context, askLocationPermissionFromSettings, Toast.LENGTH_LONG
                         ).show()
                     }
                 }
             }
         }
 
-
-        //event date
-        CustomTextField(
-            value = formattedDate,
-            onValueChange = {},
-            label = stringResource(id = R.string.eventDate),
-            readOnly = true,
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Pick date",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { showDatePicker = true }
-                )
-            }
-        )
         if (showDatePicker) {
-            DatePickerModal(
-                onDateSelected = {
-                    viewModel.eventDate = it
-                    showDatePicker = false
-                },
-                onDismiss = { showDatePicker = false }
-            )
+            DatePickerModal(onDateSelected = {
+                viewModel.eventDate = it
+                showDatePicker = false
+            }, onDismiss = { showDatePicker = false })
         }
         //event time
         CustomTextField(
@@ -382,29 +384,17 @@ fun CreateNewEventScreen(
         )
 
         if (showTimePicker) {
-            TimePickerModal(
-                onTimeSelected = { hour, minute ->
-                    val second = 0
-                    val formatted = String.format("%02d:%02d:%02d", hour, minute, second)
-                    viewModel.eventTime = formatted
-                    showTimePicker = false
-                },
-                onDismiss = { showTimePicker = false }
-            )
+            TimePickerModal(onTimeSelected = { hour, minute ->
+                val second = 0
+                val formatted = String.format("%02d:%02d:%02d", hour, minute, second)
+                viewModel.eventTime = formatted
+                showTimePicker = false
+            }, onDismiss = { showTimePicker = false })
         }
-
-        //event member limit
-        CustomTextField(
-            value = viewModel.membersLimitInput,
-            onValueChange = { viewModel.membersLimitInput = it },
-            label = stringResource(R.string.eventMembersLimit),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
         // Google Map to pick location
         if (viewModel.isMapVisible) {
             AlertDialog(
-                onDismissRequest = { viewModel.isMapVisible = false }
-            ) {
+                onDismissRequest = { viewModel.isMapVisible = false }) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -412,22 +402,16 @@ fun CreateNewEventScreen(
                         .clip(RoundedCornerShape(integerResource(R.integer.googleMapPaddingRounded).dp))
                         .background(Color.White)
                 ) {
-                    GoogleMap(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        onMapClick = { latLng ->
-                            pickedLocation = latLng
-                            viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
-                            viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
-                            viewModel.isMapVisible =
-                                false  // Close the map after selecting location
-                        },
-                        cameraPositionState = rememberCameraPositionState {
-                            position = CameraPosition.fromLatLngZoom(
-                                pickedLocation ?: LatLng(24.7136, 46.6753), 5f
-                            )
-                        }
-                    )
+                    GoogleMap(modifier = Modifier.fillMaxSize(), onMapClick = { latLng ->
+                        pickedLocation = latLng
+                        viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
+                        viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
+                        viewModel.isMapVisible = false  // Close the map after selecting location
+                    }, cameraPositionState = rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(
+                            pickedLocation ?: LatLng(24.7136, 46.6753), 5f
+                        )
+                    })
                 }
             }
         }
