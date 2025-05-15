@@ -65,6 +65,7 @@ import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoa
 import com.example.sawaapplication.screens.post.presentation.screens.CreatePostScreen
 import com.example.sawaapplication.screens.profile.screens.EditProfileScreen
 import com.example.sawaapplication.screens.profile.screens.ProfileScreen
+import com.example.sawaapplication.screens.profile.screens.UserAccount
 import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -143,7 +144,7 @@ fun AppNavigation(
                 NewCommunity(navController)
             }
             composable(Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(navController)
             }
             composable(Screen.Explore.route) {
                 ExploreScreen(navController)
@@ -213,6 +214,7 @@ fun AppNavigation(
                 CreatePostScreen(navController, communityId)
             }
 
+
             composable("groupMembers/{communityId}") { backStackEntry ->
                 val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 Log.d("DEBUG", "Navigation received communityId: $communityId")
@@ -220,6 +222,21 @@ fun AppNavigation(
                     communityId = communityId
                 )
             }
+
+            composable(
+                route = Screen.UserAccount.route,
+                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")
+                userId?.let {
+                    UserAccount(
+                        navController = navController,
+                        profileViewModel = hiltViewModel(),
+                        userId = it
+                    )
+                }
+            }
+
         }
     }
 }

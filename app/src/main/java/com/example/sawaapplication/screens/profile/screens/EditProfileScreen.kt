@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -217,17 +219,19 @@ fun EditProfileScreen(
                     fontSize = 16.sp,
                 )
 
-//                IconSwitch(
-//                    checked = isDarkTheme,
-//                    onCheckedChange = { changeAppTheme() },
-//                    iconOn = Icons.Default.DarkMode,
-//                    iconOff = Icons.Default.LightMode,
-//                    modifier = Modifier.size(width = 50.dp, height = 30.dp)
-//                )
-                SettingsThemeSwitches(
-                    isDark = isDarkTheme,
-                    onCheckedChange = { changeAppTheme() }
+                IconSwitch(
+                    checked = isDarkTheme,
+                    onCheckedChange = { changeAppTheme()
+                        themeViewModel.toggleTheme() },
+                    iconOn = Icons.Default.DarkMode,
+                    iconOff = Icons.Default.LightMode,
+                    modifier = Modifier.size(width = 50.dp, height = 30.dp)
                 )
+//                SettingsThemeSwitches(
+//                    isDark = isDarkTheme,
+//                    onCheckedChange = { changeAppTheme()
+//                        themeViewModel.toggleTheme()}
+//                )
             }
         }
         Spacer(modifier = Modifier.height(12.dp))

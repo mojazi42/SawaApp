@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -56,6 +57,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.event.presentation.vmModels.CreateEventViewModel
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -75,16 +77,19 @@ import java.util.Date
 fun CreateNewEventScreen(
     navController: NavHostController, communityId: String,
     viewModel: CreateEventViewModel = hiltViewModel(),
+    notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val success = viewModel.success.value
     val communityID = viewModel.communityId
+
 
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     var pickedLocation by remember { mutableStateOf<LatLng?>(null) }
 
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
     var showPhotoPermissionDialog by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -102,57 +107,71 @@ fun CreateNewEventScreen(
     if (showPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionDialog = false },
-            title = { Text("Location Permission") },
-            text = { Text("We need your location to pick the event location. Would you like to allow access?") },
+            title = { Text(stringResource(R.string.locationPermission)) },
+            text = { Text(stringResource(R.string.askLocationPermission)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markLocationPermissionRequested()
                     locationPermissionState.launchPermissionRequest()
                     showPermissionDialog = false
                 }) {
-                    Text("Allow")
+                    Text(stringResource(R.string.allow))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPermissionDialog = false }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.deny))
                 }
-            }
-        )
+            })
     }
     // Photo Permission Dialog
     if (showPhotoPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPhotoPermissionDialog = false },
-            title = { Text("Photo Permission") },
-            text = { Text("We need access to your photos so you can add an image for the event.") },
+            title = { Text(stringResource(R.string.photoPermission)) },
+            text = { Text(stringResource(R.string.askPhotoPermission)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markPhotoPermissionRequested()
                     photoPermissionState.launchPermissionRequest()
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Allow")
+                    Text(stringResource(R.string.allow))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.deny))
                 }
-            }
-        )
+            })
     }
 
-    LaunchedEffect(communityId,success) {
+    val eventCreated = stringResource(R.string.eventCreated)
+    LaunchedEffect(communityId, success) {
         viewModel.communityId = communityId
-
         if (success) {
-            Toast.makeText(context, "Event Created!", Toast.LENGTH_SHORT).show()
+            // Notify creator about the event creation
+            notificationViewModel.storeEventCreatedNotification(viewModel.name)
+
+            // Notify community members about the new event
+            notificationViewModel.notifyCommunityMembersOfNewEvent(
+                communityId = communityId,
+                eventName = viewModel.name
+            )
+
+            // Show success toast message
+            Toast.makeText(context, eventCreated, Toast.LENGTH_SHORT).show()
+
+            // Navigate back to previous screen
             navController.popBackStack()
+
             viewModel.success.value = false
+        } else {
+            Toast.makeText(context, "Event creation failed", Toast.LENGTH_SHORT).show()
         }
+
 
     }
 
@@ -188,19 +207,20 @@ fun CreateNewEventScreen(
             ) { Text(stringResource(R.string.create)) }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(integerResource(R.integer.mediumSpace).dp))
 
         Text(
             stringResource(R.string.newEvent),
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            fontSize = integerResource(R.integer.newEventTextSize).sp,
         )
 
         Column(
-            modifier = Modifier.padding(28.dp),
+            modifier = Modifier.padding(integerResource(R.integer.newEventTextSize).dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            val askPhotoPermissionFromSettings =
+                stringResource(R.string.askPhotoPermissionFromSettings)
             //event image
             Box(
                 modifier = Modifier
@@ -213,7 +233,9 @@ fun CreateNewEventScreen(
                             if (viewModel.shouldRequestPhoto()) {
                                 showPhotoPermissionDialog = true
                             } else {
-                                Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    context, askPhotoPermissionFromSettings, Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }
@@ -255,9 +277,11 @@ fun CreateNewEventScreen(
             )
 
             //event location
+            val askLocationPermissionFromSettings =
+                stringResource(R.string.askLocationPermissionFromSettings)
             CustomTextField(
-                value = viewModel.locationText,
-                onValueChange = {},
+                value = context.getCityNameFromGeoPoint(viewModel.location),
+                onValueChange =  {context.getCityNameFromGeoPoint(viewModel.location)},
                 label = stringResource(id = R.string.eventLocation),
                 readOnly = true,
                 trailingIcon = {
@@ -271,43 +295,12 @@ fun CreateNewEventScreen(
                             } else if (viewModel.shouldRequestLocation()) {
                                 showPermissionDialog = true
                             } else {
-                                Toast.makeText(context, "Please grant location access in settings.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    context, askLocationPermissionFromSettings, Toast.LENGTH_LONG
+                                ).show()
                             }
-                        }
-                    )
-                }
-            )
-
-            when {
-                locationPermissionState.status.isGranted -> {
-
-                }
-
-                locationPermissionState.status.shouldShowRationale -> {
-                    // Display rationale if the user has previously denied permission
-                    LaunchedEffect(Unit) {
-                        Toast.makeText(
-                            context,
-                            "Location permission is needed to pick your event location.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-
-                else -> {
-                    // Handle if permission is permanently denied allow from settings
-                    LaunchedEffect(Unit) {
-                        Toast.makeText(
-                            context,
-                            "Please grant location access in settings.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }
-            }
-
-
+                        })
+                })
             //event date
             CustomTextField(
                 value = formattedDate,
@@ -319,20 +312,21 @@ fun CreateNewEventScreen(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = "Pick date",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { showDatePicker = true }
-                    )
-                }
-            )
-            if (showDatePicker) {
-                DatePickerModal(
-                    onDateSelected = {
-                        viewModel.eventDate = it
-                        showDatePicker = false
-                    },
-                    onDismiss = { showDatePicker = false }
-                )
-            }
-
+                        modifier = Modifier.clickable { showDatePicker = true })
+                })
+            //event time
+            CustomTextField(
+                value = viewModel.eventTime,
+                onValueChange = { viewModel.eventTime = it },
+                label = stringResource(id = R.string.eventTime),
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Timer,
+                        contentDescription = "Pick Time",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { showTimePicker = true })
+                })
             //event member limit
             CustomTextField(
                 value = viewModel.membersLimitInput,
@@ -340,36 +334,70 @@ fun CreateNewEventScreen(
                 label = stringResource(R.string.eventMembersLimit),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
-            // Google Map to pick location
-            if (viewModel.isMapVisible) {
-                AlertDialog(
-                    onDismissRequest = { viewModel.isMapVisible = false }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White)
-                    ) {
-                        GoogleMap(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            onMapClick = { latLng ->
-                                pickedLocation = latLng
-                                viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
-                                viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
-                                viewModel.isMapVisible = false  // Close the map after selecting location
-                            },
-                            cameraPositionState = rememberCameraPositionState {
-                                position = CameraPosition.fromLatLngZoom(
-                                    pickedLocation ?: LatLng(24.7136, 46.6753), 5f
-                                )
-                            }
-                        )
+
+            val locationIsNeeded = stringResource(R.string.locationIsNeeded)
+            when {
+                locationPermissionState.status.isGranted -> {
+
+                }
+
+                locationPermissionState.status.shouldShowRationale -> {
+                    // Display rationale if the user has previously denied permission
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context, locationIsNeeded, Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                else -> {
+                    // Handle if permission is permanently denied allow from settings
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context, askLocationPermissionFromSettings, Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
+        }
 
+        if (showDatePicker) {
+            DatePickerModal(onDateSelected = {
+                viewModel.eventDate = it
+                showDatePicker = false
+            }, onDismiss = { showDatePicker = false })
+        }
+        if (showTimePicker) {
+            TimePickerModal(onTimeSelected = { hour, minute ->
+                val second = 0
+                val formatted = String.format("%02d:%02d:%02d", hour, minute, second)
+                viewModel.eventTime = formatted
+                showTimePicker = false
+            }, onDismiss = { showTimePicker = false })
+        }
+        // Google Map to pick location
+        if (viewModel.isMapVisible) {
+            AlertDialog(
+                onDismissRequest = { viewModel.isMapVisible = false }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(integerResource(R.integer.googleMapPadding).dp)
+                        .clip(RoundedCornerShape(integerResource(R.integer.googleMapPaddingRounded).dp))
+                        .background(Color.White)
+                ) {
+                    GoogleMap(modifier = Modifier.fillMaxSize(), onMapClick = { latLng ->
+                        pickedLocation = latLng
+                        viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
+                        viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
+                        viewModel.isMapVisible = false  // Close the map after selecting location
+                    }, cameraPositionState = rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(
+                            pickedLocation ?: LatLng(24.7136, 46.6753), 5f
+                        )
+                    })
+                }
+            }
         }
     }
+}

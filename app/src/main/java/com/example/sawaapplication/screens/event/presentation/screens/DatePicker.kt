@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.sawaapplication.R
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,5 +55,16 @@ fun DatePickerModal(
         ),
     ) {
         DatePicker(state = datePickerState)
+    }
+}
+fun formatDateString(dateString: String): String {
+    return try {
+        val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss 'GMT'Z yyyy", Locale.ENGLISH)
+        val date = inputFormat.parse(dateString)
+
+        val outputFormat = SimpleDateFormat("EEE MMM dd", Locale.ENGLISH)
+        outputFormat.format(date)
+    } catch (e: Exception) {
+        ""
     }
 }

@@ -67,20 +67,20 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.example.sawaapplication.screens.communities.presentation.vmModels.ExploreCommunityViewModel
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
+import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
+import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
 import com.google.firebase.auth.FirebaseAuth
 
-data class PostUiModel(
-    val username: String,
-    val userAvatarUrl: String = "",
-    val postImageUrl: String = ""
-)
+
 
 data class CommunityUiState(
     val logoUrl: String,
@@ -115,6 +115,7 @@ fun CommunityScreen(
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
     eventViewModel: FetchEventViewModel = hiltViewModel(),
+    joinCommunityViewModel: ExploreCommunityViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
     onClick: () -> Unit,
     navController: NavHostController
@@ -131,10 +132,26 @@ fun CommunityScreen(
         viewModel.fetchPostsForCommunity(communityId)
         fetchEventViewModel.loadEvents(communityId)
     }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(500)
+        viewModel.fetchCommunityDetail(communityId)
+    }
     val posts by viewModel.communityPosts.collectAsState()
     var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
+    //val events by eventViewModel.events.collectAsState()
+    val isUserJoined = communityDetail?.members?.contains(userId) == true
+    val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
+
+    LaunchedEffect(hasJoinedOrLeft) {
+        if (hasJoinedOrLeft) {
+            viewModel.fetchCommunityDetail(communityId)
+            // Reset the flag so it doesn't re-trigger
+            joinCommunityViewModel.resetJoinLeaveState()
+        }
+    }
+
     val events by fetchEventViewModel.events.collectAsState()
     Scaffold(
         topBar = {
@@ -226,7 +243,7 @@ fun CommunityScreen(
                 }
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
-                if (!joined) {
+                if (isUserJoined) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -237,8 +254,8 @@ fun CommunityScreen(
                         //Un-joined button
                         OutlinedButton(
                             onClick = {
-                                joined = !joined
-                                /* TODO: Handle Join */
+                                joinCommunityViewModel.leaveCommunity(communityId, userId)
+                                viewModel.fetchCommunityDetail(communityId)
                             },
                             shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -298,8 +315,8 @@ fun CommunityScreen(
                 } else {
                     Button(
                         onClick = {
-                            joined = !joined
-                            /* TODO: Handle Join */
+                            joinCommunityViewModel.joinCommunity(communityId, userId)
+                            viewModel.fetchCommunityDetail(communityId)
                         },
                         shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
@@ -353,19 +370,19 @@ fun CommunityScreen(
                 items(posts) { post ->
                     PostCard(
                         post = PostUiModel(
-                            username = post.userId,
-                            userAvatarUrl = "",
-                            postImageUrl = post.imageUri
+                            username = post.username,
+                            userAvatarUrl = post.userAvatarUrl,
+                            postImageUrl = post.postImageUrl,
+                            content = post.content
                         )
                     )
 
                 }
             } else {
-//                item {
-//                    EventCardScreen(navController = navController, communityId = communityId)
-//                }
                 items(events) { event ->
                     communityDetail?.let {
+                        val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+                        val formattedDate = formatDateString(event.date)
                         EventCard(
                             image = event.imageUri,
                             title = event.title,
@@ -374,7 +391,8 @@ fun CommunityScreen(
                             participants = event.memberLimit,
                             joinedUsers = event.joinedUsers,
                             community = it.name,
-                            time = "3:20",
+                            time = timeFormatted,
+                            date = formattedDate,
                             joined = event.joinedUsers.contains(userId),
                             onJoinClick = {
                                 if (event.joinedUsers.contains(userId)) {
@@ -392,11 +410,9 @@ fun CommunityScreen(
                                 }
                             },
                             showCancelButton = true,
-                            modifier =  Modifier.padding(4.dp)
+                            modifier = Modifier.padding(4.dp)
                         )
                     }
-
-
                 }
             }
         }

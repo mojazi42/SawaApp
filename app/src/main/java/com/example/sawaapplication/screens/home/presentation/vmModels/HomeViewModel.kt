@@ -3,6 +3,7 @@ package com.example.sawaapplication.screens.home.presentation.vmModels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sawaapplication.screens.event.domain.model.Event
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +41,13 @@ class HomeViewModel @Inject constructor(
     // Map Post object to its FireStore document ID
     private val _postDocumentIds = MutableStateFlow<Map<Post, String>>(emptyMap())
     val postDocumentIds: StateFlow<Map<Post, String>> = _postDocumentIds
+
+    private val _joinedEvents = MutableStateFlow<List<Event>>(emptyList())
+    val joinedEvents: StateFlow<List<Event>> = _joinedEvents
+
+    private val _hasCancelEvents = MutableStateFlow(false)
+    val hasCancelEvents: StateFlow<Boolean> = _hasCancelEvents
+
 
     private suspend fun getUserCommunityIds(userId: String): List<String> {
         return try {
@@ -208,4 +216,93 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+    fun fetchPostsByUser(userId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val userCommunityIds = getUserCommunityIds(userId)
+
+                if (userCommunityIds.isEmpty()) {
+                    _posts.value = emptyList()
+                    return@launch
+                }
+
+                val postsList = mutableListOf<Post>()
+                val docIdMap = mutableMapOf<Post, String>()
+
+                userCommunityIds.forEach { communityId ->
+                    val postSnapshot = firestore
+                        .collection("Community")
+                        .document(communityId)
+                        .collection("posts")
+                        .whereEqualTo("userId", userId) // filter by the passed userId
+                        .get()
+                        .await()
+
+                    for (doc in postSnapshot.documents) {
+                        val post = doc.toObject(Post::class.java)
+                        if (post != null) {
+                            postsList.add(post)
+                            docIdMap[post] = doc.id
+                        }
+                    }
+                }
+
+                _posts.value = postsList
+                _postDocumentIds.value = docIdMap
+
+                val communityIds = postsList.map { it.communityId }.distinct()
+                val userIds = postsList.map { it.userId }.distinct()
+
+                fetchCommunityNames(communityIds)
+                fetchUserDetails(userIds)
+
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    // fetch joined events
+
+    fun fetchJoinedEvents() {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val userId = firebaseAuth.currentUser?.uid ?: return@launch
+                val communityIds = getUserCommunityIds(userId)
+
+                val joinedEventsList = mutableListOf<Event>()
+
+                for (communityId in communityIds) {
+                    val eventsSnapshot = firestore.collection("Community")
+                        .document(communityId)
+                        .collection("event")
+                        .get()
+                        .await()
+
+                    for (doc in eventsSnapshot.documents) {
+                        val event = doc.toObject(Event::class.java)
+                        if (event != null && userId in event.joinedUsers) {
+                            joinedEventsList.add(event.copy(id = doc.id, communityId = communityId))
+                        }
+                    }
+                }
+
+                _joinedEvents.value = joinedEventsList
+
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error fetching joined events: ${e.message}")
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun resetCancelButton() {
+        _hasCancelEvents.value = false
+    }
+
 }

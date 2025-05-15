@@ -64,6 +64,7 @@
     <string name="eventMembersLimit">عدد للحضور</string>
     <string name="ok">تم</string>
     <string name="eventDate">تاريخ الحدث</string>
+    <string name="eventTime">وقت الحدث</string>
     <string name="eventLocation">مكان الحدث</string>
 
     <!--CommunityScreen-->
@@ -75,5 +76,28 @@
     <!-- Chats Screen-->
     <string name="chats">المحادثات</string>
     <string name="groupMembers">اعضاء المجموعة</string>
+
+    <!--NewCommunity-->
+    <string name="communityCreated">تم إنشاء المجتمع</string>
+    <string name="uploadImage">يرجا رفع صورة</string>
+    <string name="tapToUploadImage">انقر لرفع صورة</string>
+    <string name="communityName">إسم المجتمع</string>
+    <string name="newCommDescription">الوصف</string>
+
+    <!-- Event Card Screen-->
+    <string name="upcomingEvents">الأحداث القادمة</string>
+
+    <!--CreateNewEventScreen-->
+    <string name="locationPermission">الوصول للموقع</string>
+    <string name="askLocationPermission">نحتاج للوصوول للموقع، لتحديد موقع الحدث، هل تسمح بالوصول للموقع؟</string>
+    <string name="allow">سماح</string>
+    <string name="deny">رفض</string>
+    <string name="photoPermission">الوصول للصور</string>
+    <string name="askPhotoPermission">نحتاج للوصوول للصور، لإضافة صورة للحدث، هل تسمح بالوصول للصور؟</string>
+    <string name="eventCreated">تم إنشاء الحدث</string>
+    <string name="askPhotoPermissionFromSettings">يرجا السماح بالوصول للصور من الاعدادات</string>
+    <string name="askLocationPermissionFromSettings">يرجا السماح بالوصول للموقع من الاعدادات</string>
+    <string name="locationIsNeeded">نحتاج الوصول للموقع لاختيار موقع الحدث</string>
+
 
 </resources>

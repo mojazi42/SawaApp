@@ -15,10 +15,13 @@ import java.util.Date
 import javax.inject.Inject
 import android.util.Log
 import com.example.sawaapplication.core.permissions.PermissionHandler
-import com.example.sawaapplication.core.sharedPreferences.LocationSharedPreference
-import com.example.sawaapplication.core.sharedPreferences.PhotoSharedPreference
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.Job
+import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
 
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
@@ -32,6 +35,7 @@ class CreateEventViewModel @Inject constructor(
     var eventDate by mutableStateOf<Long?>(System.currentTimeMillis())
     var imageUri by mutableStateOf<Uri?>(null)
     var membersLimitInput by mutableStateOf("")
+    var eventTime by mutableStateOf("")
     var location by mutableStateOf(GeoPoint(0.0, 0.0))
     var locationText by mutableStateOf("Location not set")
     private var job: Job? = null
@@ -55,21 +59,37 @@ class CreateEventViewModel @Inject constructor(
             return
         }
 
-        val eventName = name.trim()
-        val eventDesc = description.trim()
-        val eventDateValue = eventDate ?: System.currentTimeMillis()
-        val limit = membersLimit ?: 0
-        val image = imageUri?.toString().orEmpty()
+
+        val timeFormat = SimpleDateFormat("hh:mm", Locale.getDefault())
+        val parsedTime = timeFormat.parse(eventTime)
+
+        val calendar = Calendar.getInstance()
+
+        calendar.timeInMillis = eventDate ?: System.currentTimeMillis()
+
+        parsedTime?.let {
+            val timeCal = Calendar.getInstance()
+            timeCal.time = it
+
+            calendar.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY))
+            calendar.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE))
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+        }
+
+        val finalTimestamp = Timestamp(calendar.time)
 
         val event = Event(
-            title = eventName,
+            title = name.trim(),
             location = location,
-            date = Date(eventDateValue).toString(),
-            description = eventDesc,
-            memberLimit = limit,
+            date = Date(eventDate ?: System.currentTimeMillis()).toString(), // optional
+            time = finalTimestamp,
+            description = description.trim(),
+            memberLimit = membersLimit ?: 0,
             createdBy = uid,
-            imageUri = image
+            imageUri = imageUri?.toString().orEmpty()
         )
+
 
         job = viewModelScope.launch {
             loading.value = true

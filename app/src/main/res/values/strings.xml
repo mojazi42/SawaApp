@@ -63,6 +63,7 @@
     <string name="eventMembersLimit">Number of Attendance</string>
     <string name="ok">OK</string>
     <string name="eventDate">Event Date</string>
+    <string name="eventTime">Event Time</string>
     <string name="eventLocation">Event Location</string>
 
     <!--CommunityScreen-->
@@ -74,5 +75,27 @@
     <!-- Chats Screen-->
     <string name="chats">Chats</string>
     <string name="groupMembers">Group Members</string>>
+
+    <!-- Event Card Screen-->
+    <string name="upcomingEvents">Upcoming Events</string>
+
+    <!--NewCommunity-->
+    <string name="communityCreated">Community Created</string>
+    <string name="uploadImage">Please upload an image</string>
+    <string name="tapToUploadImage">Tap to upload\nimage</string>
+    <string name="communityName">Community Name</string>
+    <string name="newCommDescription">Description</string>
+
+    <!--PostCard-->
+    <string name="locationPermission">Location Permission</string>
+    <string name="askLocationPermission">We need your location to pick the event location. Would you like to allow access?</string>
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+    <string name="photoPermission">Photo Permission</string>
+    <string name="askPhotoPermission">We need access to photos to add a photo to the event. Would you like to allow access?</string>
+    <string name="eventCreated">Event Created!</string>
+    <string name="askPhotoPermissionFromSettings">Please allow photo access in settings</string>
+    <string name="askLocationPermissionFromSettings">Please allow location access in settings</string>
+    <string name="locationIsNeeded">Location permission is needed to pick your event location.</string>
 
 </resources>

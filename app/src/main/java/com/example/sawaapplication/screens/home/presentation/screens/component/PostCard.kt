@@ -33,7 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.Post
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -42,11 +44,13 @@ import java.util.Locale
 @Composable
 fun PostCard(
     post: Post,
-    communityName: String,
-    userName: String,
+    communityName: String = "",
+    userName: String = "",
     userImage: String,
     onClick: () -> Unit,
     onLikeClick: (Post) -> Unit,
+    onUserImageClick: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     // State to track if the post is liked
@@ -109,6 +113,9 @@ fun PostCard(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
+                            .clickable {
+                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId)) }
+
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -117,7 +124,10 @@ fun PostCard(
                     Text(
                         text = userName,
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                        }
                     )
                     Text(
                         text = "Posted on $formattedDate",
@@ -146,6 +156,7 @@ fun PostCard(
                         .fillMaxWidth()
                         .height(180.dp)
                         .clip(RoundedCornerShape(8.dp))
+
                 )
             }
 

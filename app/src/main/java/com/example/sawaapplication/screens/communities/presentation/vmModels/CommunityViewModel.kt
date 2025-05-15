@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.example.sawaapplication.screens.communities.domain.useCases.GetCommunityByIdUseCase
 import com.example.sawaapplication.screens.post.domain.model.Post
+import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.screens.post.domain.repository.PostRepository
 import com.google.firebase.auth.FirebaseAuth
 
@@ -63,8 +64,9 @@ class CommunityViewModel @Inject constructor(
     val error: StateFlow<String?> = _error
 
     //Fetching the posts in side community
-    private val _communityPosts = MutableStateFlow<List<Post>>(emptyList())
-    val communityPosts: StateFlow<List<Post>> = _communityPosts
+    private val _communityPosts = MutableStateFlow<List<PostUiModel>>(emptyList())
+    val communityPosts: StateFlow<List<PostUiModel>> = _communityPosts
+
 
 
 
@@ -142,12 +144,21 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             val result = postRepository.getPostsForCommunity(communityId)
             result.onSuccess { posts ->
-                _communityPosts.value = posts
-            }.onFailure { exception ->
-                Log.e("CommunityViewModel", "Failed to fetch posts: ${exception.message}")
+                val mapped = posts.map { post ->
+                    PostUiModel(
+                        username = post.username,         // Use userId as username placeholder
+                        userAvatarUrl = post.userAvatarUrl,             // TODO: Replace with real profile image
+                        postImageUrl = post.postImageUrl,
+                        content = post.content
+                    )
+                }
+                _communityPosts.value = mapped
+            }.onFailure {
+                Log.e("CommunityViewModel", "Failed to fetch posts: ${it.message}")
             }
         }
     }
+
 
     // Cleans up any running jobs when the ViewModel is destroyed
     override fun onCleared() {

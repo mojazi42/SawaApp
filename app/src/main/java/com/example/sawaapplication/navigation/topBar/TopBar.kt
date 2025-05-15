@@ -226,6 +226,24 @@ fun getTopBar(
             }
         }
 
+        Screen.UserAccount.route -> {
+            {
+                TopBar(
+                    title = "",
+                    navIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
         Screen.Chats.route -> {
             {
                 TopBar(

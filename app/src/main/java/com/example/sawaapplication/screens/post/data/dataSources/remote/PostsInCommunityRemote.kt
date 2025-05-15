@@ -3,6 +3,7 @@ package com.example.sawaapplication.screens.post.data.dataSources.remote
 import android.net.Uri
 import android.util.Log
 import com.example.sawaapplication.screens.post.domain.model.Post
+import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -60,23 +61,33 @@ class PostsInCommunityRemote @Inject constructor(
         }
     }
 
-        suspend fun getPostsForCommunity(communityId: String): Result<List<Post>> {
-            return try {
-                val snapshot = firestore.collection("Community")
-                    .document(communityId)
-                    .collection("posts")
-                    .get()
-                    .await()
+    suspend fun getPostsForCommunity(communityId: String): Result<List<PostUiModel>> {
+        return try {
+            val snapshot = firestore.collection("Community")
+                .document(communityId)
+                .collection("posts")
+                .get()
+                .await()
 
-                val posts = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(Post::class.java)?.copy(id = doc.id)
-                }
+            val posts = snapshot.documents.mapNotNull { doc ->
+                val post = doc.toObject(Post::class.java) ?: return@mapNotNull null
+                val userSnapshot = firestore.collection("Users").document(post.userId).get().await()
+                val userName = userSnapshot.getString("name") ?: "Unknown"
+                val profileImage = userSnapshot.getString("profileImage") ?: ""
 
-                Result.success(posts)
-            } catch (e: Exception) {
-                Result.failure(e)
+                PostUiModel(
+                    username = userName,
+                    userAvatarUrl = profileImage,
+                    postImageUrl = post.imageUri,
+                    content = post.content
+                )
             }
+
+            Result.success(posts)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
+}
 
 

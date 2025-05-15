@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -52,6 +53,7 @@ fun EventCard(
     description: String,
     location: String,
     time: String,
+    date: String,
     participants: Int,
     joined: Boolean,
     onJoinClick: () -> Unit,
@@ -72,7 +74,7 @@ fun EventCard(
             defaultElevation = integerResource(id = R.integer.homeScreenCardElevation).dp
         ),
         border = BorderStroke(
-            1.dp, MaterialTheme.colorScheme.secondaryContainer
+            integerResource(R.integer.stroke).dp, MaterialTheme.colorScheme.secondaryContainer
         ),
     ) {
         Column {
@@ -103,7 +105,7 @@ fun EventCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.Gray,
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(integerResource(R.integer.spacer).dp))
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyLarge,
@@ -114,18 +116,16 @@ fun EventCard(
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
-                        fontSize = 10.sp,
+                        fontSize = integerResource(R.integer.titleSize).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis
-
                     )
                     JoinButton(
                         joined = joined,
                         onJoinClick = onJoinClick,
                         showCancel = showCancelButton
                     )
-
                 }
             }
 
@@ -144,7 +144,7 @@ fun EventCard(
                 ) {
                     Icon(
                         Icons.Outlined.LocationOn,
-                        contentDescription = "Time",
+                        contentDescription = "Location",
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
                     )
@@ -156,11 +156,23 @@ fun EventCard(
 
                 }
 
-                Text(
-                    text = time,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+
+                ) {
+                    Icon(
+                        Icons.Outlined.Timer,
+                        contentDescription = "Time",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
+                    )
+                    Text(
+                        text = "${date}•${time}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Group,
@@ -175,7 +187,6 @@ fun EventCard(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-
             }
         }
     }
@@ -220,5 +231,3 @@ fun JoinButton(
         )
     }
 }
-
-

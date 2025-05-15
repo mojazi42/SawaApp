@@ -33,9 +33,12 @@ import com.example.sawaapplication.screens.home.presentation.screens.component.P
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.navigation.NavController
+import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun HomeScreen(
+fun HomeScreen(navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -44,7 +47,7 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize()) {
 
         when (selectedTabIndex) {
-            0 -> PostsTab(viewModel)
+            0 -> PostsTab(viewModel,navController)
             1 -> MyEventsTab() // implement if needed
         }
 
@@ -67,7 +70,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun PostsTab(viewModel: HomeViewModel) {
+fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
     val posts by viewModel.posts.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -99,55 +102,90 @@ fun PostsTab(viewModel: HomeViewModel) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                items(posts) { post ->
-                    val communityName = communityNames[post.communityId] ?: "Unknown"
-                    val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
-                    PostCard(
-                        post,
-                        communityName,
-                        userName,
-                        userImage,
-                        onClick = {},
-                        onLikeClick = { viewModel.likePost(post) })
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    items(posts) { post ->
+                        val communityName = communityNames[post.communityId] ?: "Unknown"
+                        val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
+                        PostCard(
+                            post,
+                            communityName,
+                            userName,
+                            userImage,
+                            onClick = {},
+                            onLikeClick = { viewModel.likePost(post) } ,
+                            navController = navController,
+                            onUserImageClick = { viewModel.likePost(post) }
+                        )
+
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
                 }
-            }
         }
     }
 }
 
 @Composable
-fun MyEventsTab() {
-    val eventsCount = 10
-    // Just track join states — this is safe
-    val joinedStates = remember { mutableStateListOf(*Array(eventsCount) { true }) }
+fun MyEventsTab(
+    viewModel: HomeViewModel = hiltViewModel(),
+    eventViewModel: FetchEventViewModel = hiltViewModel()
+) {
+    val events by viewModel.joinedEvents.collectAsState()
+    val loading by viewModel.loading.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(eventsCount) { index ->
-            // Composable call inside the proper scope
-//            val imagePainter = painterResource(id = R.drawable.first)
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val joinResult by eventViewModel.joinResult.collectAsState()
 
-            EventCard(
-                image = "",
-                community = "Saudi Innovation Community",
-                title = "Fine art between past and present",
-                description = "World Art Day, which falls on April 15, celebrates artists and their contributions...",
-                location = "Madina",
-                time = "16 Feb 25 • 06:00 PM-10:00 PM",
-                participants = 12,
-                joined = joinedStates[index],
-                onJoinClick = { joinedStates[index] = !joinedStates[index] },
-                showCancelButton = true,
-                modifier = Modifier.padding(
-                    top = if (index == 0) integerResource(id = R.integer.homeScreenTopPadding).dp else 0.dp
-                )
+    LaunchedEffect(Unit) {
+        viewModel.fetchJoinedEvents()
+    }
+
+    // Refresh the list after a successful cancel
+    LaunchedEffect(joinResult) {
+        if (joinResult?.isSuccess == true) {
+            viewModel.fetchJoinedEvents()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+
+            events.isEmpty() -> Text(
+                "No joined events",
+                modifier = Modifier.align(Alignment.Center)
             )
+
+            else -> LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(top = 72.dp, bottom = 56.dp)
+            ) {
+                items(events) { event ->
+                    EventCard(
+                        image = event.imageUri,
+                        title = event.title,
+                        description = event.description,
+                        location = event.location.toString(),
+                        time = event.time.toString(),
+                        participants = event.joinedUsers.size,
+                        community = "Community", // Replace with resolved name if needed
+                        joined = true,
+                        onJoinClick = {
+                            eventViewModel.leaveEvent(
+                                communityId = event.communityId,
+                                eventId = event.id,
+                                userId = userId
+                            )
+                        },
+                        showCancelButton = true,
+                        joinedUsers = event.joinedUsers,
+                        date = event.date,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
         }
     }
 }
