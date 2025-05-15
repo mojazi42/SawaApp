@@ -3,7 +3,6 @@ package com.example.sawaapplication.screens.notification.presentation.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -14,8 +13,11 @@ import androidx.navigation.NavController
 import com.example.sawaapplication.screens.notification.presentation.screens.component.NotificationCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavHostController
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import java.text.SimpleDateFormat
+import kotlin.OptIn
+import kotlin.String
 
 @SuppressLint("SimpleDateFormat")
 @Composable

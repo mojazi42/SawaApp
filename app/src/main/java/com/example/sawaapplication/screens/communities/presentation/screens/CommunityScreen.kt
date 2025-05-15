@@ -67,6 +67,7 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
@@ -362,44 +363,40 @@ fun CommunityScreen(
 
                 }
             } else {
-//                item {
-//                    EventCardScreen(navController = navController, communityId = communityId)
-//                }
                 items(events) { event ->
                     communityDetail?.let {
-                        event.time?.let { it1 -> formatTimestampToTimeString(it1) }?.let { it2 ->
-                            EventCard(
-                                image = event.imageUri,
-                                title = event.title,
-                                description = event.description,
-                                location = context.getCityNameFromGeoPoint(event.location),
-                                participants = event.memberLimit,
-                                joinedUsers = event.joinedUsers,
-                                community = it.name,
-                                time = it2,
-                                joined = event.joinedUsers.contains(userId),
-                                onJoinClick = {
-                                    if (event.joinedUsers.contains(userId)) {
-                                        eventViewModel.leaveEvent(
-                                            communityId = communityId,
-                                            eventId = event.id,
-                                            userId = userId
-                                        )
-                                    } else {
-                                        eventViewModel.joinEvent(
-                                            communityId = communityId,
-                                            eventId = event.id,
-                                            userId = userId
-                                        )
-                                    }
-                                },
-                                showCancelButton = true,
-                                modifier =  Modifier.padding(4.dp)
-                            )
-                        }
+                        val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+                        val formattedDate = formatDateString(event.date)
+                        EventCard(
+                            image = event.imageUri,
+                            title = event.title,
+                            description = event.description,
+                            location = context.getCityNameFromGeoPoint(event.location),
+                            participants = event.memberLimit,
+                            joinedUsers = event.joinedUsers,
+                            community = it.name,
+                            time = timeFormatted,
+                            date = formattedDate,
+                            joined = event.joinedUsers.contains(userId),
+                            onJoinClick = {
+                                if (event.joinedUsers.contains(userId)) {
+                                    eventViewModel.leaveEvent(
+                                        communityId = communityId,
+                                        eventId = event.id,
+                                        userId = userId
+                                    )
+                                } else {
+                                    eventViewModel.joinEvent(
+                                        communityId = communityId,
+                                        eventId = event.id,
+                                        userId = userId
+                                    )
+                                }
+                            },
+                            showCancelButton = true,
+                            modifier = Modifier.padding(4.dp)
+                        )
                     }
-
-
                 }
             }
         }

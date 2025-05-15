@@ -140,11 +140,13 @@ fun MyEventsTab() {
                 title = "Fine art between past and present",
                 description = "World Art Day, which falls on April 15, celebrates artists and their contributions...",
                 location = "Madina",
-                time = "16 Feb 25 • 06:00 PM-10:00 PM",
+                time = "06:00 PM-10:00 PM",
                 participants = 12,
                 joined = joinedStates[index],
                 onJoinClick = { joinedStates[index] = !joinedStates[index] },
                 showCancelButton = true,
+                joinedUsers= emptyList(),
+                date="16 Feb 25 •",
                 modifier = Modifier.padding(
                     top = if (index == 0) integerResource(id = R.integer.homeScreenTopPadding).dp else 0.dp
                 )
