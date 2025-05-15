@@ -36,13 +36,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.navigation.NavController
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun HomeScreen(navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Posts", "My Events")
+    val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -86,7 +87,7 @@ fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
             loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
 
             error != null -> Text(
-                text = error ?: "Unknown error",
+                text = error ?: "${stringResource(R.string.unknownError)}",
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.align(Alignment.Center)
             )
