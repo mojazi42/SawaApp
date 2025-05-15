@@ -67,6 +67,7 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.example.sawaapplication.screens.communities.presentation.vmModels.ExploreCommunityViewModel
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
@@ -117,6 +118,7 @@ fun CommunityScreen(
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
     eventViewModel: FetchEventViewModel = hiltViewModel(),
+    joinCommunityViewModel: ExploreCommunityViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
     onClick: () -> Unit,
     navController: NavHostController
@@ -133,10 +135,26 @@ fun CommunityScreen(
         viewModel.fetchPostsForCommunity(communityId)
         fetchEventViewModel.loadEvents(communityId)
     }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(500)
+        viewModel.fetchCommunityDetail(communityId)
+    }
     val posts by viewModel.communityPosts.collectAsState()
     var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
+    //val events by eventViewModel.events.collectAsState()
+    val isUserJoined = communityDetail?.members?.contains(userId) == true
+    val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
+
+    LaunchedEffect(hasJoinedOrLeft) {
+        if (hasJoinedOrLeft) {
+            viewModel.fetchCommunityDetail(communityId)
+            // Reset the flag so it doesn't re-trigger
+            joinCommunityViewModel.resetJoinLeaveState()
+        }
+    }
+
     val events by fetchEventViewModel.events.collectAsState()
     Scaffold(
         topBar = {
@@ -228,7 +246,7 @@ fun CommunityScreen(
                 }
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
-                if (!joined) {
+                if (isUserJoined) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -239,8 +257,8 @@ fun CommunityScreen(
                         //Un-joined button
                         OutlinedButton(
                             onClick = {
-                                joined = !joined
-                                /* TODO: Handle Join */
+                                joinCommunityViewModel.leaveCommunity(communityId, userId)
+                                viewModel.fetchCommunityDetail(communityId)
                             },
                             shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -300,8 +318,8 @@ fun CommunityScreen(
                 } else {
                     Button(
                         onClick = {
-                            joined = !joined
-                            /* TODO: Handle Join */
+                            joinCommunityViewModel.joinCommunity(communityId, userId)
+                            viewModel.fetchCommunityDetail(communityId)
                         },
                         shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
