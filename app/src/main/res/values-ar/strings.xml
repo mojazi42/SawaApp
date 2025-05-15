@@ -99,5 +99,8 @@
     <string name="askLocationPermissionFromSettings">يرجا السماح بالوصول للموقع من الاعدادات</string>
     <string name="locationIsNeeded">نحتاج الوصول للموقع لاختيار موقع الحدث</string>
 
+    <!--PostCard-->
+    <string name="postedOn">نشر في</string>
+    <string name="like">إعجاب</string>
 
 </resources>
