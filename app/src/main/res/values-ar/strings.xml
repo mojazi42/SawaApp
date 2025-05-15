@@ -74,5 +74,6 @@
 
     <!-- Chats Screen-->
     <string name="chats">المحادثات</string>
+    <string name="groupMembers">اعضاء المجموعة</string>
 
 </resources>

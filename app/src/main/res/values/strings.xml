@@ -73,5 +73,6 @@
 
     <!-- Chats Screen-->
     <string name="chats">Chats</string>
+    <string name="groupMembers">Group Members</string>>
 
 </resources>

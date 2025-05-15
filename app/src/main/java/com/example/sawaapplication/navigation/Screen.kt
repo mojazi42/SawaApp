@@ -17,13 +17,11 @@ sealed class Screen(val route: String) {
     @Serializable data object NewCommunity : Screen("new_community")
     @Serializable data object NewPost : Screen("")
     @Serializable data object EditProfile : Screen("editProfile")
+    @Serializable data object Chats : Screen("chats/{communityId}")
 
-    @Serializable data object Chats : Screen("chats/{communityId}") {
-        fun createRoute(communityId: String) = "chats/$communityId"
-    }
-    @Serializable data object Chat : Screen("chat/{communityId}") {
-        fun createRoute(communityId: String) = "chat/$communityId"
-    }
+    @Serializable data object GroupMembers : Screen("groupMembers/{communityId}")
+
+
 
     //    @Serializable
 //    data object CreateNewEvent : Screen("create_event/{communityId}") {
