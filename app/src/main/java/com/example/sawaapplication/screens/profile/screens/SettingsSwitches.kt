@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
-import com.example.sawaapplication.R
 import java.util.Locale
 
 @Composable

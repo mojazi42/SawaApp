@@ -17,6 +17,7 @@ import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.notification.presentation.screens.component.NotificationCard
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
@@ -25,7 +26,7 @@ import java.text.SimpleDateFormat
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun NotificationScreen(
-//    navController: NavController,
+    navController: NavController,
     notificationViewModel: NotificationViewModel = hiltViewModel(),
 ) {
     val notifications = notificationViewModel.notifications.collectAsState().value
