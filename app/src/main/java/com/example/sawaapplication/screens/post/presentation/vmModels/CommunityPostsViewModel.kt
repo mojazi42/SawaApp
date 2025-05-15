@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.post.domain.model.Post
+import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.screens.post.domain.useCases.GetCommunityPostsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,7 +16,8 @@ import javax.inject.Inject
 class CommunityPostsViewModel @Inject constructor(
     private val getPostsByCommunityIdUseCase: GetCommunityPostsUseCase
 ) : ViewModel() {
-    var posts by mutableStateOf<List<Post>>(emptyList())
+    var posts by mutableStateOf<List<PostUiModel>>(emptyList())
+
         private set
 
     fun loadPosts(communityId: String) {
