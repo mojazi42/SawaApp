@@ -191,4 +191,10 @@
     <integer name="actionTimeSpacer">6</integer>
     <integer name="profileImageSizeRight">60</integer>
 
+    <!--CreatePostScreen-->
+    <integer name="communityImageSize">48</integer>
+    <integer name="postContentSize">200</integer>
+    <integer name="postContentRoundedCornerShape">8</integer>
+    <integer name="postSelectedImageRoundedCornerShape">12</integer>
+
 </resources>

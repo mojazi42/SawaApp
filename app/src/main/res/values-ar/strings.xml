@@ -111,4 +111,7 @@
     <string name="noNotifications">لا يوجد تنبيهات</string>
     <string name="systemNotification">تنبيهات النظام</string>
 
+    <!--CreatePostScreen-->
+    <string name="postContentPlaceholder">شارك أفكارك</string>
+
 </resources>
