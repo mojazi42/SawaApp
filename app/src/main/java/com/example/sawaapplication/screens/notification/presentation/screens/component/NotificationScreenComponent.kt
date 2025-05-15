@@ -13,8 +13,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.sawaapplication.R
 
 @Composable
 fun NotificationCard(
@@ -28,15 +30,15 @@ fun NotificationCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = integerResource(R.integer.mediumSpace).dp, vertical = 8.dp)
             .border(
-                width = 1.dp,
+                width = integerResource(R.integer.boxBorderWidth).dp,
                 color = Color.LightGray,
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
             .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 12.dp)
+            .padding(integerResource(R.integer.smallerSpace).dp)
     ) {
         Row(
             verticalAlignment = Alignment.Top,
@@ -48,12 +50,12 @@ fun NotificationCard(
                     painter = profileImage,
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .size(45.dp)
+                        .size(integerResource(R.integer.profileImageSizeLeft).dp)
                         .clip(CircleShape)
                 )
             }
 
-            Spacer(modifier = Modifier.width(20.dp))
+            Spacer(modifier = Modifier.width(integerResource(R.integer.largeSpace).dp))
 
             // Notification Content (center)
             Column(modifier = Modifier.weight(1f)) {
@@ -65,7 +67,7 @@ fun NotificationCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(integerResource(R.integer.extraSmallSpace).dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -73,7 +75,7 @@ fun NotificationCard(
                         style = MaterialTheme.typography.bodySmall
                     )
 
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(integerResource(R.integer.actionTimeSpacer).dp))
 
                     Text(
                         text = time,
@@ -83,7 +85,7 @@ fun NotificationCard(
                 }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(integerResource(R.integer.actionTimeSpacer).dp))
 
             // Post Image (right)
             if (postImage != null) {
@@ -91,11 +93,10 @@ fun NotificationCard(
                     painter = postImage,
                     contentDescription = "Post Picture",
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(integerResource(R.integer.profileImageSizeRight).dp)
                         .clip(RectangleShape)
                 )
             }
         }
     }
 }
-
