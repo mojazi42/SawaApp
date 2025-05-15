@@ -105,5 +105,6 @@
 
     <!--HomeScreen-->
     <string name="unknownError">خطأ غير معروف</string>
+    <string name="unknown">غير معروف</string>
 
 </resources>

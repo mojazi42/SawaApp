@@ -78,7 +78,7 @@ fun NotificationCard(
                     Text(
                         text = time,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                        color = Color.Gray,
                     )
                 }
             }

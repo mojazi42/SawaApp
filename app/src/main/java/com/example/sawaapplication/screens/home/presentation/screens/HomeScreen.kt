@@ -87,7 +87,7 @@ fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
             loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
 
             error != null -> Text(
-                text = error ?: "${stringResource(R.string.unknownError)}",
+                text = error ?: stringResource(R.string.unknownError),
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -95,35 +95,35 @@ fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
             else ->
                 LazyColumn(
                     contentPadding = PaddingValues(
-                        top = 72.dp,
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 56.dp
+                        top = integerResource(R.integer.lazyColumnPaddingTop).dp,
+                        start = integerResource(R.integer.lazyColumnPaddingStartEnd).dp,
+                        end = integerResource(R.integer.lazyColumnPaddingStartEnd).dp,
+                        bottom = integerResource(R.integer.lazyColumnPaddingButton).dp
                     ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.lazyColumnArrangement).dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(posts) { post ->
-                        val communityName = communityNames[post.communityId] ?: "Unknown"
-                        val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
-                        PostCard(
-                            post,
-                            communityName,
-                            userName,
-                            userImage,
-                            onClick = {},
-                            onLikeClick = { viewModel.likePost(post) } ,
-                            navController = navController,
-                            onUserImageClick = { viewModel.likePost(post) }
-                        )
+                items(posts) { post ->
+                    val communityName = communityNames[post.communityId] ?: stringResource(R.string.unknown)
+                    val (userName, userImage) = userDetails[post.userId] ?: (stringResource(R.string.unknown) to "")
+                    PostCard(
+                        post,
+                        communityName,
+                        userName,
+                        userImage,
+                        onClick = {},
+                        onLikeClick = { viewModel.likePost(post) },
+                        navController = navController,
+                        onUserImageClick = { viewModel.likePost(post) }
+                    )
 
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
+                    HorizontalDivider(
+                        thickness = integerResource(R.integer.lazyColumnHorizontalDividerThickness).dp,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        modifier = Modifier.padding(vertical = integerResource(R.integer.smallerSpace).dp)
+                    )
                 }
+            }
         }
     }
 }
