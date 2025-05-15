@@ -64,8 +64,6 @@ class NotificationViewModel @Inject constructor(
     fun storeProfileUpdateNotification() {
         val user = firebaseAuth.currentUser
         user?.let {
-//            val userRef = FirebaseFireStore.getInstance().collection("User").document(it.uid)
-
             // Create a notification message
             val notificationMessage = "Your profile has been updated!"
 
@@ -86,6 +84,31 @@ class NotificationViewModel @Inject constructor(
                 }
                 .addOnFailureListener { e ->
                     Log.e("ProfileViewModel", "Error saving notification: $e")
+                }
+        }
+    }
+
+    fun storeEventCreatedNotification(eventName: String) {
+        val user = firebaseAuth.currentUser
+        user?.let {
+            val notificationMessage = "You created the event: $eventName"
+
+            val notificationData = mapOf(
+                "message" to notificationMessage,
+                "timestamp" to FieldValue.serverTimestamp(),
+                "userId" to it.uid,
+                "isRead" to false
+            )
+
+            FirebaseFirestore.getInstance()
+                .collection("Notification")
+                .add(notificationData)
+                .addOnSuccessListener {
+                    Log.d("NotificationViewModel", "Event creation notification saved.")
+                    setHasUnread()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("NotificationViewModel", "Failed to save event notification: $e")
                 }
         }
     }
@@ -121,6 +144,51 @@ class NotificationViewModel @Inject constructor(
                 }
         }
     }
+
+    fun notifyCommunityMembersOfNewEvent(communityId: String, eventName: String) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        // Get Community document
+        db.collection("Community").document(communityId)
+            .get()
+            .addOnSuccessListener { document ->
+                // Get the community name and members
+                val communityName = document.getString("name") ?: "Unknown Community"
+                val members = document.get("members") as? List<String> ?: return@addOnSuccessListener
+
+                // This is the message of the event
+                val message = "A new event \"$eventName\" was created in the \"$communityName\" community."
+
+                // Iterate through members and store notifications
+                members.forEach { memberId ->
+                    if (memberId != currentUserId) { // Avoid notifying the creator
+                        // Create the notification data as a map
+                        val notificationData = mapOf(
+                            "message" to message,
+                            "timestamp" to FieldValue.serverTimestamp(),
+                            "userId" to memberId,
+                            "isRead" to false // unread flag
+                        )
+
+                        // Store the notification data in FireStore
+                        db.collection("Notification")
+                            .add(notificationData)
+                            .addOnSuccessListener {
+                                Log.d("NotificationVM", "Notification sent to $memberId")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("NotificationVM", "Failed to send to $memberId: $e")
+                            }
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("NotificationVM", "Failed to get community members: $e")
+            }
+    }
+
+
 
 }
 

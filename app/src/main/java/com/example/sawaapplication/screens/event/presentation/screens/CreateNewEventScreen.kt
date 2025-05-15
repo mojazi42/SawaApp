@@ -57,6 +57,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.event.presentation.vmModels.CreateEventViewModel
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -76,10 +77,12 @@ import java.util.Date
 fun CreateNewEventScreen(
     navController: NavHostController, communityId: String,
     viewModel: CreateEventViewModel = hiltViewModel(),
+    notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val success = viewModel.success.value
     val communityID = viewModel.communityId
+
 
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     var pickedLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -148,12 +151,27 @@ fun CreateNewEventScreen(
     val eventCreated = stringResource(R.string.eventCreated)
     LaunchedEffect(communityId, success) {
         viewModel.communityId = communityId
-
         if (success) {
+            // Notify creator about the event creation
+            notificationViewModel.storeEventCreatedNotification(viewModel.name)
+
+            // Notify community members about the new event
+            notificationViewModel.notifyCommunityMembersOfNewEvent(
+                communityId = communityId,
+                eventName = viewModel.name
+            )
+
+            // Show success toast message
             Toast.makeText(context, eventCreated, Toast.LENGTH_SHORT).show()
+
+            // Navigate back to previous screen
             navController.popBackStack()
+
             viewModel.success.value = false
+        } else {
+            Toast.makeText(context, "Event creation failed", Toast.LENGTH_SHORT).show()
         }
+
 
     }
 
@@ -349,6 +367,22 @@ fun CreateNewEventScreen(
                 showDatePicker = false
             }, onDismiss = { showDatePicker = false })
         }
+        //event time
+        CustomTextField(
+            value = viewModel.eventTime,
+            onValueChange = { viewModel.eventTime = it },
+            label = stringResource(id = R.string.eventTime),
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Timer,
+                    contentDescription = "Pick Time",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { showTimePicker = true }
+                )
+            }
+        )
+
         if (showTimePicker) {
             TimePickerModal(onTimeSelected = { hour, minute ->
                 val second = 0
