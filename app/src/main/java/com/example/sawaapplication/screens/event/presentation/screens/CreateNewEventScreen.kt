@@ -280,8 +280,8 @@ fun CreateNewEventScreen(
             val askLocationPermissionFromSettings =
                 stringResource(R.string.askLocationPermissionFromSettings)
             CustomTextField(
-                value = viewModel.locationText,
-                onValueChange = {},
+                value = context.getCityNameFromGeoPoint(viewModel.location),
+                onValueChange =  {context.getCityNameFromGeoPoint(viewModel.location)},
                 label = stringResource(id = R.string.eventLocation),
                 readOnly = true,
                 trailingIcon = {
