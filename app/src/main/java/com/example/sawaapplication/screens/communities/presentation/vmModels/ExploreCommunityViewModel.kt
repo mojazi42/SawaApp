@@ -14,6 +14,8 @@ import com.example.sawaapplication.screens.communities.domain.model.Community
 import com.example.sawaapplication.screens.communities.domain.useCases.JoinCommunityUseCase
 import com.example.sawaapplication.screens.communities.domain.useCases.LeaveCommunityUseCase
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
 
 @HiltViewModel
@@ -28,6 +30,10 @@ class ExploreCommunityViewModel @Inject constructor(
 
     var searchText by mutableStateOf("")
     var communities by mutableStateOf<List<Community>>(emptyList())
+
+    private val _hasJoinedOrLeft = MutableStateFlow(false)
+    val hasJoinedOrLeft: StateFlow<Boolean> = _hasJoinedOrLeft
+
     private val _error = mutableStateOf<String?>(null)
     val error: String? get() = _error.value
 
@@ -76,6 +82,7 @@ class ExploreCommunityViewModel @Inject constructor(
             val result = joinCommunityUseCase(communityId, userId)
             result.onSuccess {
                 fetchCommunities() // just refresh the list
+                _hasJoinedOrLeft.value = true
             }.onFailure {
                 _error.value = "Failed to join community: ${it.message}"
             }
@@ -86,14 +93,15 @@ class ExploreCommunityViewModel @Inject constructor(
             val result = leaveCommunityUseCase(communityId, userId)
             result.onSuccess {
                 fetchCommunities() // Refresh data
+                _hasJoinedOrLeft.value = true
             }.onFailure {
                 _error.value = "Failed to leave community: ${it.message}"
             }
         }
     }
-
-
-
+    fun resetJoinLeaveState() {
+        _hasJoinedOrLeft.value = false
+    }
 
     fun onSearchTextChange(newText: String) {
         searchText = newText
