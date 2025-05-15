@@ -74,22 +74,22 @@ fun CreatePostScreen(
     if (showPhotoPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPhotoPermissionDialog = false },
-            title = { Text("Photo Permission") },
-            text = { Text("We need access to your photos so you can add an image for the event.") },
+            title = { Text(stringResource(R.string.photoPermission)) },
+            text = { Text(stringResource(R.string.askPhotoPermission)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markPhotoPermissionRequested()
                     photoPermissionState.launchPermissionRequest()
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Allow")
+                    Text(stringResource(R.string.allow))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.deny))
                 }
             }
         )
@@ -142,11 +142,12 @@ fun CreatePostScreen(
                 painter = rememberAsyncImagePainter("https://api.dicebear.com/7.x/lorelei/svg"),
                 contentDescription = "Profile Image",
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(50))
+                    .size(integerResource(R.integer.communityImageSize).dp)
+                    .clip(RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)))
                     .background(Color.Blue)
             )
             // Add Photo Icon
+            val askPhotoPermissionFromSettings = stringResource(R.string.askPhotoPermissionFromSettings)
             Icon(
                 imageVector = Icons.Outlined.AddAPhoto,
                 contentDescription = "Add photo",
@@ -158,11 +159,11 @@ fun CreatePostScreen(
                             if (viewModel.shouldRequestPhoto()) {
                                 showPhotoPermissionDialog = true
                             } else {
-                                Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, askPhotoPermissionFromSettings, Toast.LENGTH_LONG).show()
                             }
                         }
                     }
-                    .padding(8.dp),
+                    .padding(integerResource(R.integer.smallerSpace).dp),
                 tint = Color.Gray
             )
         }
@@ -171,13 +172,13 @@ fun CreatePostScreen(
         OutlinedTextField(
             value = viewModel.content,
             onValueChange = { viewModel.content = it },
-            placeholder = { Text("Share your Idea", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.postContentPlaceholder), color = Color.Gray) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
-                .padding(bottom = 16.dp),
+                .height(integerResource(R.integer.postContentSize).dp)
+                .padding(bottom = integerResource(R.integer.padding).dp),
             singleLine = false,
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(integerResource(R.integer.postContentRoundedCornerShape).dp),
         )
 
         // Show selected image preview if available
@@ -187,12 +188,11 @@ fun CreatePostScreen(
                 contentDescription = "Selected Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(bottom = 16.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .height(integerResource(R.integer.postContentSize).dp)
+                    .padding(bottom = integerResource(R.integer.padding).dp)
+                    .clip(RoundedCornerShape(integerResource(R.integer.postSelectedImageRoundedCornerShape).dp)),
                 contentScale = ContentScale.Crop
             )
         }
-
     }
 }

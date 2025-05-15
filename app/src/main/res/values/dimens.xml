@@ -163,9 +163,38 @@
     <integer name="googleMapPadding">16</integer>
     <integer name="googleMapPaddingRounded">16</integer>
 
-
     <!--EventCard-->
     <integer name="stroke">1</integer>
     <integer name="spacer">2</integer>
     <integer name="titleSize">10</integer>
+
+    <!--PostCard-->
+    <integer name="cardRoundedCornerShape">12</integer>
+    <integer name="cardElevation">4</integer>
+    <integer name="cardHorizontalPadding">8</integer>
+    <integer name="cardBorder">1</integer>
+    <integer name="boxRoundedCornerShape">4</integer>
+    <integer name="asyncImageSize">36</integer>
+    <integer name="postAsyncImageSize">180</integer>
+    <integer name="postImageRoundedCornerShape">8</integer>
+
+    <!--PostsTab-->
+    <integer name="lazyColumnPaddingTop">72</integer>
+    <integer name="lazyColumnPaddingStartEnd">16</integer>
+    <integer name="lazyColumnPaddingButton">56</integer>
+    <integer name="lazyColumnArrangement">14</integer>
+    <integer name="lazyColumnHorizontalDividerThickness">1</integer>
+
+    <!--fun NotificationCard-->
+    <integer name="boxBorderWidth">1</integer>
+    <integer name="profileImageSizeLeft">45</integer>
+    <integer name="actionTimeSpacer">6</integer>
+    <integer name="profileImageSizeRight">60</integer>
+
+    <!--CreatePostScreen-->
+    <integer name="communityImageSize">48</integer>
+    <integer name="postContentSize">200</integer>
+    <integer name="postContentRoundedCornerShape">8</integer>
+    <integer name="postSelectedImageRoundedCornerShape">12</integer>
+
 </resources>

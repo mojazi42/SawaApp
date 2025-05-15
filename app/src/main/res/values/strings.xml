@@ -86,7 +86,7 @@
     <string name="communityName">Community Name</string>
     <string name="newCommDescription">Description</string>
 
-    <!--PostCard-->
+    <!--CreateNewEventScreen-->
     <string name="locationPermission">Location Permission</string>
     <string name="askLocationPermission">We need your location to pick the event location. Would you like to allow access?</string>
     <string name="allow">Allow</string>
@@ -97,5 +97,20 @@
     <string name="askPhotoPermissionFromSettings">Please allow photo access in settings</string>
     <string name="askLocationPermissionFromSettings">Please allow location access in settings</string>
     <string name="locationIsNeeded">Location permission is needed to pick your event location.</string>
+
+    <!--PostCard-->
+    <string name="postedOn">Posted on</string>
+    <string name="like">Like</string>
+
+    <!--HomeScreen-->
+    <string name="unknownError">Unknown error</string>
+    <string name="unknown">Unknown</string>
+
+    <!--NotificationScreen-->
+    <string name="noNotifications">No notifications.</string>
+    <string name="systemNotification">System Notification</string>
+
+    <!--CreatePostScreen-->
+    <string name="postContentPlaceholder">Share your Idea</string>
 
 </resources>

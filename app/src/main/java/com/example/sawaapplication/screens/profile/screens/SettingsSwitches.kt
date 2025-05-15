@@ -21,9 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
+import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
+import com.example.sawaapplication.R
 import java.util.Locale
 
 @Composable
@@ -33,8 +36,8 @@ fun SettingsSwitches(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(start = 16.dp)
+        horizontalArrangement = Arrangement.spacedBy(integerResource(R.integer.mediumSpace).dp),
+        modifier = Modifier.padding(start = integerResource(R.integer.padding).dp)
     ) {
 
         // Language Toggle (Arabic / English)
@@ -91,8 +94,8 @@ fun SettingsThemeSwitches(
     ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(start = 16.dp)
+        horizontalArrangement = Arrangement.spacedBy(integerResource(R.integer.mediumSpace).dp),
+        modifier = Modifier.padding(start = integerResource(R.integer.padding).dp)
     ) {
         // Theme Toggle (Light / Dark) using IconSwitch
         Row(verticalAlignment = Alignment.CenterVertically) {

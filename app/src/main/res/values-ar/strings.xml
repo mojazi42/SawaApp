@@ -99,5 +99,19 @@
     <string name="askLocationPermissionFromSettings">يرجا السماح بالوصول للموقع من الاعدادات</string>
     <string name="locationIsNeeded">نحتاج الوصول للموقع لاختيار موقع الحدث</string>
 
+    <!--PostCard-->
+    <string name="postedOn">نشر في</string>
+    <string name="like">إعجاب</string>
+
+    <!--HomeScreen-->
+    <string name="unknownError">خطأ غير معروف</string>
+    <string name="unknown">غير معروف</string>
+
+    <!--NotificationScreen-->
+    <string name="noNotifications">لا يوجد تنبيهات</string>
+    <string name="systemNotification">تنبيهات النظام</string>
+
+    <!--CreatePostScreen-->
+    <string name="postContentPlaceholder">شارك أفكارك</string>
 
 </resources>
