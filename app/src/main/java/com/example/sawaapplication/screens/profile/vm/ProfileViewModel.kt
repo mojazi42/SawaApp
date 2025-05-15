@@ -13,13 +13,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.net.Uri
 import com.example.sawaapplication.core.permissions.PermissionHandler
+import com.example.sawaapplication.screens.profile.domain.model.User
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseAuthDataSource: FirebaseAuthDataSource,
-    private val permissionHandler: PermissionHandler
+    private val permissionHandler: PermissionHandler,
+    private val firestore: FirebaseFirestore
 ) : ViewModel() {
 
     private val _userName = MutableStateFlow<String?>(null)
@@ -132,7 +135,25 @@ class ProfileViewModel @Inject constructor(
             }
             .addOnFailureListener { onFailure(it) }
     }
-
+    private val _selectedUser = MutableStateFlow<User?>(null)
+    val selectedUser: StateFlow<User?> = _selectedUser
+    fun fetchUserById(userId: String) {
+        viewModelScope.launch {
+            try {
+                val snapshot = firestore.collection("User").document(userId).get().await()
+                if (snapshot.exists()) {
+                    val user = snapshot.toObject(User::class.java)
+                    _selectedUser.value = user
+                    Log.d("HomeViewModel", "successfully fetching user: ")
+                } else {
+                    _selectedUser.value = null
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error fetching user: ${e.message}")
+                _selectedUser.value = null
+            }
+        }
+    }
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 }

@@ -33,9 +33,10 @@ import com.example.sawaapplication.screens.home.presentation.screens.component.P
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.navigation.NavController
 
 @Composable
-fun HomeScreen(
+fun HomeScreen(navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -44,7 +45,7 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize()) {
 
         when (selectedTabIndex) {
-            0 -> PostsTab(viewModel)
+            0 -> PostsTab(viewModel,navController)
             1 -> MyEventsTab() // implement if needed
         }
 
@@ -67,7 +68,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun PostsTab(viewModel: HomeViewModel) {
+fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
     val posts by viewModel.posts.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -99,23 +100,27 @@ fun PostsTab(viewModel: HomeViewModel) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                items(posts) { post ->
-                    val communityName = communityNames[post.communityId] ?: "Unknown"
-                    val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
-                    PostCard(
-                        post,
-                        communityName,
-                        userName,
-                        userImage,
-                        onClick = {},
-                        onLikeClick = { viewModel.likePost(post) })
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    items(posts) { post ->
+                        val communityName = communityNames[post.communityId] ?: "Unknown"
+                        val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
+                        PostCard(
+                            post,
+                            communityName,
+                            userName,
+                            userImage,
+                            onClick = {},
+                            onLikeClick = { viewModel.likePost(post) } ,
+                            navController = navController,
+                            onUserImageClick = { viewModel.likePost(post) }
+                        )
+
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
                 }
-            }
         }
     }
 }
@@ -144,8 +149,8 @@ fun MyEventsTab() {
                 joined = joinedStates[index],
                 onJoinClick = { joinedStates[index] = !joinedStates[index] },
                 showCancelButton = true,
-                joinedUsers= emptyList(),
-                date="16 Feb 25 •",
+                joinedUsers = emptyList(),
+                date = "16 Feb 25 •",
                 modifier = Modifier.padding(
                     top = if (index == 0) integerResource(id = R.integer.homeScreenTopPadding).dp else 0.dp
                 )
