@@ -13,6 +13,8 @@ data class Event(
     val memberLimit: Int = 0,
     val createdBy: String ="",
     val imageUri:String = "",
-    val joinedUsers: List<String> = emptyList()
+    val joinedUsers: List<String> = emptyList(),
+    val communityId: String = "", // for fetch events
+    val participants: Int = 0 // for fetch events
 )
 
