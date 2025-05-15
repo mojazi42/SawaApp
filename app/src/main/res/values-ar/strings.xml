@@ -106,4 +106,8 @@
     <string name="unknownError">خطأ غير معروف</string>
     <string name="unknown">غير معروف</string>
 
+    <!--NotificationScreen-->
+    <string name="noNotifications">لا يوجد تنبيهات</string>
+    <string name="systemNotification">تنبيهات النظام</string>
+
 </resources>
