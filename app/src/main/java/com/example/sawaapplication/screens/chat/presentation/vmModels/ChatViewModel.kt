@@ -11,6 +11,7 @@ import com.example.sawaapplication.screens.authentication.domain.repository.Auth
 import com.example.sawaapplication.screens.chat.domain.model.ChatUserInfo
 import com.example.sawaapplication.screens.chat.domain.model.Message
 import com.example.sawaapplication.screens.chat.domain.useCases.FetchUnreadMessagesUseCase
+import com.example.sawaapplication.screens.chat.domain.useCases.GetCommunityMembersUseCase
 import com.example.sawaapplication.screens.chat.domain.useCases.GetLastMessageWithSenderUseCase
 import com.example.sawaapplication.screens.chat.domain.useCases.GetSenderInfoUseCase
 import com.example.sawaapplication.screens.chat.domain.useCases.MarkMessagesAsReadUseCase
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val sendMessageUseCase: SendMessageUseCase,
@@ -32,46 +32,79 @@ class ChatViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val fetchUnreadMessagesUseCase: FetchUnreadMessagesUseCase,
     private val markMessagesAsReadUseCase: MarkMessagesAsReadUseCase,
-    private val getSenderInfoUseCase: GetSenderInfoUseCase
+    private val getSenderInfoUseCase: GetSenderInfoUseCase,
+    private val getCommunityMembersUseCase: GetCommunityMembersUseCase
 ) : ViewModel() {
-
 
     val currentUserId = authRepository.getCurrentUserId()
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
-
     private val _senderInfo = MutableStateFlow<Map<String, ChatUserInfo>>(emptyMap())
     val senderInfo: StateFlow<Map<String, ChatUserInfo>> get() = _senderInfo
 
-    var currentCommunityIdInView by mutableStateOf<String?>(null)
+    private val _communityMembers = MutableStateFlow<List<ChatUserInfo>>(emptyList())
+    val communityMembers: StateFlow<List<ChatUserInfo>> = _communityMembers
 
-/*
-    fun fetchSenderInfo(userId: String) {
-        if (_senderInfo.value.containsKey(userId)) return
+    private val _loading = MutableStateFlow(true)
+    val loading: StateFlow<Boolean> = _loading
 
-        FirebaseFirestore.getInstance()
-            .collection("User")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                val name = document.getString("name")
-                val image = document.getString("image")
-                val userInfo = ChatUserInfo(name, image)
-                _senderInfo.value = _senderInfo.value + (userId to userInfo)
+    private val _dataLoaded = MutableStateFlow(false)
+    val dataLoaded: StateFlow<Boolean> = _dataLoaded
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
+    fun fetchCommunityMembers(communityId: String) {
+        viewModelScope.launch {
+            try {
+                _loading.value = true
+                val members = getCommunityMembersUseCase(communityId)
+                if (members.isNotEmpty()) {
+                    _communityMembers.value = members
+                } else {
+                    _communityMembers.value = emptyList()
+                }
+            } catch (e: Exception) {
+                _communityMembers.value = emptyList()
+                _error.value = "Error fetching community members: ${e.message}"
+            } finally {
+                checkIfDataLoaded()
             }
-    }*/
+        }
+    }
+
     fun observeMessages(communityId: String) {
         viewModelScope.launch {
-            currentUserId?.let { userId ->
-                observeMessagesUseCase(communityId, userId).collect { newMessages ->
-                    _messages.value = newMessages
-                    markMessagesAsRead(communityId, userId)
+            try {
+                _loading.value = true
+                currentUserId?.let { userId ->
+                    observeMessagesUseCase(communityId, userId).collect { newMessages ->
+                        if (newMessages.isNotEmpty()) {
+                            _messages.value = newMessages
+                        } else {
+                            _messages.value = emptyList()
+                        }
+                        markMessagesAsRead(communityId, userId)
+                    }
                 }
+            } catch (e: Exception) {
+                _messages.value = emptyList()
+                _error.value = "Error fetching messages: ${e.message}"
+            } finally {
+                checkIfDataLoaded()
             }
+        }
+    }
+
+    private fun checkIfDataLoaded() {
+        // Check if both community members and messages are loaded
+        if (_communityMembers.value.isNotEmpty() && _messages.value.isNotEmpty()) {
+            _loading.value = false
+            _dataLoaded.value = true
+        } else {
+            _loading.value = false
         }
     }
 

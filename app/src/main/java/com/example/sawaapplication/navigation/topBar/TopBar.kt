@@ -225,6 +225,7 @@ fun getTopBar(
                 )
             }
         }
+
         Screen.UserAccount.route -> {
             {
                 TopBar(
@@ -259,6 +260,23 @@ fun getTopBar(
             }
         }
 
+        Screen.GroupMembers.route -> {
+            {
+                TopBar(
+                    title = stringResource(R.string.groupMembers),
+                    navIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    }
+                )
+            }
+        }
         else -> null
     }
 }

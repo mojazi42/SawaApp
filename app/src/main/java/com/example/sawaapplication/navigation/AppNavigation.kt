@@ -52,6 +52,7 @@ import com.example.sawaapplication.screens.authentication.presentation.screens.R
 import com.example.sawaapplication.screens.authentication.presentation.screens.SignUpScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SplashScreen
 import com.example.sawaapplication.screens.chat.presentation.screens.ChatScreen
+import com.example.sawaapplication.screens.chat.presentation.screens.GroupMembersScreen
 import com.example.sawaapplication.screens.chat.presentation.screens.ViewChatsScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.CommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
@@ -207,10 +208,21 @@ fun AppNavigation(
                 CreateNewEventScreen(navController, communityId)
             }
 
+
             composable("create_post/{communityId}") { backStackEntry ->
                 val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 CreatePostScreen(navController, communityId)
             }
+
+
+            composable("groupMembers/{communityId}") { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                Log.d("DEBUG", "Navigation received communityId: $communityId")
+                GroupMembersScreen(
+                    communityId = communityId
+                )
+            }
+
             composable(
                 route = Screen.UserAccount.route,
                 arguments = listOf(navArgument("userId") { type = NavType.StringType })
