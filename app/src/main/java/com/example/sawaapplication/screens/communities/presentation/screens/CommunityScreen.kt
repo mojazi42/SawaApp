@@ -67,6 +67,7 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
@@ -365,7 +366,7 @@ fun CommunityScreen(
                 items(events) { event ->
                     communityDetail?.let {
                         val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
-
+                        val formattedDate = formatDateString(event.date)
                         EventCard(
                             image = event.imageUri,
                             title = event.title,
@@ -375,6 +376,7 @@ fun CommunityScreen(
                             joinedUsers = event.joinedUsers,
                             community = it.name,
                             time = timeFormatted,
+                            date = formattedDate,
                             joined = event.joinedUsers.contains(userId),
                             onJoinClick = {
                                 if (event.joinedUsers.contains(userId)) {
