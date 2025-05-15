@@ -11,6 +11,6 @@ object ThemeManager {
 
     fun getSavedTheme(context: Context): Boolean{
         val sharedPreference = context.getSharedPreferences("app_prefs",Context.MODE_PRIVATE)
-        return sharedPreference.getBoolean("theme",false) ?: false // Default light mode if not set
+        return sharedPreference.getBoolean("theme",false)
     }
 }

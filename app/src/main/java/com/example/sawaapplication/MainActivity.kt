@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.rememberNavController
+import com.example.sawaapplication.core.sharedPreferences.ThemeManager
 import com.example.sawaapplication.core.sharedpreferences.LanguageManager
 import com.example.sawaapplication.navigation.AppNavigation
 import com.example.sawaapplication.screens.profile.screens.changeAppLocale
@@ -22,6 +23,9 @@ class MainActivity : ComponentActivity() {
         // Set saved language but don't trigger recreate loop
         val savedLang = LanguageManager.getSavedLanguage(this)
         changeAppLocale(this, savedLang)
+
+        val savedTheme = ThemeManager.getSavedTheme(this).toString()
+        changeAppLocale(this, savedTheme)
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
