@@ -33,13 +33,14 @@ import com.example.sawaapplication.screens.home.presentation.screens.component.P
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Posts", "My Events")
+    val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -83,7 +84,7 @@ fun PostsTab(viewModel: HomeViewModel) {
             loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
 
             error != null -> Text(
-                text = error ?: "Unknown error",
+                text = error ?: "${stringResource(R.string.unknownError)}",
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.align(Alignment.Center)
             )
