@@ -40,10 +40,13 @@ import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.res.stringResource
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 
 @Composable
-fun HomeScreen(navController: NavController,
+fun HomeScreen(
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -52,7 +55,7 @@ fun HomeScreen(navController: NavController,
     Box(modifier = Modifier.fillMaxSize()) {
 
         when (selectedTabIndex) {
-            0 -> PostsTab(viewModel,navController)
+            0 -> PostsTab(viewModel, navController)
             1 -> MyEventsTab() // implement if needed
         }
 
@@ -75,12 +78,25 @@ fun HomeScreen(navController: NavController,
 }
 
 @Composable
-fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
+fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
     val posts by viewModel.posts.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
     val communityNames by viewModel.communityNames.collectAsState()
     val userDetails by viewModel.userDetails.collectAsState()
+    val notificationViewModel: NotificationViewModel = hiltViewModel()
+
+    val postLikedUserId = viewModel.postLikedEvent.collectAsState().value
+
+    // Trigger a notification whenever a post is liked by a user
+    LaunchedEffect(postLikedUserId) {
+        postLikedUserId?.let { likedUserId ->
+            val post = posts.find { it.userId == likedUserId }
+            post?.let {
+                notificationViewModel.sendLikeNotification(it)
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchAllPosts()
@@ -107,27 +123,32 @@ fun PostsTab(viewModel: HomeViewModel,navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.lazyColumnArrangement).dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                items(posts) { post ->
-                    val communityName = communityNames[post.communityId] ?: stringResource(R.string.unknown)
-                    val (userName, userImage) = userDetails[post.userId] ?: (stringResource(R.string.unknown) to "")
-                    PostCard(
-                        post,
-                        communityName,
-                        userName,
-                        userImage,
-                        onClick = {},
-                        onLikeClick = { viewModel.likePost(post) },
-                        navController = navController,
-                        onUserImageClick = { viewModel.likePost(post) }
-                    )
+                    items(posts) { post ->
+                        val communityName =
+                            communityNames[post.communityId] ?: stringResource(R.string.unknown)
+                        val (userName, userImage) = userDetails[post.userId]
+                            ?: (stringResource(R.string.unknown) to "")
+                        PostCard(
+                            post,
+                            communityName,
+                            userName,
+                            userImage,
+                            onClick = {},
+                            onLikeClick = {
+                                viewModel.likePost(post)
+                                notificationViewModel.sendLikeNotification(post)
+                            },
+                            navController = navController,
+                            onUserImageClick = { viewModel.likePost(post) }
+                        )
 
-                    HorizontalDivider(
-                        thickness = integerResource(R.integer.lazyColumnHorizontalDividerThickness).dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        modifier = Modifier.padding(vertical = integerResource(R.integer.smallerSpace).dp)
-                    )
+                        HorizontalDivider(
+                            thickness = integerResource(R.integer.lazyColumnHorizontalDividerThickness).dp,
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            modifier = Modifier.padding(vertical = integerResource(R.integer.smallerSpace).dp)
+                        )
+                    }
                 }
-            }
         }
     }
 }
