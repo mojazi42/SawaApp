@@ -144,6 +144,8 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+
     private suspend fun fetchCommunityNames(communityIds: List<String>) = coroutineScope {
         try {
             val namesList = communityIds.map { id ->
