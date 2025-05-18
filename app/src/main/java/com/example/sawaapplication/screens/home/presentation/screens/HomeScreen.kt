@@ -33,10 +33,14 @@ import com.example.sawaapplication.screens.home.presentation.screens.component.P
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.res.stringResource
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
+import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
+import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 
 @Composable
 fun HomeScreen(navController: NavController,
@@ -139,6 +143,9 @@ fun MyEventsTab(
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val joinResult by eventViewModel.joinResult.collectAsState()
 
+    // Fetch community names
+    val communityNames by viewModel.communityNames.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.fetchJoinedEvents()
     }
@@ -164,15 +171,22 @@ fun MyEventsTab(
                 contentPadding = PaddingValues(top = 72.dp, bottom = 56.dp)
             ) {
                 items(events) { event ->
+                    val communityName = communityNames[event.communityId] ?: "Unknown Community"
+                    val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+                    val formattedDate = formatDateString(event.date)
+                    val context = LocalContext.current
+
                     EventCard(
                         image = event.imageUri,
                         title = event.title,
                         description = event.description,
-                        location = event.location.toString(),
-                        time = event.time.toString(),
-                        participants = event.joinedUsers.size,
-                        community = "Community", // Replace with resolved name if needed
-                        joined = true,
+                        location = context.getCityNameFromGeoPoint(event.location),
+                        participants = event.memberLimit,
+                        joinedUsers = event.joinedUsers,
+                        community = communityName,
+                        time = timeFormatted,
+                        date = formattedDate,
+                        joined = event.joinedUsers.contains(userId),
                         onJoinClick = {
                             eventViewModel.leaveEvent(
                                 communityId = event.communityId,
@@ -181,8 +195,6 @@ fun MyEventsTab(
                             )
                         },
                         showCancelButton = true,
-                        joinedUsers = event.joinedUsers,
-                        date = event.date,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
