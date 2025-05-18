@@ -169,7 +169,9 @@ fun EventCard(
                     Text(
                         text = "${date}•${time}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 4.dp)
                     )
                 }
 
@@ -223,7 +225,7 @@ fun JoinButton(
     ) {
         Text(
             text = when {
-                isCancelVisible -> "Cancel"
+                isCancelVisible -> "Leave"
                 joined -> "Joined"
                 else -> "Join"
             },
