@@ -21,7 +21,7 @@ import kotlinx.coroutines.tasks.await
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
 ) : ViewModel() {
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
@@ -49,6 +49,8 @@ class HomeViewModel @Inject constructor(
     private val _hasCancelEvents = MutableStateFlow(false)
     val hasCancelEvents: StateFlow<Boolean> = _hasCancelEvents
 
+    private val _postLikedEvent = MutableStateFlow<String?>(null)
+    val postLikedEvent: StateFlow<String?> = _postLikedEvent
 
     private suspend fun getUserCommunityIds(userId: String): List<String> {
         return try {
@@ -87,22 +89,28 @@ class HomeViewModel @Inject constructor(
                 val postsList = mutableListOf<Post>()
                 val docIdMap = mutableMapOf<Post, String>()
 
-                userCommunityIds.forEach { communityId ->
-                    val postSnapshot = firestore
-                        .collection("Community")
-                        .document(communityId)
-                        .collection("posts")
-                        .get()
-                        .await()
+                // Fetch posts concurrently for each community
+                val postDeferreds = userCommunityIds.map { communityId ->
+                    async {
+                        val postSnapshot = firestore
+                            .collection("Community")
+                            .document(communityId)
+                            .collection("posts")
+                            .get()
+                            .await()
 
-                    for (doc in postSnapshot.documents) {
-                        val post = doc.toObject(Post::class.java)
-                        if (post != null) {
-                            postsList.add(post)
-                            docIdMap[post] = doc.id
+                        postSnapshot.documents.forEach { doc ->
+                            val post = doc.toObject(Post::class.java)
+                            if (post != null) {
+                                postsList.add(post)
+                                docIdMap[post] = doc.id
+                            }
                         }
                     }
                 }
+
+                // Await all post fetching operations to finish
+                postDeferreds.awaitAll()
 
                 _posts.value = postsList
                 _postDocumentIds.value = docIdMap
@@ -110,8 +118,13 @@ class HomeViewModel @Inject constructor(
                 val communityIds = postsList.map { it.communityId }.distinct()
                 val userIds = postsList.map { it.userId }.distinct()
 
-                fetchCommunityNames(communityIds)
-                fetchUserDetails(userIds)
+                // Fetch community names and user details concurrently
+                val communityNamesDeferred = async { fetchCommunityNames(communityIds) }
+                val userDetailsDeferred = async { fetchUserDetails(userIds) }
+
+                // Await all community and user details fetches
+                communityNamesDeferred.await()
+                userDetailsDeferred.await()
 
             } catch (e: Exception) {
                 _error.value = e.message
@@ -120,7 +133,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
 
     private suspend fun fetchCommunityNames(communityIds: List<String>) = coroutineScope {
         try {
@@ -177,10 +189,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // Like functionality: Increase likes in FireStore
     fun likePost(post: Post) {
         viewModelScope.launch {
             try {
+                val currentUserId = firebaseAuth.currentUser?.uid
+                if (currentUserId.isNullOrEmpty()) {
+                    Log.e("HomeViewModel", "User not logged in")
+                    return@launch
+                }
+
                 val docId = postDocumentIds.value[post]
                 if (docId == null) {
                     Log.e("HomeViewModel", "Document ID not found for post")
@@ -193,23 +210,49 @@ class HomeViewModel @Inject constructor(
                     .collection("posts")
                     .document(docId)
 
-                val snapshot = postRef.get().await()
-                val currentLikes = snapshot.getLong("likes") ?: 0
-                val newLikes = if (currentLikes == 1L) 0 else 1
+                var postLikedUserId: String? = null
+                var updatedPost: Post? = null
 
                 firestore.runTransaction { transaction ->
-                    transaction.update(postRef, "likes", newLikes)
+                    val snapshot = transaction.get(postRef)
+                    val likedBy = snapshot.get("likedBy") as? List<String> ?: emptyList()
+
+                    val isLiked = currentUserId in likedBy
+                    val newLikedBy =
+                        if (isLiked) likedBy - currentUserId else likedBy + currentUserId
+                    val newLikes = newLikedBy.size
+
+                    transaction.update(
+                        postRef, mapOf(
+                            "likes" to newLikes,
+                            "likedBy" to newLikedBy
+                        )
+                    )
+
+                    updatedPost = post.copy(
+                        likes = newLikes,
+                        likedBy = newLikedBy
+                    )
+
+                    // Prepare to emit after transaction finishes
+                    if (!isLiked && post.userId != currentUserId) {
+                        postLikedUserId = post.userId
+                    }
                 }.await()
 
-                val updatedPost = post.copy(likes = newLikes.toInt())
-                _posts.value = _posts.value.map {
-                    if (it == post) updatedPost else it
+                // Update local state after transaction
+                updatedPost?.let {
+                    _posts.value = _posts.value.map { existing ->
+                        if (existing == post) it else existing
+                    }
+                    _postDocumentIds.value = _postDocumentIds.value.toMutableMap().apply {
+                        remove(post)
+                        put(it, docId)
+                    }
                 }
 
-                // Also update the post ID mapping to match the new object
-                _postDocumentIds.value = _postDocumentIds.value.toMutableMap().apply {
-                    remove(post)
-                    put(updatedPost, docId)
+                postLikedUserId?.let {
+                    _postLikedEvent.emit(it)
                 }
 
             } catch (e: Exception) {
@@ -217,6 +260,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     fun fetchPostsByUser(userId: String) {
         viewModelScope.launch {
             _loading.value = true
@@ -275,24 +319,29 @@ class HomeViewModel @Inject constructor(
                 val userId = firebaseAuth.currentUser?.uid ?: return@launch
                 val communityIds = getUserCommunityIds(userId)
 
-                val joinedEventsList = mutableListOf<Event>()
+                val joinedEventsDeferred = communityIds.map { communityId ->
+                    async {
+                        val eventsSnapshot = firestore.collection("Community")
+                            .document(communityId)
+                            .collection("event")
+                            .get()
+                            .await()
 
-                for (communityId in communityIds) {
-                    val eventsSnapshot = firestore.collection("Community")
-                        .document(communityId)
-                        .collection("event")
-                        .get()
-                        .await()
-
-                    for (doc in eventsSnapshot.documents) {
-                        val event = doc.toObject(Event::class.java)
-                        if (event != null && userId in event.joinedUsers) {
-                            joinedEventsList.add(event.copy(id = doc.id, communityId = communityId))
+                        val events = eventsSnapshot.documents.mapNotNull { doc ->
+                            val event = doc.toObject(Event::class.java)
+                            if (event != null && userId in event.joinedUsers) {
+                                event.copy(id = doc.id, communityId = communityId)
+                            } else {
+                                null
+                            }
                         }
+                        events
                     }
                 }
 
-                _joinedEvents.value = joinedEventsList
+                // Await all joined events fetches
+                val eventsList = joinedEventsDeferred.awaitAll().flatten()
+                _joinedEvents.value = eventsList
 
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Error fetching joined events: ${e.message}")
@@ -305,5 +354,6 @@ class HomeViewModel @Inject constructor(
     fun resetCancelButton() {
         _hasCancelEvents.value = false
     }
+
 
 }
