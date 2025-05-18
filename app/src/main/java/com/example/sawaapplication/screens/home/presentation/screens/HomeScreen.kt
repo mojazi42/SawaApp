@@ -93,7 +93,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
         postLikedUserId?.let { likedUserId ->
             val post = posts.find { it.userId == likedUserId }
             post?.let {
-                notificationViewModel.sendLikeNotification(it)
+                notificationViewModel.notifyLike(it)
             }
         }
     }
@@ -136,7 +136,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                             onClick = {},
                             onLikeClick = {
                                 viewModel.likePost(post)
-                                notificationViewModel.sendLikeNotification(post)
+                                notificationViewModel.notifyLike(post)
                             },
                             navController = navController,
                             onUserImageClick = { viewModel.likePost(post) }
