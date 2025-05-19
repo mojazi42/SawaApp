@@ -3,8 +3,12 @@ package com.example.sawaapplication.screens.communities.presentation.screens
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -24,6 +28,7 @@ import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.screens.component.MyCommunitiesCard
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.screenComponent.FloatingButton
+import com.example.sawaapplication.ui.screenComponent.SearchField
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -34,45 +39,57 @@ fun MyCommunitiesScreen(
 ) {
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-    // Fetch the communities when the screen is loaded
-    LaunchedEffect(Unit) {
-        viewModel.fetchCreatedCommunities(currentUserId)
-    }
-
     // Observe the state of communities and loading
     val communities by viewModel.createdCommunities.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
+    val searchText by viewModel.searchText.collectAsState()
+    val filteredCommunities by viewModel.filteredCreatedCommunities.collectAsState()
 
-    ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
-            verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
-            horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
-            modifier = Modifier.padding(vertical = integerResource(id = R.integer.largerSpace).dp)
-        ) {
-            items(communities) { community ->
-                MyCommunitiesCard(
-                    community = community,
-                    onClick = {
-                        // Added debug log to confirm the community ID being navigated to
-                        Log.d("DEBUG", "Navigating to community id: ${community.id}")
-                        // Navigate to the CommunityScreen using the community ID
-                        navController.navigate("community_screen/${community.id}")
-                    }
-                )
-            }
-        }
-        FloatingButton(
-            onClick = { navController.navigate(Screen.NewCommunity.route) },
+    // Fetch the communities when the screen is loaded
+    LaunchedEffect(Unit) {
+        viewModel.fetchCreatedCommunities(currentUserId)
+    }
+    Column {
+        SearchField(
+            value = searchText,
+            onValueChange = viewModel::onSearchTextChange,
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(integerResource(R.integer.mediumSpace).dp)
+                .fillMaxWidth()
+                .padding(horizontal = integerResource(R.integer.padding).dp)
         )
+        Spacer(Modifier.height(integerResource(R.integer.mediumSpace).dp))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
+                verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+                horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+                modifier = Modifier.padding(vertical = integerResource(id = R.integer.largerSpace).dp)
+            ) {
+                items(filteredCommunities) { community ->
+                    MyCommunitiesCard(
+                        community = community,
+                        onClick = {
+                            // Added debug log to confirm the community ID being navigated to
+                            Log.d("DEBUG", "Navigating to community id: ${community.id}")
+                            // Navigate to the CommunityScreen using the community ID
+                            navController.navigate("community_screen/${community.id}")
+                        }
+                    )
+                }
+            }
+            FloatingButton(
+                onClick = { navController.navigate(Screen.NewCommunity.route) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(integerResource(R.integer.mediumSpace).dp)
+            )
+        }
     }
 }
