@@ -4,25 +4,26 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import com.example.sawaapplication.screens.communities.domain.useCases.CreateCommunityUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import com.example.sawaapplication.screens.communities.domain.model.Community
-import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCreatedCommunitiesUseCase
-import kotlinx.coroutines.Job
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sawaapplication.core.permissions.PermissionHandler
+import com.example.sawaapplication.screens.communities.domain.model.Community
+import com.example.sawaapplication.screens.communities.domain.useCases.CreateCommunityUseCase
 import com.example.sawaapplication.screens.communities.domain.useCases.GetCommunityByIdUseCase
-import com.example.sawaapplication.screens.post.domain.model.Post
+import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCreatedCommunitiesUseCase
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.screens.post.domain.repository.PostRepository
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
@@ -97,6 +98,26 @@ class CommunityViewModel @Inject constructor(
             }
         }
     }
+
+    // Holds the current search text
+    private val _searchText = MutableStateFlow("")
+    val searchText: StateFlow<String> = _searchText
+
+    fun onSearchTextChange(newText: String) {
+        _searchText.value = newText
+    }
+
+    // Filtered list based on search text
+    val filteredCreatedCommunities: StateFlow<List<Community>> =
+        combine(_searchText, _createdCommunities) { query, communities ->
+            if (query.isBlank()) {
+                communities
+            } else {
+                communities.filter {
+                    it.name.contains(query, ignoreCase = true)
+                }
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
