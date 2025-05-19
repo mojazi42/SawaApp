@@ -194,6 +194,11 @@ fun MyEventsTab(
     var selectedCommunityId by remember { mutableStateOf<String?>(null) }
     val communityNames by viewModel.communityNames.collectAsState() // fetch community names
 
+
+    var showLeaveEventDialog by remember { mutableStateOf(false) }
+    var selectedEventId by remember { mutableStateOf<String?>(null) }
+    var selectedCommunityId by remember { mutableStateOf<String?>(null) }
+
     LaunchedEffect(Unit) {
         viewModel.fetchJoinedEvents()
     }
