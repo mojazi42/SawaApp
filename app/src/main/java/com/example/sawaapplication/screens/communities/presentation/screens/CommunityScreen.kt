@@ -152,6 +152,12 @@ fun CommunityScreen(
     }
 
 
+    var showLeaveCommunityDialog by remember { mutableStateOf(false) }
+
+    var showLeaveEventDialog by remember { mutableStateOf(false) }
+    var selectedEventId by remember { mutableStateOf<String?>(null) }
+
+
     LaunchedEffect(hasJoinedOrLeft) {
         if (hasJoinedOrLeft) {
             viewModel.fetchCommunityDetail(communityId)
