@@ -33,9 +33,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -46,62 +48,71 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 
 import coil.compose.AsyncImage
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 
 @Composable
-fun GroupMembersScreen(
-    communityId: String,
-) {
+fun GroupMembersScreen(communityId: String) {
     val communityViewModel: CommunityViewModel = hiltViewModel()
+    val chatViewModel: ChatViewModel = hiltViewModel()
+
     val communityDetails by communityViewModel.communityDetail.collectAsState()
     val communityImage = communityDetails?.image.orEmpty()
     val communityName = communityDetails?.name.orEmpty()
 
-    val chatViewModel: ChatViewModel = hiltViewModel()
     val members by chatViewModel.communityMembers.collectAsState()
     val loading by chatViewModel.loading.collectAsState()
     val error by chatViewModel.error.collectAsState()
+    val mediaList by chatViewModel.chatMedia.collectAsState()
 
-    // Fetch when screen appears
+    var previewImageUrl by remember { mutableStateOf<String?>(null) }
+
     LaunchedEffect(communityId) {
         communityViewModel.fetchCommunityDetail(communityId)
         chatViewModel.fetchCommunityMembers(communityId)
+        chatViewModel.observeMessages(communityId)
     }
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp),
-        contentAlignment = Alignment.TopCenter
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
         when {
-            loading -> {
+            loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
 
-            error != null -> {
+            error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(error!!, color = MaterialTheme.colorScheme.error)
             }
 
             else -> {
-                Column(Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp)
+                        .zIndex(0f)
+                ) {
                     // Header
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -132,52 +143,43 @@ fun GroupMembersScreen(
                         }
                     }
 
-/*
-                    // Horizontal scroll of avatars + names
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        items(members) { member ->
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .widthIn(min = 64.dp)
-                                    .clickable { */
-/* Maybe show member detail? *//*
- }
-                            ) {
-                                AsyncImage(
-                                    model = member.image,
-                                    contentDescription = member.name,
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(CircleShape)
-                                        .border(
-                                            2.dp,
-                                            MaterialTheme.colorScheme.surface,
-                                            CircleShape
-                                        ),
-                                    contentScale = ContentScale.Crop
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = member.name ?: "Unknown",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
+                    Spacer(Modifier.height(16.dp))
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        thickness = 1.dp
+                    )
+
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Shared Media",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        if (mediaList.isNotEmpty()) {
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(mediaList) { imageUrl ->
+                                    AsyncImage(
+                                        model = imageUrl,
+                                        contentDescription = "Chat media",
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .clickable { previewImageUrl = imageUrl },
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
                             }
+                        } else {
+                            Text(
+                                text = "No media shared in this chat.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
-*/
-                    Spacer(Modifier.height(16.dp))
 
-                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
-                    Spacer(Modifier.height(16.dp))
-
-                    // Vertical list of all members
                     LazyColumn(
                         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -208,5 +210,22 @@ fun GroupMembersScreen(
             }
         }
     }
-}
 
+    if (previewImageUrl != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.95f))
+                .clickable { previewImageUrl = null }
+                .zIndex(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = previewImageUrl,
+                contentDescription = "Full Image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
+        }
+    }
+}

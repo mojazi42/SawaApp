@@ -28,7 +28,7 @@ class GetCommunityMembersUseCase @Inject constructor(
                     .await()
                 val name = userDoc.getString("name")
                 val image = userDoc.getString("image")
-                if (name != null && image != null) ChatUserInfo(name, image) else null
+                if (name != null && image != null) ChatUserInfo(userId = userId, name, image) else null
             } catch (e: Exception) {
                 null
             }

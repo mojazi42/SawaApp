@@ -7,5 +7,6 @@ data class Message(
     val senderId: String = "",
     val text: String = "",
     val createdAt: Timestamp? = null,
-    val readBy: Map<String, Boolean> = emptyMap()
+    val readBy: Map<String, Boolean> = emptyMap(),
+    val imageUrl: String = ""
 )
