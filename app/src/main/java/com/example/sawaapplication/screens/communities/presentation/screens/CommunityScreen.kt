@@ -135,10 +135,6 @@ fun CommunityScreen(
     val isUserJoined = communityDetail?.members?.contains(userId) == true
     val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
 
-    var showLeaveCommunityDialog by remember { mutableStateOf(false) }
-
-    var showLeaveEventDialog by remember { mutableStateOf(false) }
-    var selectedEventId by remember { mutableStateOf<String?>(null) }
 
     val events by fetchEventViewModel.events.collectAsState()
 
