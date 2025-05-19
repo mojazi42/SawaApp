@@ -38,6 +38,8 @@ import com.example.sawaapplication.screens.home.presentation.screens.component.P
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.LocalContext
@@ -234,6 +236,27 @@ fun MyEventsTab(
 
                 }
             }
+        }
+        //Dialog for confirm leaving an event
+        if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {
+            CustomConfirmationDialog(
+                message = stringResource(R.string.areYouSureEvent),
+                onConfirm = {
+                    eventViewModel.leaveEvent(
+                        communityId = selectedCommunityId!!,
+                        eventId = selectedEventId!!,
+                        userId = userId
+                    )
+                    showLeaveEventDialog = false
+                    selectedEventId = null
+                    selectedCommunityId = null
+                },
+                onDismiss = {
+                    showLeaveEventDialog = false
+                    selectedEventId = null
+                    selectedCommunityId = null
+                }
+            )
         }
         //Dialog for confirm leaving an event
         if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {
