@@ -146,6 +146,9 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                                 viewModel.likePost(post)
                                 notificationViewModel.notifyLike(post)
                             },
+                            onDeleteClick = {
+                                viewModel.deletePost(post)
+                            },
                             navController = navController,
                             onUserImageClick = { viewModel.likePost(post) }
                         )

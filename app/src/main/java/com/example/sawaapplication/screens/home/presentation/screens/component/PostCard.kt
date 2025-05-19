@@ -2,6 +2,7 @@ package com.example.sawaapplication.screens.home.presentation.screens.component
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,6 +42,7 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.post.domain.model.Post
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -54,6 +57,7 @@ fun PostCard(
     onClick: () -> Unit,
     onLikeClick: (Post) -> Unit,
     onUserImageClick: () -> Unit,
+    onDeleteClick: (Post) -> Unit,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
@@ -63,7 +67,8 @@ fun PostCard(
     var isLiked by remember(post.likedBy) {
         mutableStateOf(currentUserId != null && currentUserId in post.likedBy)
     }
-
+    val isOwnedByCurrentUser = currentUserId == post.userId
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Set icon color based on like state
     val likeIconColor = if (isLiked) Color.Red else Color.Gray
@@ -175,25 +180,49 @@ fun PostCard(
 
             // Likes count
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "${post.likes} ${stringResource(R.string.like)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(end = integerResource(R.integer.smallerSpace).dp)
-                )
-
-                IconButton(onClick = {
-                    // Toggle the like status
-                    isLiked = !isLiked
-                    onLikeClick(post) // Notify the viewModel to update the like count in FireStore
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "Like",
-                        tint = likeIconColor // Change the tint based on like state
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "${post.likes} ${stringResource(R.string.like)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(end = 8.dp)
                     )
+
+                    IconButton(onClick = {
+                        isLiked = !isLiked
+                        onLikeClick(post)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Like",
+                            tint = likeIconColor
+                        )
+                    }
                 }
+
+                // Show delete button if post belongs to current user
+                if (isOwnedByCurrentUser) {
+                    IconButton(onClick = { showDeleteDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Post",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+            }
+            if (showDeleteDialog) {
+                CustomConfirmationDialog(
+                    message = stringResource(R.string.areYouSurePost),
+                    onDismiss = { showDeleteDialog = false },
+                    onConfirm = {
+                        showDeleteDialog = false
+                        onDeleteClick(post)
+                    }
+                )
             }
         }
     }
