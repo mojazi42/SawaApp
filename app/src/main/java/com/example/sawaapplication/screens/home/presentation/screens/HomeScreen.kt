@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -17,32 +18,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.CustomTabRow
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.navigation.NavController
-import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
-import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.ui.res.stringResource
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
@@ -96,6 +97,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
     LaunchedEffect(Unit) {
         viewModel.fetchAllPosts()
     }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -151,13 +153,18 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
 @Composable
 fun MyEventsTab(
     viewModel: HomeViewModel = hiltViewModel(),
-    eventViewModel: FetchEventViewModel = hiltViewModel()
+    eventViewModel: FetchEventViewModel = hiltViewModel(),
 ) {
     val events by viewModel.joinedEvents.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val joinResult by eventViewModel.joinResult.collectAsState()
+
+
+    var showLeaveEventDialog by remember { mutableStateOf(false) }
+    var selectedEventId by remember { mutableStateOf<String?>(null) }
+    var selectedCommunityId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchJoinedEvents()
@@ -169,6 +176,7 @@ fun MyEventsTab(
             viewModel.fetchJoinedEvents()
         }
     }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -194,19 +202,40 @@ fun MyEventsTab(
                         community = "Community", // Replace with resolved name if needed
                         joined = true,
                         onJoinClick = {
-                            eventViewModel.leaveEvent(
-                                communityId = event.communityId,
-                                eventId = event.id,
-                                userId = userId
-                            )
+                            //leave event
+                            selectedEventId = event.id
+                            selectedCommunityId = event.communityId
+                            showLeaveEventDialog = true
                         },
                         showCancelButton = true,
                         joinedUsers = event.joinedUsers,
                         date = event.date,
                         modifier = Modifier.padding(8.dp)
                     )
+
                 }
             }
+        }
+        //Dialog for confirm leaving an event
+        if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {
+            CustomConfirmationDialog(
+                message = stringResource(R.string.areYouSureEvent),
+                onConfirm = {
+                    eventViewModel.leaveEvent(
+                        communityId = selectedCommunityId!!,
+                        eventId = selectedEventId!!,
+                        userId = userId
+                    )
+                    showLeaveEventDialog = false
+                    selectedEventId = null
+                    selectedCommunityId = null
+                },
+                onDismiss = {
+                    showLeaveEventDialog = false
+                    selectedEventId = null
+                    selectedCommunityId = null
+                }
+            )
         }
     }
 }
