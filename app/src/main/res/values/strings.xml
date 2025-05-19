@@ -72,6 +72,7 @@
     <string name="events">Events</string>
     <string name="chat">Chat</string>
     <string name="joinCommunity">Join Community</string>
+    <string name="areYouSureEvent">Are you sure you want to leave this event?</string>
 
     <!-- Chats Screen-->
     <string name="chats">Chats</string>
@@ -114,4 +115,7 @@
     <!--CreatePostScreen-->
     <string name="postContentPlaceholder">Share your Idea</string>
 
+    <!--CustomConfirmationDialog-->
+    <string name="yesImSure">Yes, I\'m sure</string>
+    <string name="no">No</string>
 </resources>
