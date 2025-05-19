@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.chat.data.repository
 
+import android.net.Uri
 import com.example.sawaapplication.screens.chat.data.dataSources.remote.MassageRemoteDataSource
 import com.example.sawaapplication.screens.chat.domain.model.ChatUserInfo
 import com.example.sawaapplication.screens.chat.domain.model.Message
@@ -11,7 +12,8 @@ class MessageRepositoryImpl @Inject constructor(
     private val remoteDataSource: MassageRemoteDataSource
 ) : MessageRepository {
     override suspend fun sendMessage(communityId: String, message: Message) {
-        remoteDataSource.sendMessage(communityId, message.text,  message.senderId)
+        val uri = if (message.imageUrl.isNotBlank()) Uri.parse(message.imageUrl) else null
+        remoteDataSource.sendMessage(communityId, message.text, message.senderId, uri)
     }
 
     override fun observeMessages(communityId: String, currentUserId: String): Flow<List<Message>> {
@@ -33,5 +35,6 @@ class MessageRepositoryImpl @Inject constructor(
     override suspend fun getSenderInfo(userId: String): ChatUserInfo? {
         return remoteDataSource.getSenderInfo(userId)
     }
+
 }
 
