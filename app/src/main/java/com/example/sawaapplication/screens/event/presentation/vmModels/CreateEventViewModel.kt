@@ -87,7 +87,9 @@ class CreateEventViewModel @Inject constructor(
             description = description.trim(),
             memberLimit = membersLimit ?: 0,
             createdBy = uid,
-            imageUri = imageUri?.toString().orEmpty()
+            imageUri = imageUri?.toString().orEmpty(),
+            latitude = location.latitude,
+            longitude = location.longitude
         )
 
 

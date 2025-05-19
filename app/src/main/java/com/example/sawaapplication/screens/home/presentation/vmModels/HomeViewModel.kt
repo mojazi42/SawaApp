@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.event.domain.model.Event
+import com.example.sawaapplication.screens.event.domain.useCases.GetAllEventInCommunity
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -25,6 +27,7 @@ import java.util.Locale
 class HomeViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
+    private val getAllEventInCommunity: GetAllEventInCommunity,
 ) : ViewModel() {
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
@@ -54,6 +57,13 @@ class HomeViewModel @Inject constructor(
 
     private val _postLikedEvent = MutableStateFlow<String?>(null)
     val postLikedEvent: StateFlow<String?> = _postLikedEvent
+
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    val events = _events.asStateFlow()
+
+    fun getEventById(eventId: String): Event? {
+        return _events.value.find { it.id == eventId }
+    }
 
     private suspend fun getUserCommunityIds(userId: String): List<String> {
         return try {
@@ -412,6 +422,19 @@ class HomeViewModel @Inject constructor(
     fun resetCancelButton() {
         _hasCancelEvents.value = false
     }
+
+    fun loadEvents(communityId: String) {
+        viewModelScope.launch {
+            val result = getAllEventInCommunity(communityId)
+            result.onSuccess { fetchedEvents ->
+                _events.value = fetchedEvents
+            }.onFailure {
+                Log.e("HomeViewModel", "Failed to fetch events: ${it.message}")
+            }
+        }
+    }
+
+
 
 
 }
