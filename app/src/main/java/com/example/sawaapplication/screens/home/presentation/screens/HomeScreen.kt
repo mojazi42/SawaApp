@@ -39,10 +39,8 @@ import com.example.sawaapplication.screens.home.presentation.screens.component.C
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.navigation.NavController
-import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
+import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.res.stringResource
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
@@ -67,7 +65,8 @@ import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 
 @Composable
-fun HomeScreen(navController: NavController,
+fun HomeScreen(
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
