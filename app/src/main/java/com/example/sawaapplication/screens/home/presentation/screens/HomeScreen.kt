@@ -43,11 +43,18 @@ import com.example.sawaapplication.screens.notification.presentation.viewmodels.
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.res.stringResource
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
+import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import com.example.sawaapplication.utils.getCityNameFromGeoPoint
+
+
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
@@ -58,7 +65,7 @@ fun HomeScreen(
             0 -> PostsTab(viewModel, navController)
             1 -> MyEventsTab() // implement if needed
         }
-
+//
         // Top transparent tab row
         Box(
             modifier = Modifier
@@ -164,6 +171,9 @@ fun MyEventsTab(
 
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val joinResult by eventViewModel.joinResult.collectAsState()
+
+    // Fetch community names
+
 
 
     var showLeaveEventDialog by remember { mutableStateOf(false) }
