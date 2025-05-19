@@ -14,12 +14,4 @@ class NotificationPreferences @Inject constructor(
         prefs.edit { putBoolean("hasUnread", false) }
     }
 
-    fun setUnread() {
-        prefs.edit { putBoolean("hasUnread", true) }
-    }
-
-    fun hasUnread(): Boolean {
-        return prefs.getBoolean("hasUnread", true)
-    }
-
 }

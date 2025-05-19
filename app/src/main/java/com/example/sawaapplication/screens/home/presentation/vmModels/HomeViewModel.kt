@@ -380,8 +380,35 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    // fetch joined events
 
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            try {
+                val docId = _postDocumentIds.value[post]
+                if (docId.isNullOrEmpty()) {
+                    Log.e("HomeViewModel", "Document ID not found for post")
+                    return@launch
+                }
+
+                val postRef = firestore
+                    .collection("Community")
+                    .document(post.communityId)
+                    .collection("posts")
+                    .document(docId)
+
+                postRef.delete().await()
+
+                // Remove the post from local state
+                _posts.value = _posts.value.filter { it != post }
+                _postDocumentIds.value = _postDocumentIds.value - post
+
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Failed to delete post: ${e.message}")
+            }
+        }
+    }
+
+    // fetch joined events
     fun fetchJoinedEvents() {
         viewModelScope.launch {
             _loading.value = true

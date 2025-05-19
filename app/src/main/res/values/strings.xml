@@ -108,6 +108,7 @@
     <!--HomeScreen-->
     <string name="unknownError">Unknown error</string>
     <string name="unknown">Unknown</string>
+    <string name="areYouSurePost">Are you sure you want to delete this post?</string>
 
     <!--NotificationScreen-->
     <string name="noNotifications">No notifications.</string>

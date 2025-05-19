@@ -43,13 +43,6 @@ import com.example.sawaapplication.screens.notification.presentation.viewmodels.
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.ui.res.stringResource
-import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
-import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import com.example.sawaapplication.utils.getCityNameFromGeoPoint
-
-
 
 @Composable
 fun HomeScreen(
@@ -65,7 +58,7 @@ fun HomeScreen(
             0 -> PostsTab(viewModel, navController)
             1 -> MyEventsTab(navController = navController) // implement if needed
         }
-//
+
         // Top transparent tab row
         Box(
             modifier = Modifier
@@ -146,6 +139,9 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                                 viewModel.likePost(post)
                                 notificationViewModel.notifyLike(post)
                             },
+                            onDeleteClick = {
+                                viewModel.deletePost(post)
+                            },
                             navController = navController,
                             onUserImageClick = { viewModel.likePost(post) }
                         )
@@ -174,8 +170,6 @@ fun MyEventsTab(
     val joinResult by eventViewModel.joinResult.collectAsState()
 
     // Fetch community names
-
-
 
     var showLeaveEventDialog by remember { mutableStateOf(false) }
     var selectedEventId by remember { mutableStateOf<String?>(null) }
@@ -240,7 +234,7 @@ fun MyEventsTab(
                 }
             }
         }
-        //Dialog for confirm leaving an event
+        // Dialog for confirm leaving an event
         if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {
             CustomConfirmationDialog(
                 message = stringResource(R.string.areYouSureEvent),
