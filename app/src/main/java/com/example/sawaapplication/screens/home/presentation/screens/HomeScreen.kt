@@ -63,7 +63,7 @@ fun HomeScreen(
 
         when (selectedTabIndex) {
             0 -> PostsTab(viewModel, navController)
-            1 -> MyEventsTab() // implement if needed
+            1 -> MyEventsTab(navController = navController) // implement if needed
         }
 //
         // Top transparent tab row
@@ -165,6 +165,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
 fun MyEventsTab(
     viewModel: HomeViewModel = hiltViewModel(),
     eventViewModel: FetchEventViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val events by viewModel.joinedEvents.collectAsState()
     val loading by viewModel.loading.collectAsState()
@@ -229,7 +230,11 @@ fun MyEventsTab(
                             showLeaveEventDialog = true
                         },
                         showCancelButton = true,
-                        modifier = Modifier.padding(8.dp)
+                        onClick = {
+                            navController.navigate("event_detail/${event.communityId}/${event.id}")
+
+                        }
+                       // modifier = Modifier.padding(8.dp)
                     )
 
                 }

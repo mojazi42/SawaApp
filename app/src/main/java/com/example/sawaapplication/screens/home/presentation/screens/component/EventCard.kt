@@ -2,6 +2,7 @@ package com.example.sawaapplication.screens.home.presentation.screens.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -59,13 +60,16 @@ fun EventCard(
     onJoinClick: () -> Unit,
     showCancelButton: Boolean = false,
     joinedUsers: List<String> = emptyList(),
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
 
     OutlinedCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(integerResource(id = R.integer.smallerSpace).dp),
+            .padding(integerResource(id = R.integer.smallerSpace).dp)
+            .clickable { onClick() },
+
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
