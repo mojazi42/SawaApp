@@ -113,4 +113,7 @@
     <!--CreatePostScreen-->
     <string name="postContentPlaceholder">Share your Idea</string>
 
+    <!--CustomConfirmationDialog-->
+    <string name="yesImSure">Yes, I\'m sure</string>
+    <string name="no">No</string>
 </resources>
