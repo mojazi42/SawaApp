@@ -1,12 +1,19 @@
 package com.example.sawaapplication.screens.notification.data.dataSources
 
+import android.content.Context
 import android.util.Log
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.sawaapplication.screens.notification.DelayedReminderWorker
 import com.example.sawaapplication.screens.notification.domain.model.Notification
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NotificationRemoteDataSource @Inject constructor(
@@ -104,5 +111,37 @@ class NotificationRemoteDataSource @Inject constructor(
             }
     }
 
+    fun scheduleEventReminder(
+        eventName: String,
+        eventDateMillis: Long,
+        eventTime: String,
+        context: Context
+    ) {
+        val timeParts = eventTime.split(":")
+        val hour = timeParts.getOrNull(0)?.toIntOrNull() ?: 0
+        val minute = timeParts.getOrNull(1)?.toIntOrNull() ?: 0
 
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = eventDateMillis
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+        }
+
+        // Subtract 1 day for reminder
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+
+        val notificationTimeMillis = calendar.timeInMillis
+        val currentTimeMillis = System.currentTimeMillis()
+        val delayMillis = notificationTimeMillis - currentTimeMillis
+
+        if (delayMillis > 0) {
+            val workRequest = OneTimeWorkRequestBuilder<DelayedReminderWorker>()
+                .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+                .setInputData(workDataOf("eventName" to eventName))
+                .build()
+
+            WorkManager.getInstance(context).enqueue(workRequest)
+        }
+    }
 }
