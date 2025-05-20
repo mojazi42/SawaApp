@@ -78,8 +78,8 @@
     <string name="booksLiterature">Books and Literature</string>
     <string name="travelAdventure">Travel and Adventure</string>
     <string name="healthWellness">Health and Wellness</string>
-    <string name="artCreativity">Art Creativity</string>
-    <string name="funn">Fun</string>
+    <string name="artCreativity">Art and Creativity</string>
+    <string name="funny">Fun</string>
     <string name="other">Other</string>
 
     <!--CommunityScreen-->
@@ -103,6 +103,9 @@
     <string name="tapToUploadImage">Tap to upload\nimage</string>
     <string name="communityName">Community Name</string>
     <string name="newCommDescription">Description</string>
+    <string name="nameRequired">Name is Required</string>
+    <string name="descriptionRequired">Description is Required</string>
+    <string name="categoryRequired">Category is Required</string>
 
     <!--CreateNewEventScreen-->
     <string name="locationPermission">Location Permission</string>

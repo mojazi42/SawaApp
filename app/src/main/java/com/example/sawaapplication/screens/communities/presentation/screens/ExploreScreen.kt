@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,11 +37,13 @@ import com.example.sawaapplication.screens.communities.presentation.vmModels.Exp
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.ui.screenComponent.SearchField
 
+
 @Composable
 fun ExploreScreen(
     navController: NavController,
     viewModel: ExploreCommunityViewModel = hiltViewModel()
 ) {
+
     val searchText = viewModel.searchText
     val filteredList = viewModel.filteredCommunities
     var isFilterMenuExpanded by remember { mutableStateOf(false) }
@@ -49,6 +53,26 @@ fun ExploreScreen(
 
     var showConfirmationDialog by remember { mutableStateOf(false) }
     var selectedCommunityId by remember { mutableStateOf<String?>(null) }
+
+    val categoryStrings = listOf(
+        R.string.artCreativity,
+        R.string.booksLiterature,
+        R.string.funny,
+        R.string.gaming,
+        R.string.healthWellness,
+        R.string.moviesTVShows,
+        R.string.petsAnimals,
+        R.string.sports,
+        R.string.techGadgets,
+        R.string.travelAdventure,
+        R.string.other
+    ).map { stringResource(it) }
+
+    val allFilters = listOf(
+        CommunityFilterType.DEFAULT,
+        CommunityFilterType.MOST_POPULAR,
+        CommunityFilterType.MOST_RECENT
+    ) + categoryStrings.map { CommunityFilterType.Category(it) }
 
     // Scroll to top when scrollToTopTrigger changes
     LaunchedEffect(scrollToTopTrigger) {
@@ -83,32 +107,29 @@ fun ExploreScreen(
 
                 DropdownMenu(
                     expanded = isFilterMenuExpanded,
-                    onDismissRequest = { isFilterMenuExpanded = false }
+                    onDismissRequest = { isFilterMenuExpanded = false },
+
+                    // to control visible items number
+                    modifier = Modifier.heightIn(max = (4 * integerResource(R.integer.itemHeight)).dp)
+
                 ) {
-                    DropdownMenuItem(
-                        text = { Text("Default") },
-                        onClick = {
-                            viewModel.selectedFilter = CommunityFilterType.DEFAULT
-                            scrollToTopTrigger++
-                            isFilterMenuExpanded = false
+                    allFilters.forEach { filter ->
+                        val label = when (filter) {
+                            is CommunityFilterType.DEFAULT -> "Default"
+                            is CommunityFilterType.MOST_POPULAR -> "Most Popular"
+                            is CommunityFilterType.MOST_RECENT -> "Most Recent"
+                            is CommunityFilterType.Category -> filter.categoryName
                         }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Most Popular") },
-                        onClick = {
-                            viewModel.selectedFilter = CommunityFilterType.MOST_POPULAR
-                            scrollToTopTrigger++
-                            isFilterMenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Most Recent") },
-                        onClick = {
-                            viewModel.selectedFilter = CommunityFilterType.MOST_RECENT
-                            scrollToTopTrigger++
-                            isFilterMenuExpanded = false
-                        }
-                    )
+
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                viewModel.selectedFilter = filter
+                                scrollToTopTrigger++
+                                isFilterMenuExpanded = false
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -129,7 +150,7 @@ fun ExploreScreen(
             }
         )
 
-        if(showConfirmationDialog && selectedCommunityId != null){
+        if (showConfirmationDialog && selectedCommunityId != null) {
             CustomConfirmationDialog(
                 message = stringResource(R.string.areYouSureCommunity),
                 onConfirm = {

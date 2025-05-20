@@ -118,18 +118,30 @@ fun NewCommunity(navController: NavController) {
             TextButton(onClick = { navController.popBackStack() }) {
                 Text(stringResource(R.string.cancel))
             }
-            val uploadImage = stringResource(R.string.uploadImage)
             Button(
                 onClick = {
-                    if (viewModel.imageUri == null) {
-                        Toast.makeText(context, uploadImage, Toast.LENGTH_SHORT).show()
-                    } else {
-                        viewModel.createCommunity(
-                            name = viewModel.name,
-                            description = viewModel.description,
-                            imageUri = viewModel.imageUri,
-                            currentUserId = viewModel.currentUserId
-                        )
+                    when {
+                        viewModel.name.isBlank() -> {
+                            Toast.makeText(context, context.getString(R.string.nameRequired), Toast.LENGTH_SHORT).show()
+                        }
+                        viewModel.description.isBlank() -> {
+                            Toast.makeText(context, context.getString(R.string.descriptionRequired), Toast.LENGTH_SHORT).show()
+                        }
+                        viewModel.category.isBlank() -> {
+                            Toast.makeText(context, context.getString(R.string.categoryRequired), Toast.LENGTH_SHORT).show()
+                        }
+                        viewModel.imageUri == null -> {
+                            Toast.makeText(context, context.getString(R.string.uploadImage), Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {
+                            viewModel.createCommunity(
+                                name = viewModel.name,
+                                description = viewModel.description,
+                                imageUri = viewModel.imageUri,
+                                category = viewModel.category,
+                                currentUserId = viewModel.currentUserId
+                            )
+                        }
                     }
                 }
             ) {
@@ -196,7 +208,7 @@ fun NewCommunity(navController: NavController) {
             listOf(
                 R.string.artCreativity,
                 R.string.booksLiterature,
-                R.string.funn,
+                R.string.funny,
                 R.string.gaming,
                 R.string.healthWellness,
                 R.string.moviesTVShows,
@@ -218,8 +230,10 @@ fun NewCommunity(navController: NavController) {
 
         CommunityTypeDropdown(
             selectedText=selectedText,
-            selectedIndex = selectedTypeIndex,
-            onTypeSelected = { selectedTypeIndex = it },
+            onTypeSelected = {
+                selectedTypeIndex = it
+                viewModel.category = communityTypes[it]
+            },
             communityTypes = communityTypes
         )
     }
@@ -228,7 +242,6 @@ fun NewCommunity(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityTypeDropdown(
-    selectedIndex: Int,
     selectedText: String,
     onTypeSelected: (Int) -> Unit,
     communityTypes: List<String>
