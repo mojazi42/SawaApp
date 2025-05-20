@@ -57,7 +57,6 @@ import com.example.sawaapplication.screens.event.presentation.screens.formatDate
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 
-
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -153,6 +152,9 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                                 viewModel.likePost(post)
                                 notificationViewModel.notifyLike(post)
                             },
+                            onDeleteClick = {
+                                viewModel.deletePost(post)
+                            },
                             navController = navController,
                             onUserImageClick = { viewModel.likePost(post) }
                         )
@@ -182,14 +184,10 @@ fun MyEventsTab(
 
     // Fetch community names
 
-
     var showLeaveEventDialog by remember { mutableStateOf(false) }
     var selectedEventId by remember { mutableStateOf<String?>(null) }
     var selectedCommunityId by remember { mutableStateOf<String?>(null) }
     val communityNames by viewModel.communityNames.collectAsState() // fetch community names
-
-
-
 
     LaunchedEffect(Unit) {
         viewModel.fetchJoinedEvents()
@@ -249,27 +247,6 @@ fun MyEventsTab(
 
                 }
             }
-        }
-        //Dialog for confirm leaving an event
-        if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {
-            CustomConfirmationDialog(
-                message = stringResource(R.string.areYouSureEvent),
-                onConfirm = {
-                    eventViewModel.leaveEvent(
-                        communityId = selectedCommunityId!!,
-                        eventId = selectedEventId!!,
-                        userId = userId
-                    )
-                    showLeaveEventDialog = false
-                    selectedEventId = null
-                    selectedCommunityId = null
-                },
-                onDismiss = {
-                    showLeaveEventDialog = false
-                    selectedEventId = null
-                    selectedCommunityId = null
-                }
-            )
         }
         //Dialog for confirm leaving an event
         if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {

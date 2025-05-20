@@ -27,6 +27,7 @@ import com.example.sawaapplication.screens.post.domain.repository.PostRepository
 import com.example.sawaapplication.screens.post.domain.useCases.CreatePostUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -170,12 +171,23 @@ object AppModule {
     ): LocationSharedPreference {
         return LocationSharedPreference(context)
     }
-
+//
     @Provides
     fun provideMassagesRepository(
-        remoteDataSource: MassageRemoteDataSource
+        remoteDataSource: MassageRemoteDataSource,
     ): MessageRepository {
         return MessageRepositoryImpl(remoteDataSource)
     }
+
+    @Provides
+    fun provideFirebaseStorage(): FirebaseStorage =
+        FirebaseStorage.getInstance()
+
+    @Provides
+    fun provideMassageRemoteDataSource(
+        firestore: FirebaseFirestore,
+        storage: FirebaseStorage
+    ): MassageRemoteDataSource =
+        MassageRemoteDataSource(firestore, storage)
 
 }

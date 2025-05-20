@@ -1,45 +1,67 @@
 package com.example.sawaapplication.screens.chat.data.dataSources.remote
 
+import android.net.Uri
 import android.util.Log
 import com.example.sawaapplication.screens.chat.domain.model.ChatUserInfo
 import com.example.sawaapplication.screens.chat.domain.model.Message
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class MassageRemoteDataSource @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val storage: FirebaseStorage
 ) {
+
+    /**
+     * Sends a message which can contain text, an image, or both.
+     * If imageUri != null it will be uploaded to Storage first.
+     */
     suspend fun sendMessage(
         communityId: String,
         messageText: String,
         senderId: String,
-    ): Result<Unit> {
-        return try {
-            val messageMap = mapOf(
-                "text" to messageText,
-                "senderId" to senderId,
-                "readBy" to mapOf(senderId to true),  // Mark as read by sender
-                "createdAt" to FieldValue.serverTimestamp()
-            )
+        imageUri: Uri?
+    ): Result<Unit> = try {
+            var imageUrl = ""
 
-            firestore.collection("Community")
-                .document(communityId)
-                .collection("messages")
-                .add(messageMap)
-                .await()
+            // Upload image to Firebase Storage if provided
+            if (imageUri != null) {
+                val storageRef = storage.reference
+                    .child("chats/$communityId/${UUID.randomUUID()}.jpg")  // ✅ remove the extra quote
 
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+                storageRef.putFile(imageUri).await()
+                imageUrl = storageRef.downloadUrl.await().toString()
+            }
+        // 2) Build your Firestore map
+        val messageMap = mutableMapOf<String, Any>(
+            "senderId"   to senderId,
+            "readBy"     to mapOf(senderId to true),
+            "createdAt"  to FieldValue.serverTimestamp()
+        ).apply {
+            if (messageText.isNotBlank()) put("text", messageText)
+            if (imageUrl.isNotBlank()) put("imageUrl", imageUrl)
         }
+
+        // 3) Write to Firestore
+        firestore.collection("Community")
+            .document(communityId)
+            .collection("messages")
+            .add(messageMap)
+            .await()
+
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
     fun observeMessages(communityId: String, currentUserId: String): Flow<List<Message>> = callbackFlow {
@@ -85,8 +107,10 @@ class MassageRemoteDataSource @Inject constructor(
                             .addOnSuccessListener { userDoc ->
                                 val senderName = userDoc.getString("name")
                                 val senderImage = userDoc.getString("image")
+                                val senderId = userDoc.id
+
                                 Log.d("Firestore", "Sender name: $senderName")
-                                cont.resume(message.text to ChatUserInfo(senderName, senderImage))
+                                cont.resume(message.text to ChatUserInfo(userId = senderId, name = senderName, image = senderImage))
                             }
                             .addOnFailureListener {
                                 Log.e("Firestore", "Failed to get sender", it)
@@ -140,9 +164,11 @@ class MassageRemoteDataSource @Inject constructor(
                 .get()
                 .await()
 
+
             val name = doc.getString("name")
             val image = doc.getString("image")
-            ChatUserInfo(name, image)
+
+            ChatUserInfo(userId = doc.id,name, image)
         } catch (e: Exception) {
             null
         }

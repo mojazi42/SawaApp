@@ -114,14 +114,14 @@ fun UserAccount(
         )
 
         when (selectedTabIndex) {
-            0 -> MyPostsTab(viewModel, navController,userId)
-            1 -> PostsTabLike(viewModel, navController,userId)
+            0 -> MyPostsTab(viewModel, navController, userId)
+            1 -> PostsTabLike(viewModel, navController, userId)
         }
     }
 }
 
 @Composable
-fun MyPostsTab(viewModel: HomeViewModel,navController: NavController,userId: String) {
+fun MyPostsTab(viewModel: HomeViewModel, navController: NavController, userId: String) {
     val posts by viewModel.posts.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -161,7 +161,10 @@ fun MyPostsTab(viewModel: HomeViewModel,navController: NavController,userId: Str
                             userName,
                             userImage,
                             onClick = {},
-                            onLikeClick = { viewModel.likePost(post) } ,
+                            onLikeClick = { viewModel.likePost(post) },
+                            onDeleteClick = {
+                                viewModel.deletePost(post)
+                            },
                             navController = navController,
                             onUserImageClick = { viewModel.likePost(post) }
                         )
@@ -178,7 +181,7 @@ fun MyPostsTab(viewModel: HomeViewModel,navController: NavController,userId: Str
 }
 
 @Composable
-fun PostsTabLike(viewModel: HomeViewModel,navController: NavController,userId: String) {
+fun PostsTabLike(viewModel: HomeViewModel, navController: NavController, userId: String) {
     val posts by viewModel.posts.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -218,9 +221,12 @@ fun PostsTabLike(viewModel: HomeViewModel,navController: NavController,userId: S
                             userName,
                             userImage,
                             onClick = {},
-                            onLikeClick = { viewModel.likePost(post) } ,
+                            onLikeClick = { viewModel.likePost(post) },
                             navController = navController,
-                            onUserImageClick = { viewModel.likePost(post) }
+                            onUserImageClick = { viewModel.likePost(post) },
+                            onDeleteClick = {
+                                viewModel.deletePost(post)
+                            },
                         )
 
                         HorizontalDivider(
