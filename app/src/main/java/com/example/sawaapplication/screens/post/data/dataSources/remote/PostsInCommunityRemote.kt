@@ -80,7 +80,11 @@ class PostsInCommunityRemote @Inject constructor(
                     username = userName,
                     userAvatarUrl = profileImage,
                     postImageUrl = post.imageUri,
-                    content = post.content
+                    content = post.content,
+                    likes = post.likes,
+                    likedBy = post.likedBy,
+                    userId = post.userId,
+                    communityId = post.communityId
                 )
             }
 
