@@ -46,24 +46,17 @@ import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.res.stringResource
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
-import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
-import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
-import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
-import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.res.stringResource
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
-import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
+
 
 @Composable
 fun HomeScreen(
@@ -188,7 +181,6 @@ fun MyEventsTab(
     val joinResult by eventViewModel.joinResult.collectAsState()
 
     // Fetch community names
-    val communityNames by viewModel.communityNames.collectAsState()
 
 
     var showLeaveEventDialog by remember { mutableStateOf(false) }
@@ -197,10 +189,7 @@ fun MyEventsTab(
     val communityNames by viewModel.communityNames.collectAsState() // fetch community names
 
 
-    var showLeaveEventDialog by remember { mutableStateOf(false) }
-    var selectedEventId by remember { mutableStateOf<String?>(null) }
-    var selectedCommunityId by remember { mutableStateOf<String?>(null) }
-    val communityNames by viewModel.communityNames.collectAsState() // fetch community names
+
 
     LaunchedEffect(Unit) {
         viewModel.fetchJoinedEvents()
