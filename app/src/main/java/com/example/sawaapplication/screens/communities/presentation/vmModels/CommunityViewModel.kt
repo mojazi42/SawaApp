@@ -118,7 +118,7 @@ class CommunityViewModel @Inject constructor(
             }
         }
     }
-    
+
     // Filtered list based on search text
     val filteredCreatedCommunities: StateFlow<List<Community>> =
         combine(_searchText, _createdCommunities) { query, communities ->
