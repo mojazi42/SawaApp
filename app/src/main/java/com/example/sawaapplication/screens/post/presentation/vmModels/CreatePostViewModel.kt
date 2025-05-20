@@ -12,6 +12,8 @@ import com.example.sawaapplication.screens.post.domain.model.Post
 import com.example.sawaapplication.screens.post.domain.useCases.CreatePostUseCase
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -26,6 +28,8 @@ class CreatePostViewModel @Inject constructor(
     var content by mutableStateOf("")
     var imageUri by mutableStateOf<Uri?>(null)
 
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
 
     private val uid: String
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
@@ -97,7 +101,9 @@ class CreatePostViewModel @Inject constructor(
         )
 
         return try {
+            _loading.value = true
             Log.d("CreatePost", "Creating post in communityId: $communityId")
+
             createPostUseCase(communityId, post, imageUri)
             Log.d("CreatePost", "Post created successfully")
 
@@ -108,6 +114,8 @@ class CreatePostViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("CreatePost", "Error creating post: ${e.message}", e)
             false
+        } finally {
+            _loading.value = true
         }
     }
 

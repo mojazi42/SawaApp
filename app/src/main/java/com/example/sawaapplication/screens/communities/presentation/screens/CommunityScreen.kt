@@ -416,18 +416,16 @@ fun CommunityScreen(
             if (selectedTab == 0) {
                 items(posts) { post ->
                     PostCard(
-                        post = PostUiModel(
-                            id = post.id,
-                            username      = post.username,
-                            userAvatarUrl = post.userAvatarUrl,
-                            postImageUrl  = post.postImageUrl,
-                            content       = post.content
-                        ),
+                        post = post,
+                        currentUserId = userId,
                         onImageClick = { imageUrl ->
-                            Log.d("FULLSCREEN", "Image URL passed: $imageUrl")
                             val encoded = URLEncoder.encode(imageUrl, "utf-8")
-                            onClick(encoded) // this triggers navigation to fullscreen screen
-                        }
+                            onClick(encoded)
+                        },
+
+
+                        onLikeClick = { viewModel.likePost(it) }
+
                     )
 
                 }
