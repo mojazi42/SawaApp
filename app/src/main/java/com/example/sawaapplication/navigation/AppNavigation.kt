@@ -260,7 +260,8 @@ fun AppNavigation(
                 val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
                 Log.d("DEBUG", "Navigation received communityId: $communityId")
                 GroupMembersScreen(
-                    communityId = communityId
+                    communityId = communityId,
+                    navController = navController
                 )
             }
 
