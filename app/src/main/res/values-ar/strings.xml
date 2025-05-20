@@ -86,6 +86,9 @@
     <string name="tapToUploadImage">انقر لرفع صورة</string>
     <string name="communityName">إسم المجتمع</string>
     <string name="newCommDescription">الوصف</string>
+    <string name="nameRequired">يجب إدخال الاسم</string>
+    <string name="descriptionRequired">يجب إدخال الوصف</string>
+    <string name="categoryRequired">يجب إدخال التصنيف</string>
 
     <!--Community Types-->
     <string name="selectCommunityType">إختر نوع المجتمع</string>
@@ -99,7 +102,7 @@
     <string name="travelAdventure">السفر والمغامرة</string>
     <string name="healthWellness">الصحة</string>
     <string name="artCreativity">الإبداع والفن</string>
-    <string name="funn">المرح</string>
+    <string name="funny">المرح</string>
     <string name="other">غير ذلك</string>
 
     <!-- Event Card Screen-->

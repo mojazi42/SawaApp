@@ -21,7 +21,7 @@ import kotlinx.coroutines.tasks.await
 @HiltViewModel
 class ExploreCommunityViewModel @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
 ) : ViewModel() {
     val currentUserId = firebaseAuth.currentUser?.uid ?: ""
 
@@ -37,7 +37,7 @@ class ExploreCommunityViewModel @Inject constructor(
     private val _error = mutableStateOf<String?>(null)
     val error: String? get() = _error.value
 
-    var selectedFilter by mutableStateOf(CommunityFilterType.DEFAULT)
+    var selectedFilter by mutableStateOf<CommunityFilterType>(CommunityFilterType.DEFAULT)
 
     init {
         fetchCommunities()
@@ -56,6 +56,7 @@ class ExploreCommunityViewModel @Inject constructor(
                             image = document.getString("image") ?: "",
                             creatorId = document.getString("creatorId") ?: "",
                             members = document.get("members") as? List<String> ?: emptyList(),
+                            category = document.getString("category") ?: "Other",
                             createdAt = document.get("createdAt")?.toString() ?: "",
                             updatedAt = document.get("updatedAt")?.toString() ?: ""
                         )
@@ -118,22 +119,28 @@ class ExploreCommunityViewModel @Inject constructor(
             val baseList = if (searchText.isBlank()) communities
             else communities.filter { it.name.contains(searchText, ignoreCase = true) }
 
-            return when (selectedFilter) {
-                CommunityFilterType.MOST_POPULAR ->
+            return when (val filter = selectedFilter) {
+                is CommunityFilterType.MOST_POPULAR ->
                     baseList.sortedByDescending { it.members.size }
 
-                CommunityFilterType.MOST_RECENT ->
+                is CommunityFilterType.MOST_RECENT ->
                     baseList.sortedByDescending { it.createdAt.toLongOrNull() ?: 0L }
 
-                CommunityFilterType.DEFAULT ->
+                is CommunityFilterType.DEFAULT ->
                     baseList.sortedBy { it.createdAt.toLongOrNull() ?: Long.MAX_VALUE }
+
+                is CommunityFilterType.Category ->
+                    baseList.filter {
+                        it.category.equals(filter.categoryName, ignoreCase = true)
+                    }
             }
         }
 
 }
 
-enum class CommunityFilterType {
-    DEFAULT,
-    MOST_POPULAR,
-    MOST_RECENT
+sealed class CommunityFilterType {
+    object DEFAULT : CommunityFilterType()
+    object MOST_POPULAR : CommunityFilterType()
+    object MOST_RECENT : CommunityFilterType()
+    data class Category(val categoryName: String) : CommunityFilterType()
 }

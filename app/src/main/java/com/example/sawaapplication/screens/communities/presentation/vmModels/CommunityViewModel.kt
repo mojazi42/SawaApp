@@ -41,6 +41,7 @@ class CommunityViewModel @Inject constructor(
     var imageUri by mutableStateOf<Uri?>(null)
     var name by mutableStateOf("")
     var description by mutableStateOf("")
+    var category by mutableStateOf("")
 
     // Current user ID from Firebase
     val currentUserId = firebaseAuth.currentUser?.uid ?: ""
@@ -68,9 +69,7 @@ class CommunityViewModel @Inject constructor(
     private val _communityPosts = MutableStateFlow<List<PostUiModel>>(emptyList())
     val communityPosts: StateFlow<List<PostUiModel>> = _communityPosts
 
-
-
-
+    var selectedFilter by mutableStateOf<CommunityFilterType>(CommunityFilterType.DEFAULT)
 
 
     // Creates a new community, uploads its image, and updates state
@@ -78,13 +77,14 @@ class CommunityViewModel @Inject constructor(
         name: String,
         description: String,
         imageUri: Uri?,
+        category: String,
         currentUserId: String
     ) {
         if (_loading.value) return
         job = viewModelScope.launch {
             _loading.value = true
             try {
-                val result = createCommunityUseCase(name, description, imageUri, currentUserId)
+                val result = createCommunityUseCase(name=name, description=description, category=category, imageUri=imageUri, currentUserId)
                 result.onSuccess {
                     fetchCreatedCommunities(currentUserId) // Refresh list after successful creation
                     _success.value = true
@@ -110,14 +110,38 @@ class CommunityViewModel @Inject constructor(
     // Filtered list based on search text
     val filteredCreatedCommunities: StateFlow<List<Community>> =
         combine(_searchText, _createdCommunities) { query, communities ->
-            if (query.isBlank()) {
+
+            var filtered = if (query.isBlank()) {
                 communities
             } else {
                 communities.filter {
                     it.name.contains(query, ignoreCase = true)
                 }
             }
+
+            when (val filter = selectedFilter) {
+                is CommunityFilterType.DEFAULT -> {
+                    filtered = filtered.sortedBy { it.createdAt.toLongOrNull() ?: Long.MAX_VALUE }
+                }
+
+                is CommunityFilterType.MOST_POPULAR -> {
+                    filtered = filtered.sortedByDescending { it.members.size }
+                }
+
+                is CommunityFilterType.MOST_RECENT -> {
+                    filtered = filtered.sortedByDescending { it.createdAt.toLongOrNull() ?: 0L }
+                }
+
+                is CommunityFilterType.Category -> {
+                    filtered = filtered.filter {
+                        it.category.equals(filter.categoryName, ignoreCase = true)
+                    }
+                }
+            }
+
+            filtered
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
 
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
