@@ -44,7 +44,11 @@ class PostRepositoryImpl @Inject constructor(
                     username      = userDoc.getString("name") ?: "Unknown",
                     userAvatarUrl = userDoc.getString("image") ?: "",
                     postImageUrl  = post.imageUri,
-                    content       = post.content
+                    content       = post.content,
+                    likes = post.likes,
+                    likedBy = post.likedBy,
+                    userId = post.userId,
+                    communityId = post.communityId
                 )
 
             }
