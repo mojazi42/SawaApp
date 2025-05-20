@@ -471,8 +471,8 @@ fun CommunityScreen(
                         },
 
 
-                        onLikeClick = { viewModel.likePost(it) }
-
+                        onLikeClick = { viewModel.likePost(it) },
+                        navController =  navController
                     )
 
                 }
