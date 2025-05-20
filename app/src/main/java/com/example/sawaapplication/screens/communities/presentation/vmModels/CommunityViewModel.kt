@@ -84,8 +84,6 @@ class CommunityViewModel @Inject constructor(
         _searchText.value = newText
     }
 
-    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
-    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
@@ -118,7 +116,7 @@ class CommunityViewModel @Inject constructor(
             }
         }
     }
-    
+
     // Filtered list based on search text
     val filteredCreatedCommunities: StateFlow<List<Community>> =
         combine(_searchText, _createdCommunities) { query, communities ->
@@ -154,6 +152,12 @@ class CommunityViewModel @Inject constructor(
             filtered
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+
+    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
+    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
+
+    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
+    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 
 
     // Fetches communities where the current user is a member
