@@ -15,6 +15,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -31,27 +37,39 @@ class CommunityViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var job: Job? = null
-    val currentUserId = firebaseAuth.currentUser?.uid.orEmpty()
 
+    // UI-bound form fields
     var imageUri by mutableStateOf<Uri?>(null)
     var name by mutableStateOf("")
     var description by mutableStateOf("")
 
+    // Current user ID from Firebase
+    val currentUserId = firebaseAuth.currentUser?.uid ?: ""
+
+    // Holds the details of a single community for the detail screen
     private val _communityDetail = MutableStateFlow<Community?>(null)
     val communityDetail: StateFlow<Community?> = _communityDetail
 
+    // Check if the current user is also the admin of community
+    val isAdmin: StateFlow<Boolean> = communityDetail.map { it?.creatorId == currentUserId }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // Tracks whether the community creation was successful
     private val _success = MutableStateFlow(false)
     val success: StateFlow<Boolean> = _success
 
+    // Stores the list of communities created by the current user
     private val _createdCommunities = MutableStateFlow<List<Community>>(emptyList())
     val createdCommunities: StateFlow<List<Community>> = _createdCommunities
 
+    // Loading and error states for UI feedback
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    //Fetching the posts in side community
     private val _communityPosts = MutableStateFlow<List<PostUiModel>>(emptyList())
     val communityPosts: StateFlow<List<PostUiModel>> = _communityPosts
 
@@ -71,14 +89,21 @@ class CommunityViewModel @Inject constructor(
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 
-    fun createCommunity(name: String, description: String, imageUri: Uri?, currentUserId: String) {
+
+    // Creates a new community, uploads its image, and updates state
+    fun createCommunity(
+        name: String,
+        description: String,
+        imageUri: Uri?,
+        currentUserId: String
+    ) {
         if (_loading.value) return
         job = viewModelScope.launch {
             _loading.value = true
             try {
                 val result = createCommunityUseCase(name, description, imageUri, currentUserId)
                 result.onSuccess {
-                    fetchCreatedCommunities(currentUserId)
+                    fetchCreatedCommunities(currentUserId) // Refresh list after successful creation
                     _success.value = true
                 }.onFailure {
                     _error.value = "Failed to create community: ${it.message}"
@@ -110,6 +135,7 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
+    // Fetches the full detail of a single community by its ID
     fun fetchCommunityDetail(communityId: String) {
         viewModelScope.launch {
             _loading.value = true
