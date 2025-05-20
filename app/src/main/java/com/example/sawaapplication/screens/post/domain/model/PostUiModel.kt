@@ -5,5 +5,11 @@ data class PostUiModel(
     val username: String,
     val userAvatarUrl: String = "",
     val postImageUrl: String = "",
-    val content: String = ""
+    val content: String = "",
+    val likes: Int = 0,
+    val likedBy: List<String> = emptyList(),
+    val userId: String = "",
+    val communityId: String = ""
 )
+
+
