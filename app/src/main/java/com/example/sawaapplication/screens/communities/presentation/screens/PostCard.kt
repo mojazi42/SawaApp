@@ -16,8 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.R
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.black
@@ -28,7 +30,8 @@ fun PostCard(
     post: PostUiModel,
     currentUserId: String,
     onImageClick: (String) -> Unit,
-    onLikeClick: (PostUiModel) -> Unit
+    onLikeClick: (PostUiModel) -> Unit,
+    navController: NavController
 ) {
     val isLiked = currentUserId in post.likedBy
 
@@ -46,7 +49,14 @@ fun PostCard(
                     contentDescription = "${post.username} avatar",
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .clickable {
+                            if(post.userId == currentUserId){
+                            navController.navigate(Screen.Profile.route)
+                            }else{
+                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                            }
+                        },
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.width(8.dp))
