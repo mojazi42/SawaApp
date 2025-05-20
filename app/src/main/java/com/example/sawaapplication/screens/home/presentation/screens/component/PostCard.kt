@@ -130,8 +130,12 @@ fun PostCard(
                             .size(integerResource(R.integer.asyncImageSize).dp)
                             .clip(CircleShape)
                             .clickable {
-                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
-                            }
+                                if(post.userId == currentUserId){
+                                    navController.navigate(Screen.Profile.route)
+                                }else{
+                                    navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                                }
+                            },
 
                     )
                 }

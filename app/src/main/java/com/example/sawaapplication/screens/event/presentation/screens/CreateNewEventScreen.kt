@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -52,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -67,6 +71,8 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import java.text.DateFormat
 import java.util.Date
@@ -376,25 +382,75 @@ fun CreateNewEventScreen(
         }
         // Google Map to pick location
         if (viewModel.isMapVisible) {
-            AlertDialog(
-                onDismissRequest = { viewModel.isMapVisible = false }) {
-                Box(
+            Dialog(onDismissRequest = { viewModel.isMapVisible = false }) {
+                Surface(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(integerResource(R.integer.googleMapPadding).dp)
-                        .clip(RoundedCornerShape(integerResource(R.integer.googleMapPaddingRounded).dp))
-                        .background(Color.White)
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White,
+                    tonalElevation = 8.dp,
                 ) {
-                    GoogleMap(modifier = Modifier.fillMaxSize(), onMapClick = { latLng ->
-                        pickedLocation = latLng
-                        viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
-                        viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
-                        viewModel.isMapVisible = false  // Close the map after selecting location
-                    }, cameraPositionState = rememberCameraPositionState {
-                        position = CameraPosition.fromLatLngZoom(
-                            pickedLocation ?: LatLng(24.7136, 46.6753), 5f
-                        )
-                    })
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Pick a Location", style = MaterialTheme.typography.titleMedium)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White)
+                        ) {
+                            val cameraPositionState = rememberCameraPositionState {
+                                position = CameraPosition.fromLatLngZoom(
+                                    pickedLocation ?: LatLng(24.7136, 46.6753),
+                                    5f
+                                )
+                            }
+
+                            GoogleMap(
+                                modifier = Modifier.fillMaxSize(),
+                                cameraPositionState = cameraPositionState,
+                                onMapClick = { latLng ->
+                                    pickedLocation = latLng
+                                    viewModel.location = GeoPoint(latLng.latitude, latLng.longitude)
+                                    viewModel.locationText = "${latLng.latitude}, ${latLng.longitude}"
+                                }
+                            ) {
+                                pickedLocation?.let {
+                                    Marker(
+                                        state = MarkerState(position = it),
+                                        title = "Selected Location"
+                                    )
+                                }
+                            }
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(onClick = {
+                                pickedLocation = null
+                                viewModel.location = GeoPoint(0.0, 0.0)
+                                viewModel.locationText = ""
+                            }) {
+                                Text("Reselect")
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            TextButton(onClick = {
+                                viewModel.isMapVisible = false
+                            }) {
+                                Text("OK")
+                            }
+                        }
+                    }
                 }
             }
         }

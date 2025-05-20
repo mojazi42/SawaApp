@@ -2,7 +2,9 @@ package com.example.sawaapplication.screens.communities.presentation.screens
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.PersonAdd
@@ -52,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
@@ -80,34 +84,6 @@ import com.example.sawaapplication.ui.theme.white
 import com.google.firebase.auth.FirebaseAuth
 import java.net.URLEncoder
 
-
-
-data class CommunityUiState(
-    val logoUrl: String,
-    val communityName: String,
-    val membersCount: String,
-    val communityDescription: String,
-    val posts: List<PostUiModel>
-)
-
-//private val FakeCommunityUiState = CommunityUiState(
-//    logoUrl = "",
-//    communityName = "Saudi Innovation",
-//    membersCount = "2.5M",
-//    communityDescription = "This community fosters innovation across Saudi Arabia...",
-//    posts = listOf(
-//        PostUiModel(
-//            "@mohammed1",
-//            userAvatarUrl = "https://i.pravatar.cc/150?img=1",
-//            postImageUrl = ""
-//        ),
-//        PostUiModel(
-//            "@ahmed2",
-//            userAvatarUrl = "https://i.pravatar.cc/150?img=2",
-//            postImageUrl = "https://images.unsplash.com/photo-1593642634367-d91a135587b5"
-//        )
-//    )
-//)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -255,14 +231,41 @@ fun CommunityScreen(
         ) {
             item {
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
-                AsyncImage(
-                    model = communityDetail?.image,
-                    contentDescription = null,
+                Box(
                     modifier = Modifier
-                        .size(integerResource(R.integer.itemSpacerSize).dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                        .size(integerResource(R.integer.photoBoxSize).dp),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    AsyncImage(
+                        model = communityDetail?.image,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    if ( communityDetail?.creatorId == userId ){
+                        IconButton(
+                            onClick = {
+                               // navController.navigate("edit_community/$communityId")
+                            },
+                            modifier = Modifier
+                                .size(32.dp) // size of the clickable icon container
+                                .background(
+                                    color = Color(0xFFFF5722),
+                                    shape = CircleShape
+                                )
+                                .padding(4.dp) // inner padding for the icon
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Create,
+                                contentDescription = "Edit",
+                                modifier = Modifier.size(16.dp),
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
                 communityDetail?.let {
                     Text(
@@ -288,48 +291,14 @@ fun CommunityScreen(
                 }
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
-                if (isUserJoined) {
+                // Admin actions
+                if (communityDetail?.creatorId == userId) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(integerResource(R.integer.padding).dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        //Un-joined button
-                        OutlinedButton(
-                            onClick = {
-                                //Leave Community
-                                showLeaveCommunityDialog=true
-//                                joinCommunityViewModel.leaveCommunity(communityId, userId)
-//                                viewModel.fetchCommunityDetail(communityId)
-                            },
-                            shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            border = BorderStroke(
-                                integerResource(R.integer.buttonStroke).dp,
-                                PrimaryOrange
-                            ),
-                            contentPadding = PaddingValues(
-                                horizontal = integerResource(R.integer.buttonPaddingH).dp,
-                                vertical = integerResource(R.integer.buttonPaddingV).dp
-                            ),
-                            elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .wrapContentSize()
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.unjoind),
-                                contentDescription = "nu-join icon",
-                                tint = PrimaryOrange,
-                                modifier = Modifier
-                                    .size(integerResource(R.integer.iconSize).dp),
-                            )
-                            Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
-                            Text(stringResource(R.string.joined))
-                        }
-
                         //Go to chat button
                         OutlinedButton(
                             onClick = { navController.navigate("chat/${communityId}") },
@@ -357,30 +326,108 @@ fun CommunityScreen(
                             )
                             Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
                             Text(stringResource(R.string.chat))
+
+                        }
+
+                    }
+
+                }else{
+                    if (isUserJoined) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(integerResource(R.integer.padding).dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            //Un-joined button
+                            OutlinedButton(
+                                onClick = {
+                                    //Leave Community
+                                    showLeaveCommunityDialog=true
+//                                joinCommunityViewModel.leaveCommunity(communityId, userId)
+//                                viewModel.fetchCommunityDetail(communityId)
+                                },
+                                shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                                border = BorderStroke(
+                                    integerResource(R.integer.buttonStroke).dp,
+                                    PrimaryOrange
+                                ),
+                                contentPadding = PaddingValues(
+                                    horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                                    vertical = integerResource(R.integer.buttonPaddingV).dp
+                                ),
+                                elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .wrapContentSize()
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.unjoind),
+                                    contentDescription = "nu-join icon",
+                                    tint = PrimaryOrange,
+                                    modifier = Modifier
+                                        .size(integerResource(R.integer.iconSize).dp),
+                                )
+                                Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                                Text(stringResource(R.string.joined))
+                            }
+
+                            //Go to chat button
+                            OutlinedButton(
+                                onClick = { navController.navigate("chat/${communityId}") },
+                                shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                                border = BorderStroke(
+                                    integerResource(R.integer.buttonStroke).dp,
+                                    PrimaryOrange
+                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                                contentPadding = PaddingValues(
+                                    horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                                    integerResource(R.integer.buttonPaddingV).dp
+                                ),
+                                elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .wrapContentSize()
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.chats),
+                                    contentDescription = "chat icon",
+                                    tint = PrimaryOrange,
+                                    modifier = Modifier
+                                        .size(integerResource(R.integer.iconSize).dp),
+                                )
+                                Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                                Text(stringResource(R.string.chat))
+                            }
+                        }
+                    } else {
+                        Button(
+                            onClick = {
+                                joinCommunityViewModel.joinCommunity(communityId, userId)
+                                viewModel.fetchCommunityDetail(communityId)
+                            },
+                            shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
+                            contentPadding = PaddingValues(
+                                horizontal = integerResource(R.integer.buttonPaddingH).dp,
+                                vertical = integerResource(R.integer.buttonPaddingV).dp
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
+                        ) {
+                            Icon(Icons.Default.PersonAdd, contentDescription = null)
+                            Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
+                            Text(
+                                stringResource(R.string.joinCommunity),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                         }
                     }
-                } else {
-                    Button(
-                        onClick = {
-                            joinCommunityViewModel.joinCommunity(communityId, userId)
-                            viewModel.fetchCommunityDetail(communityId)
-                        },
-                        shape = RoundedCornerShape(integerResource(R.integer.roundedCornerShapeCircle)),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
-                        contentPadding = PaddingValues(
-                            horizontal = integerResource(R.integer.buttonPaddingH).dp,
-                            vertical = integerResource(R.integer.buttonPaddingV).dp
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
-                    ) {
-                        Icon(Icons.Default.PersonAdd, contentDescription = null)
-                        Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
-                        Text(
-                            stringResource(R.string.joinCommunity),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
                 }
+
+
 
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
@@ -416,18 +463,16 @@ fun CommunityScreen(
             if (selectedTab == 0) {
                 items(posts) { post ->
                     PostCard(
-                        post = PostUiModel(
-                            id = post.id,
-                            username      = post.username,
-                            userAvatarUrl = post.userAvatarUrl,
-                            postImageUrl  = post.postImageUrl,
-                            content       = post.content
-                        ),
+                        post = post,
+                        currentUserId = userId,
                         onImageClick = { imageUrl ->
-                            Log.d("FULLSCREEN", "Image URL passed: $imageUrl")
                             val encoded = URLEncoder.encode(imageUrl, "utf-8")
-                            onClick(encoded) // this triggers navigation to fullscreen screen
-                        }
+                            onClick(encoded)
+                        },
+
+
+                        onLikeClick = { viewModel.likePost(it) },
+                        navController =  navController
                     )
 
                 }

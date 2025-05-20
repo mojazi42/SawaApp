@@ -43,6 +43,19 @@ import com.example.sawaapplication.screens.notification.presentation.viewmodels.
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.res.stringResource
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
+import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import com.example.sawaapplication.utils.getCityNameFromGeoPoint
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
+import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
+import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 
 @Composable
 fun HomeScreen(
@@ -206,6 +219,7 @@ fun MyEventsTab(
                     val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
                     val formattedDate = formatDateString(event.date)
                     val context = LocalContext.current
+
                     EventCard(
                         image = event.imageUri,
                         title = event.title,
@@ -234,7 +248,7 @@ fun MyEventsTab(
                 }
             }
         }
-        // Dialog for confirm leaving an event
+        //Dialog for confirm leaving an event
         if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {
             CustomConfirmationDialog(
                 message = stringResource(R.string.areYouSureEvent),

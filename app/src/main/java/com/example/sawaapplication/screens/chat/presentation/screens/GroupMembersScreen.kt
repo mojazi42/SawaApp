@@ -71,10 +71,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 
 import coil.compose.AsyncImage
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 
 @Composable
-fun GroupMembersScreen(communityId: String) {
+fun GroupMembersScreen(communityId: String, navController: NavController) {
     val communityViewModel: CommunityViewModel = hiltViewModel()
     val chatViewModel: ChatViewModel = hiltViewModel()
 
@@ -188,7 +189,18 @@ fun GroupMembersScreen(communityId: String) {
                         items(members) { member ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                    navController.navigate(
+                                        if (member.userId == chatViewModel.currentUserId) {
+                                            Screen.Profile.route
+                                        } else {
+                                            Screen.UserAccount.createRoute(userId = member.userId)
+                                        }
+                                    )
+                                }
+
                             ) {
                                 AsyncImage(
                                     model = member.image,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -63,6 +65,7 @@ fun CreatePostScreen(
     val context = LocalContext.current
     val createPostViewModel: CreatePostViewModel = hiltViewModel()
     val communityViewModel: CommunityViewModel = hiltViewModel()
+    val isLoading by createPostViewModel.loading.collectAsState()
 
     val communityDetails by communityViewModel.communityDetail.collectAsState()
     val communityImage = communityDetails?.image.orEmpty()
@@ -106,6 +109,17 @@ fun CreatePostScreen(
                 }
             }
         )
+    }
+
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
     }
 
     Column(

@@ -1,11 +1,9 @@
 package com.example.sawaapplication.screens.profile.vm
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,15 +12,23 @@ import javax.inject.Inject
 import android.net.Uri
 import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.example.sawaapplication.screens.profile.domain.model.User
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.tasks.await
+import com.example.sawaapplication.screens.profile.domain.useCases.FetchAboutMeUseCase
+import com.example.sawaapplication.screens.profile.domain.useCases.FetchImageUseCase
+import com.example.sawaapplication.screens.profile.domain.useCases.FetchUserByIdUseCase
+import com.example.sawaapplication.screens.profile.domain.useCases.FetchUserNameUseCase
+import com.example.sawaapplication.screens.profile.domain.useCases.UploadProfileImageUseCase
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseAuthDataSource: FirebaseAuthDataSource,
     private val permissionHandler: PermissionHandler,
-    private val firestore: FirebaseFirestore
+    private val fetchAboutMeUseCase: FetchAboutMeUseCase,
+    private val fetchUserNameUseCase: FetchUserNameUseCase,
+    private val fetchImageUseCase: FetchImageUseCase,
+    private val uploadProfileImageUseCase: UploadProfileImageUseCase,
+    private val fetchUserByIdUseCase: FetchUserByIdUseCase
+
 ) : ViewModel() {
 
     private val _userName = MutableStateFlow<String?>(null)
@@ -37,8 +43,15 @@ class ProfileViewModel @Inject constructor(
     private val _profileImageUrl = MutableStateFlow<String?>(null)
     val profileImageUrl: StateFlow<String?> get() = _profileImageUrl
 
-    private val _currentUserId = MutableStateFlow<String>("")
+    private val _currentUserId = MutableStateFlow("")
     val currentUserId: StateFlow<String> = _currentUserId
+
+    private val _selectedUser = MutableStateFlow<User?>(null)
+    val selectedUser: StateFlow<User?> = _selectedUser
+
+    private val _isUploading = MutableStateFlow(false)
+
+    private val _uploadError = MutableStateFlow<String?>(null)
 
     fun loadCurrentUserId() {
         val id = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -53,6 +66,7 @@ class ProfileViewModel @Inject constructor(
         _userName.value = user?.displayName
         _userEmail.value = user?.email
         user?.let {
+
             fetchAboutMe(it.uid)
             fetchUserName(it.uid)
             fetchProfileImageUrl(it.uid)
@@ -72,93 +86,51 @@ class ProfileViewModel @Inject constructor(
             _userName.value = newName
         }
     }
-
     private fun fetchAboutMe(userId: String) {
-        val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
-
-        // Start a real-time FireStore listener on the user document to track 'aboutMe' updates
-        userRef.addSnapshotListener { documentSnapshot, error ->
-
-            if (error != null) {
-                Log.e("ProfileViewModel", "FireStore error: ", error)
-                return@addSnapshotListener
-            }
-
-            //  When the document exists and is not null, extract the 'aboutMe' field
-            if (documentSnapshot != null && documentSnapshot.exists()) {
-                val about = documentSnapshot.getString("aboutMe")
-
-                //  Update the StateFlow with the latest value from FireStore
-                // This triggers recomposition in the UI if it's collecting aboutMe
-                _aboutMe.value = about
-            }
+        viewModelScope.launch {
+            val about =fetchAboutMeUseCase(userId)
+            _aboutMe.value = about
         }
     }
-
     private fun fetchUserName(userId: String) {
-        val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
-
-        // Changed from .get() to addSnapshotListener for real-time FireStore updates
-        // Now directly updates _userName.value when FireStore document changes
-        userRef.addSnapshotListener { documentSnapshot, error ->
-            if (error != null) {
-                Log.e("ProfileViewModel", "FireStore error (fetchUserName): ", error)
-                return@addSnapshotListener // early return if FireStore listener throws an error
-            }
-
-            if (documentSnapshot != null && documentSnapshot.exists()) {
-                val name = documentSnapshot.getString("name")
-                _userName.value = name //  update StateFlow to notify UI of real-time name change
-            }
+        viewModelScope.launch {
+            val name = fetchUserNameUseCase(userId)
+            _userName.value = name
         }
     }
 
     private fun fetchProfileImageUrl(userId: String) {
-        val userRef = FirebaseFirestore.getInstance().collection("User").document(userId)
-        userRef.get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                _profileImageUrl.value = document.getString("image")
-            }
+        viewModelScope.launch {
+            val imageUrl = fetchImageUseCase(userId)
+            _profileImageUrl.value = imageUrl
         }
     }
 
-    fun uploadProfileImage(uri: Uri, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        val user = firebaseAuth.currentUser ?: return
-        val storageRef = FirebaseStorage.getInstance().reference
-            .child("profileImages/${user.uid}.jpg")
+    fun uploadProfileImage(
+        uri: Uri,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        viewModelScope.launch {
+            _isUploading.value = true
+            _uploadError.value = null
 
-        storageRef.putFile(uri)
-            .addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    FirebaseFirestore.getInstance()
-                        .collection("User")
-                        .document(user.uid)
-                        .update("image", downloadUri.toString())
-                        .addOnSuccessListener {
-                            onSuccess()
-                        }
-                        .addOnFailureListener { onFailure(it) }
-                }
+            val success = uploadProfileImageUseCase(uri)
+
+            _isUploading.value = false
+
+            if (success) {
+                onSuccess()
+            } else {
+                _uploadError.value = "Failed to upload image"
+                onFailure()
             }
-            .addOnFailureListener { onFailure(it) }
+        }
     }
-    private val _selectedUser = MutableStateFlow<User?>(null)
-    val selectedUser: StateFlow<User?> = _selectedUser
     fun fetchUserById(userId: String) {
         viewModelScope.launch {
-            try {
-                val snapshot = firestore.collection("User").document(userId).get().await()
-                if (snapshot.exists()) {
-                    val user = snapshot.toObject(User::class.java)
-                    _selectedUser.value = user
-                    Log.d("HomeViewModel", "successfully fetching user: ")
-                } else {
-                    _selectedUser.value = null
-                }
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error fetching user: ${e.message}")
-                _selectedUser.value = null
-            }
+            val user = fetchUserByIdUseCase(userId)
+            _selectedUser.value = user
         }
     }
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
