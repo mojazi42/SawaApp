@@ -65,6 +65,15 @@ class CommunityRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateCommunity(
+        communityId: String,
+        name: String,
+        description: String,
+        imageUri: Uri?
+    ): Result<Unit> {
+        return remoteDataSource.updateCommunity(communityId, name, description, imageUri)
+    }
+
 
 }
 

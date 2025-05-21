@@ -55,6 +55,7 @@ import com.example.sawaapplication.screens.chat.presentation.screens.ChatScreen
 import com.example.sawaapplication.screens.chat.presentation.screens.GroupMembersScreen
 import com.example.sawaapplication.screens.chat.presentation.screens.ViewChatsScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.CommunityScreen
+import com.example.sawaapplication.screens.communities.presentation.screens.EditCommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
@@ -64,10 +65,10 @@ import com.example.sawaapplication.screens.event.presentation.screens.CreateNewE
 import com.example.sawaapplication.screens.event.presentation.screens.EventDetailScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
 import com.example.sawaapplication.screens.post.presentation.screens.CreatePostScreen
-import com.example.sawaapplication.screens.profile.screens.EditProfileScreen
-import com.example.sawaapplication.screens.profile.screens.ProfileScreen
-import com.example.sawaapplication.screens.profile.screens.UserAccount
-import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+import com.example.sawaapplication.screens.profile.presentation.screens.EditProfileScreen
+import com.example.sawaapplication.screens.profile.presentation.screens.ProfileScreen
+import com.example.sawaapplication.screens.profile.presentation.screens.UserAccount
+import com.example.sawaapplication.screens.profile.presentation.vm.ProfileViewModel
 import java.net.URLDecoder
 import com.example.sawaapplication.screens.post.presentation.screens.FullscreenImageScreen
 
@@ -224,6 +225,11 @@ fun AppNavigation(
                     },
                     navController  = navController
                 )
+            }
+
+            composable("edit_community/{communityId}") { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                EditCommunityScreen(communityId = communityId, navController = navController)
             }
 
 
