@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.chat.presentation.screens.chatComponent
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,11 +20,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-
 @Composable
 fun ChatTopBarBanner(
     communityImage: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onImageClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -33,7 +34,9 @@ fun ChatTopBarBanner(
         AsyncImage(
             model = communityImage,
             contentDescription = "Community Banner",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { onImageClick() },
             contentScale = ContentScale.Crop
         )
         IconButton(
