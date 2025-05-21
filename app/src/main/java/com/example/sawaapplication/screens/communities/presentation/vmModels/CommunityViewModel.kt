@@ -31,6 +31,7 @@ class CommunityViewModel @Inject constructor(
     private val getUserCreatedCommunitiesUseCase: GetUserCreatedCommunitiesUseCase,
     private val getCommunityByIdUseCase: GetCommunityByIdUseCase,
     private val updateCommunityUseCase : UpdateCommunityUseCase,
+    private val deleteCommunityUseCase : DeleteCommunityUseCase,
     private val postRepository: PostRepository,
     private val permissionHandler: PermissionHandler,
     private val firebaseAuth: FirebaseAuth,
@@ -269,17 +270,36 @@ class CommunityViewModel @Inject constructor(
         communityId: String,
         name: String,
         description: String,
+        category : String,
         imageUri: Uri?
     ) {
         viewModelScope.launch {
             _loading.value = true
             try {
-                val result = updateCommunityUseCase(communityId, name, description, imageUri)
+                val result = updateCommunityUseCase(communityId, name, description,category, imageUri)
                 result.onSuccess {
                     _success.value = true
                     fetchCommunityDetail(communityId) // Refresh updated data
                 }.onFailure {
                     _error.value = "Update failed: ${it.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Unexpected error: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun deleteCommunity(communityId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val result = deleteCommunityUseCase(communityId)
+                result.onSuccess {
+                    _success.value = true // Triggers UI nav
+                }.onFailure {
+                    _error.value = "Failed to delete community: ${it.message}"
                 }
             } catch (e: Exception) {
                 _error.value = "Unexpected error: ${e.message}"

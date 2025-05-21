@@ -13,8 +13,9 @@ class UpdateCommunityUseCase @Inject constructor(
         communityId: String,
         name: String,
         description: String,
+        category : String,
         imageUri: Uri? // nullable for optional image update
     ): Result<Unit> {
-        return remoteDataSource.updateCommunity(communityId, name, description, imageUri)
+        return remoteDataSource.updateCommunity(communityId, name, description, category ,imageUri)
     }
 }

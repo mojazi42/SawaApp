@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -39,11 +40,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -61,6 +64,33 @@ fun EditCommunityScreen(
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var category = viewModel.category
+
+    val communityTypes = remember {
+        listOf(
+            R.string.artCreativity,
+            R.string.booksLiterature,
+            R.string.funny,
+            R.string.gaming,
+            R.string.healthWellness,
+            R.string.moviesTVShows,
+            R.string.petsAnimals,
+            R.string.sports,
+            R.string.techGadgets,
+            R.string.travelAdventure,
+            R.string.other
+        )
+    }.map { stringResource(it) }
+
+    val selectedTypeIndex = remember {
+        mutableStateOf(communityTypes.indexOf(viewModel.category))
+    }
+
+    val selectedText = if (selectedTypeIndex.value >= 0) {
+        communityTypes[selectedTypeIndex.value]
+    } else {
+        stringResource(R.string.select)
+    }
 
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
 
@@ -89,6 +119,7 @@ fun EditCommunityScreen(
     LaunchedEffect(communityDetail) {
         name = communityDetail?.name ?: ""
         description = communityDetail?.description ?: ""
+        category = communityDetail?.category ?: ""
     }
 
     // Photo Permission Dialog
@@ -139,10 +170,6 @@ fun EditCommunityScreen(
             contentAlignment = Alignment.Center
         ) {
             if (imageUri != null) {
-//                AsyncImage(
-//                    model = imageUri,
-//                    contentDescription = "New Image"
-//                )
                 Image(
                     painter = rememberAsyncImagePainter(imageUri),
                     contentDescription = "New Image",
@@ -150,10 +177,6 @@ fun EditCommunityScreen(
                     contentScale = ContentScale.Crop
                 )
             } else {
-//                AsyncImage(
-//                    model = communityDetail?.image,
-//                    contentDescription = "Old Image"
-//                )
                 Image (
                     painter = rememberAsyncImagePainter(communityDetail?.image),
                     contentDescription = "Old Image",
@@ -187,6 +210,17 @@ fun EditCommunityScreen(
 
         Spacer(Modifier.height(16.dp))
 
+
+        CommunityTypeDropdown(
+            selectedText = selectedText,
+            onTypeSelected = {
+                selectedTypeIndex.value = it
+                viewModel.category = communityTypes[it]
+            },
+            communityTypes = communityTypes
+        )
+
+
         if (loading){
             Box(
                 modifier = Modifier
@@ -197,24 +231,30 @@ fun EditCommunityScreen(
             }
         }
 
+        Spacer(Modifier.height(16.dp))
+
         Button(
             onClick = {
-                viewModel.updateCommunity(communityId, name, description, imageUri)
+                viewModel.updateCommunity(communityId, name, description, category ,imageUri)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Update")
         }
 
-//        if (loading){
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize(),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                CircularProgressIndicator()
-//            }
-//        }
+        Spacer(Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                viewModel.deleteCommunity(communityId)
+                navController.popBackStack()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+        ) {
+            Text("Delete Community", color = Color.White)
+        }
+
     }
 
 }
