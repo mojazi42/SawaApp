@@ -76,13 +76,15 @@ class CommunityRemoteDataSource @Inject constructor(
         communityId: String,
         name: String,
         description: String,
+        category : String,
         imageUri: Uri?
     ): Result<Unit> {
         return try {
             val docRef = firestore.collection("Community").document(communityId)
             val updates = mutableMapOf<String, Any>(
                 "name" to name,
-                "description" to description
+                "description" to description,
+                "category" to category
             )
 
             // If a new image was selected
@@ -109,6 +111,24 @@ class CommunityRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun deleteCommunity(communityId: String): Result<Unit> {
+        return try {
+            val communityDoc = firestore.collection("Community").document(communityId)
+
+            val snapshot = communityDoc.get().await()
+            val imageUrl = snapshot.getString("image")
+            imageUrl?.let {
+                FirebaseStorage.getInstance().getReferenceFromUrl(it).delete().await()
+            }
+
+            communityDoc.delete().await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("DeleteCommunity", "Failed to delete community: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
 
 }
 
