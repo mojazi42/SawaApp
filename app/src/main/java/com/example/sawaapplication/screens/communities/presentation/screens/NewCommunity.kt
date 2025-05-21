@@ -59,7 +59,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun NewCommunity(navController: NavController) {
+fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommunityScreen
     val context = LocalContext.current
     val viewModel: CommunityViewModel = hiltViewModel()
     val success by viewModel.success.collectAsState()
