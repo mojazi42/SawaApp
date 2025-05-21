@@ -72,5 +72,43 @@ class CommunityRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun updateCommunity(
+        communityId: String,
+        name: String,
+        description: String,
+        imageUri: Uri?
+    ): Result<Unit> {
+        return try {
+            val docRef = firestore.collection("Community").document(communityId)
+            val updates = mutableMapOf<String, Any>(
+                "name" to name,
+                "description" to description
+            )
+
+            // If a new image was selected
+            if (imageUri != null) {
+                try {
+                    val imageRef = FirebaseStorage.getInstance().reference
+                        .child("communityImages/${firebaseAuth.currentUser?.uid}.jpg")
+
+                    imageRef.putFile(imageUri).await()
+                    val newImageUrl = imageRef.downloadUrl.await().toString()
+
+                    updates["image"] = newImageUrl
+                }catch (e: Exception) {
+                    Log.e("Firestore", "Image upload failed: ${e.message}", e)
+                    return Result.failure(e)
+                }
+            }
+            docRef.update(updates).await()
+            Log.d("Firestore", "Community $communityId updated")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Update failed: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+
 }
 

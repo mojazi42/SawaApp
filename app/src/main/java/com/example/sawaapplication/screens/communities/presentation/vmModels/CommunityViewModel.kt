@@ -30,6 +30,7 @@ class CommunityViewModel @Inject constructor(
     private val createCommunityUseCase: CreateCommunityUseCase,
     private val getUserCreatedCommunitiesUseCase: GetUserCreatedCommunitiesUseCase,
     private val getCommunityByIdUseCase: GetCommunityByIdUseCase,
+    private val updateCommunityUseCase : UpdateCommunityUseCase,
     private val postRepository: PostRepository,
     private val permissionHandler: PermissionHandler,
     private val firebaseAuth: FirebaseAuth,
@@ -256,6 +257,30 @@ class CommunityViewModel @Inject constructor(
 
             } catch (e: Exception) {
                 Log.e("CommunityViewModel", "Failed to like post: ${e.message}")
+            }
+        }
+    }
+
+    fun updateCommunity(
+        communityId: String,
+        name: String,
+        description: String,
+        imageUri: Uri?
+    ) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val result = updateCommunityUseCase(communityId, name, description, imageUri)
+                result.onSuccess {
+                    _success.value = true
+                    fetchCommunityDetail(communityId) // Refresh updated data
+                }.onFailure {
+                    _error.value = "Update failed: ${it.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Unexpected error: ${e.message}"
+            } finally {
+                _loading.value = false
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.profile.screens
+package com.example.sawaapplication.screens.profile.presentation.screens
 
 import android.Manifest
 import android.net.Uri
@@ -34,8 +34,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
-import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
-import com.example.sawaapplication.screens.profile.vm.ThemeViewModel
+import com.example.sawaapplication.screens.profile.presentation.vm.ProfileViewModel
+import com.example.sawaapplication.screens.profile.presentation.vm.ThemeViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.theme.Red
 import com.example.sawaapplication.ui.theme.firstOrange
