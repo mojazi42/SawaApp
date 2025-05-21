@@ -75,7 +75,7 @@ import com.example.sawaapplication.screens.event.presentation.screens.formatTime
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
-import com.example.sawaapplication.screens.post.domain.model.PostUiModel
+import com.example.sawaapplication.screens.post.presentation.vmModels.CommunityPostsViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
@@ -91,6 +91,7 @@ fun CommunityScreen(
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
     eventViewModel: FetchEventViewModel = hiltViewModel(),
+    communityPostsViewModel: CommunityPostsViewModel = hiltViewModel(),
     joinCommunityViewModel: ExploreCommunityViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
     onClick: (String) -> Unit,
@@ -103,7 +104,7 @@ fun CommunityScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
 
-    val posts by viewModel.communityPosts.collectAsState()
+    val posts by communityPostsViewModel.communityPosts.collectAsState()
     var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
@@ -117,7 +118,7 @@ fun CommunityScreen(
     LaunchedEffect(communityId) {
         Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
         viewModel.fetchCommunityDetail(communityId)
-        viewModel.fetchPostsForCommunity(communityId)
+        communityPostsViewModel.loadPosts(communityId)
         fetchEventViewModel.loadEvents(communityId)
     }
     LaunchedEffect(Unit) {
