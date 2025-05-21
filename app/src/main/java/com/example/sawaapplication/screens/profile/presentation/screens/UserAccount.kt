@@ -156,15 +156,14 @@ fun MyPostsTab(viewModel: HomeViewModel, navController: NavController, userId: S
                         val communityName = communityNames[post.communityId] ?: "Unknown"
                         val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
                         PostCard(
-                            post,
-                            communityName,
-                            userName,
-                            userImage,
+                            post = post,
+                            communityName = communityName,
+                            communityId = post.communityId,
+                            userName = userName,
+                            userImage = userImage,
                             onClick = {},
                             onLikeClick = { viewModel.likePost(post) },
-                            onDeleteClick = {
-                                viewModel.deletePost(post)
-                            },
+                            onDeleteClick = { viewModel.deletePost(post) },
                             navController = navController,
                             onUserImageClick = { viewModel.likePost(post) }
                         )
@@ -216,17 +215,16 @@ fun PostsTabLike(viewModel: HomeViewModel, navController: NavController, userId:
                         val communityName = communityNames[post.communityId] ?: "Unknown"
                         val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
                         PostCard(
-                            post,
-                            communityName,
-                            userName,
-                            userImage,
+                            post = post,
+                            communityName = communityName,
+                            communityId = post.communityId,
+                            userName = userName,
+                            userImage = userImage,
                             onClick = {},
                             onLikeClick = { viewModel.likePost(post) },
+                            onDeleteClick = { viewModel.deletePost(post) },
                             navController = navController,
-                            onUserImageClick = { viewModel.likePost(post) },
-                            onDeleteClick = {
-                                viewModel.deletePost(post)
-                            },
+                            onUserImageClick = { viewModel.likePost(post) }
                         )
 
                         HorizontalDivider(

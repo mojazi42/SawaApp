@@ -272,20 +272,20 @@ fun CommunityScreen(
                     Text(
                         text = it.name,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = black
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
                     text = "${communityDetail?.members?.size ?: 0} Members",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Gray
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
                 communityDetail?.let {
                     Text(
                         text = it.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = black,
+                        color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
                     )
@@ -434,7 +434,7 @@ fun CommunityScreen(
 
                 TabRow(
                     selectedTabIndex = selectedTab,
-                    containerColor = white,
+                    containerColor = MaterialTheme.colorScheme.background,
                     indicator = { positions ->
                         TabRowDefaults.Indicator(
                             Modifier
@@ -452,7 +452,7 @@ fun CommunityScreen(
                                 Text(
                                     title,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (selectedTab == i) black else Gray
+                                    color = if (selectedTab == i) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
                         )

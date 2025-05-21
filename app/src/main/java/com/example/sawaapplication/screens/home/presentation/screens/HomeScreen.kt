@@ -43,19 +43,7 @@ import com.example.sawaapplication.screens.notification.presentation.viewmodels.
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.ui.res.stringResource
-import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
-import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import com.example.sawaapplication.utils.getCityNameFromGeoPoint
-import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
-import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.utils.getCityNameFromGeoPoint
+
 
 @Composable
 fun HomeScreen(
@@ -145,6 +133,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                         PostCard(
                             post,
                             communityName,
+                            communityId = post.communityId, // make sure this is available
                             userName,
                             userImage,
                             onClick = {},
@@ -156,7 +145,10 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                                 viewModel.deletePost(post)
                             },
                             navController = navController,
-                            onUserImageClick = { viewModel.likePost(post) }
+                            onUserImageClick = { viewModel.likePost(post) },
+                            onCommunityClick = { communityId ->
+                                navController.navigate("community_screen/$communityId")
+                            }
                         )
 
                         HorizontalDivider(
