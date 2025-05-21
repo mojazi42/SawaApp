@@ -195,7 +195,9 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             val result = postRepository.getPostsForCommunity(communityId)
             result.onSuccess { posts ->
-                _communityPosts.value = posts.map {
+                _communityPosts.value = posts
+                    .sortedBy { it.createdAt }
+                    .map {
                     PostUiModel(
                         id = it.id,
                         username = it.username,
