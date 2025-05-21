@@ -158,9 +158,6 @@ class CommunityViewModel @Inject constructor(
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 
-    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
-    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
-
 
     // Fetches communities where the current user is a member
     fun fetchCreatedCommunities(userId: String) {

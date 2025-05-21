@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +43,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -80,6 +82,7 @@ import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.ui.theme.PrimaryOrange
 import com.example.sawaapplication.ui.theme.white
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.reporting.MessagingClientEvent
 import java.net.URLEncoder
 
 
@@ -107,6 +110,8 @@ fun CommunityScreen(
     val communityDetail by viewModel.communityDetail.collectAsState()
     val isUserJoined = communityDetail?.members?.contains(userId) == true
     val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var eventToDelete by remember { mutableStateOf<MessagingClientEvent.Event?>(null) }
 
     val isAdmin by viewModel.isAdmin.collectAsState()
 
@@ -159,7 +164,7 @@ fun CommunityScreen(
         )
     }
 
-    if (showLeaveCommunityDialog){
+    if (showLeaveCommunityDialog) {
         CustomConfirmationDialog(
             message = stringResource(R.string.areYouSureCommunity),
             onDismiss = {
@@ -478,7 +483,8 @@ fun CommunityScreen(
             } else {
                 items(events) { event ->
                     communityDetail?.let {
-                        val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+                        val timeFormatted =
+                            event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
                         val formattedDate = formatDateString(event.date)
 
                         EventCard(
@@ -492,6 +498,14 @@ fun CommunityScreen(
                             time = timeFormatted,
                             date = formattedDate,
                             joined = event.joinedUsers.contains(userId),
+                            isEditable = event.createdBy == userId,
+                            onEditClick = {
+                                navController.navigate("edit_event/${event.id}")
+                            },
+                            onDeleteClick = {
+                                selectedEventId = event.id
+                                showDeleteDialog = true
+                            },
                             onJoinClick = {
                                 if (event.joinedUsers.contains(userId)) {
                                     selectedEventId = event.id
@@ -516,6 +530,49 @@ fun CommunityScreen(
                     }
                 }
             }
+
+
+
+
+//            if (showDeleteDialog && eventToDelete != null) {
+//                AlertDialog(
+//                    onDismissRequest = { showDeleteDialog = false },
+//                    confirmButton = {
+//                        TextButton(onClick = {
+//                            viewModel.deleteEvent(eventToDelete!!.id)
+//                            showDeleteDialog = false
+//                        }) {
+//                            Text("Yes")
+//                        }
+//                    },
+//                    dismissButton = {
+//                        TextButton(onClick = { showDeleteDialog = false }) {
+//                            Text("Cancel")
+//                        }
+//                    },
+//                    title = { Text("Delete Event") },
+//                    text = { Text("Are you sure you want to delete this event?") }
+//                )
+//            }
+
         }
+    }
+    if (showDeleteDialog && selectedEventId != null) {
+        CustomConfirmationDialog(
+            message = stringResource(R.string.areYouSureEvent),
+            onConfirm = {
+                eventViewModel.deleteEvent(
+                    communityId = communityId,
+                    eventId = selectedEventId!!
+                )
+                fetchEventViewModel.loadEvents(communityId) // <--- ADD THIS LINE
+                showDeleteDialog = false
+                selectedEventId = null
+            },
+            onDismiss = {
+                showDeleteDialog = false
+                selectedEventId = null
+            }
+        )
     }
 }

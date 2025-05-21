@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,16 +18,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.event.domain.model.Event
+import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 import com.google.firebase.Timestamp
 
 
@@ -61,7 +73,10 @@ fun EventCard(
     showCancelButton: Boolean = false,
     joinedUsers: List<String> = emptyList(),
     onClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isEditable: Boolean = false,
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     fun isEventExpired(eventTime: Timestamp): Boolean {
         val eventMillis = eventTime.toDate().time
@@ -79,13 +94,13 @@ fun EventCard(
     val isExpired = remember(eventTimestamp) {
         eventTimestamp?.let { isEventExpired(it) } ?: false
     }
+    var expanded by remember { mutableStateOf(false) }
 
     OutlinedCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(integerResource(id = R.integer.smallerSpace).dp)
             .clickable { onClick() },
-
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
@@ -94,22 +109,27 @@ fun EventCard(
             defaultElevation = integerResource(id = R.integer.homeScreenCardElevation).dp
         ),
         border = BorderStroke(
-            integerResource(R.integer.stroke).dp, MaterialTheme.colorScheme.secondaryContainer
+            integerResource(R.integer.stroke).dp,
+            MaterialTheme.colorScheme.secondaryContainer
         ),
     ) {
         Column {
-            Row {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // Image
                 Image(
-                    painter = if (image != null)
+                    painter = if (image.isNotEmpty())
                         rememberAsyncImagePainter(image)
                     else
                         painterResource(id = R.drawable.ic_launcher_background),
-                    contentDescription = "Profile image",
+                    contentDescription = "Event image",
                     contentScale = ContentScale.Crop,
-
                     modifier = Modifier
                         .clip(RectangleShape)
-                        .clip(RoundedCornerShape(topStart = integerResource(id = R.integer.homeScreenRoundedCornerShape).dp))
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = integerResource(id = R.integer.homeScreenRoundedCornerShape).dp
+                            )
+                        )
                         .size(integerResource(id = R.integer.homeScreenEventImageSize).dp)
                 )
 
@@ -117,22 +137,26 @@ fun EventCard(
 
                 Column(
                     modifier = Modifier
-                        .padding(top = integerResource(id = R.integer.smallSpace).dp)
                         .weight(1f)
+                        .padding(top = integerResource(id = R.integer.smallSpace).dp)
                 ) {
                     Text(
                         text = community,
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray,
+                        color = Color.Gray
                     )
+
                     Spacer(modifier = Modifier.height(integerResource(R.integer.spacer).dp))
+
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
+
                     Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
+
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
@@ -141,6 +165,7 @@ fun EventCard(
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
+
                     JoinButton(
                         joined = joined,
                         onJoinClick = onJoinClick,
@@ -149,8 +174,47 @@ fun EventCard(
                         isFull = isFull,
                     )
                 }
+
+                // Overflow menu
+                if (isEditable) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Top)
+                            .padding(top = 4.dp, end = 4.dp)
+                    ) {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon( // Replace with Icons.Default.MoreVert if needed
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Edit") },
+                                onClick = {
+                                    expanded = false
+                                    onEditClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Delete", color = Color.Red) },
+                                onClick = {
+                                    expanded = false
+                                    onDeleteClick()
+                                }
+                            )
+                        }
+                    }
+                }
             }
 
+            // Bottom info row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -160,10 +224,7 @@ fun EventCard(
                     ),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Outlined.LocationOn,
                         contentDescription = "Location",
@@ -173,15 +234,11 @@ fun EventCard(
                     Text(
                         text = location,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
-
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Outlined.Timer,
                         contentDescription = "Time",
@@ -189,10 +246,9 @@ fun EventCard(
                         modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
                     )
                     Text(
-                        text = "${date}•${time}",
+                        text = "$date•$time",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        maxLines = 1,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
@@ -207,7 +263,7 @@ fun EventCard(
                     Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
 
                     Text(
-                        text = "${participants}/${joinedUsers.size}",
+                        text = "$participants/${joinedUsers.size}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -225,6 +281,7 @@ fun EventCard(
         }
     }
 }
+
 
 
 @Composable
