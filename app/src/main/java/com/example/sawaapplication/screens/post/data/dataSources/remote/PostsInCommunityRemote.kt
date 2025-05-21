@@ -9,7 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class PostsInCommunityRemote @Inject constructor(
@@ -68,6 +70,7 @@ class PostsInCommunityRemote @Inject constructor(
                 .collection("posts")
                 .get()
                 .await()
+            val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
 
             val uiModels = snapshot.documents.mapNotNull { doc ->
                 val post = doc.toObject(Post::class.java) ?: return@mapNotNull null
@@ -78,7 +81,7 @@ class PostsInCommunityRemote @Inject constructor(
                     .await()
 
                 val username = userDoc.getString("name") ?: "Unknown"
-                val avatarUrl = userDoc.getString("profileImage") ?: ""
+                val avatarUrl = userDoc.getString("image") ?: ""
 
                 PostUiModel(
                     id = post.id,
@@ -90,15 +93,18 @@ class PostsInCommunityRemote @Inject constructor(
                     likedBy = post.likedBy,
                     userId = post.userId,
                     communityId = post.communityId,
-                )
-            }.sortedBy { it.createdAt }
+                    createdAt = post.createdAt
+                    )
+            }.sortedByDescending { parser.parse(it.createdAt) ?: Date(0) }
 
             Result.success(uiModels)
         } catch (e: Exception) {
             Log.e("PostRepository", "Error fetching posts: ${e.message}", e)
             Result.failure(e)
         }
+
     }
+
 }
 
 
