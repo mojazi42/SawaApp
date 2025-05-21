@@ -69,27 +69,33 @@ class PostsInCommunityRemote @Inject constructor(
                 .get()
                 .await()
 
-            val posts = snapshot.documents.mapNotNull { doc ->
+            val uiModels = snapshot.documents.mapNotNull { doc ->
                 val post = doc.toObject(Post::class.java) ?: return@mapNotNull null
-                val userSnapshot = firestore.collection("Users").document(post.userId).get().await()
-                val userName = userSnapshot.getString("name") ?: "Unknown"
-                val profileImage = userSnapshot.getString("profileImage") ?: ""
+
+                val userDoc = firestore.collection("User")
+                    .document(post.userId)
+                    .get()
+                    .await()
+
+                val username = userDoc.getString("name") ?: "Unknown"
+                val avatarUrl = userDoc.getString("profileImage") ?: ""
 
                 PostUiModel(
                     id = post.id,
-                    username = userName,
-                    userAvatarUrl = profileImage,
+                    username = username,
+                    userAvatarUrl = avatarUrl,
                     postImageUrl = post.imageUri,
                     content = post.content,
                     likes = post.likes,
                     likedBy = post.likedBy,
                     userId = post.userId,
-                    communityId = post.communityId
+                    communityId = post.communityId,
                 )
-            }
+            }.sortedBy { it.createdAt }
 
-            Result.success(posts)
+            Result.success(uiModels)
         } catch (e: Exception) {
+            Log.e("PostRepository", "Error fetching posts: ${e.message}", e)
             Result.failure(e)
         }
     }
