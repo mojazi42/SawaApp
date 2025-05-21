@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -61,6 +63,8 @@ fun EditCommunityScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+
+    val loading by viewModel.loading.collectAsState()
 
     var showPhotoPermissionDialog by remember { mutableStateOf(false) }
 
@@ -183,6 +187,16 @@ fun EditCommunityScreen(
 
         Spacer(Modifier.height(16.dp))
 
+        if (loading){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
         Button(
             onClick = {
                 viewModel.updateCommunity(communityId, name, description, imageUri)
@@ -191,6 +205,16 @@ fun EditCommunityScreen(
         ) {
             Text("Update")
         }
+
+//        if (loading){
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize(),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                CircularProgressIndicator()
+//            }
+//        }
     }
 
 }

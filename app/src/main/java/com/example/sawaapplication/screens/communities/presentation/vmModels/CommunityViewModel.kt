@@ -243,7 +243,7 @@ class CommunityViewModel @Inject constructor(
                     ))
                 }.await()
 
-                // ✅ Locally update the UI
+                // Locally update the UI
                 _communityPosts.update { posts ->
                     posts.map {
                         if (it.id == post.id) {
