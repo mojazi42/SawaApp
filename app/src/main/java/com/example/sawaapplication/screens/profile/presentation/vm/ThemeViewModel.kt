@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.profile.vm
+package com.example.sawaapplication.screens.profile.presentation.vm
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

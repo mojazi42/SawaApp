@@ -99,7 +99,6 @@ fun CommunityScreen(
 ) {
     val context = LocalContext.current
     val fetchEventViewModel: FetchEventViewModel = hiltViewModel()
-//    val uiState = FakeCommunityUiState
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
@@ -108,9 +107,10 @@ fun CommunityScreen(
     var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
-    //val events by eventViewModel.events.collectAsState()
     val isUserJoined = communityDetail?.members?.contains(userId) == true
     val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
+
+    val isAdmin by viewModel.isAdmin.collectAsState()
 
 
     val events by fetchEventViewModel.events.collectAsState()
@@ -245,10 +245,10 @@ fun CommunityScreen(
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
-                    if ( communityDetail?.creatorId == userId ){
+                    if ( isAdmin ){
                         IconButton(
                             onClick = {
-                               // navController.navigate("edit_community/$communityId")
+                                navController.navigate("edit_community/$communityId")
                             },
                             modifier = Modifier
                                 .size(32.dp) // size of the clickable icon container
@@ -293,7 +293,7 @@ fun CommunityScreen(
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
                 // Admin actions
-                if (communityDetail?.creatorId == userId) {
+                if (isAdmin) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
