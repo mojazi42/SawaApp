@@ -87,7 +87,6 @@ fun CreateNewEventScreen(
     notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-   // val success = viewModel.success.value
     val success by viewModel.success.collectAsState()
     val communityID = viewModel.communityId
     val loading by viewModel.loading.collectAsState()
