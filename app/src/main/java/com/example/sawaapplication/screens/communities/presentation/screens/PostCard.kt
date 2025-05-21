@@ -9,21 +9,26 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
-import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PostCard(
@@ -35,6 +40,16 @@ fun PostCard(
 ) {
     val isLiked = currentUserId in post.likedBy
 
+    val formattedDate = remember(post.createdAt) {
+        try {
+            val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+            val date = parser.parse(post.createdAt)
+            val formatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+            formatter.format(date ?: Date())
+        } catch (e: Exception) {
+            "Unknown date"
+        }
+    }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -43,29 +58,75 @@ fun PostCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             // User row
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = post.userAvatarUrl,
-                    contentDescription = "${post.username} avatar",
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            if(post.userId == currentUserId){
-                            navController.navigate(Screen.Profile.route)
-                            }else{
-                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
-                            }
-                        },
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = post.username,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = black
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (post.userAvatarUrl.isNotBlank()) {
+                    AsyncImage(
+                        model = post.userAvatarUrl,
+                        contentDescription = "User Profile Image",
+                        modifier = Modifier
+                            .size(integerResource(R.integer.asyncImageSize).dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                if(post.userId == currentUserId){
+                                    navController.navigate(Screen.Profile.route)
+                                }else{
+                                    navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                                }
+                            },
+
+                        )
+                }
+                Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = post.username,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                        }
+                    )
+                    Text(
+                        text = "${stringResource(R.string.postedOn)} $formattedDate",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Gray
+                    )
+                }
             }
+
+
+//            Row(verticalAlignment = Alignment.CenterVertically) {
+//                AsyncImage(
+//                    model = post.userAvatarUrl,
+//                    contentDescription = "${post.username} avatar",
+//                    modifier = Modifier
+//                        .size(36.dp)
+//                        .clip(CircleShape)
+//                        .clickable {
+//                            if(post.userId == currentUserId){
+//                            navController.navigate(Screen.Profile.route)
+//                            }else{
+//                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+//                            }
+//                        },
+//                    contentScale = ContentScale.Crop
+//                )
+//                Spacer(Modifier.width(8.dp))
+//                Text(
+//                    text = post.username,
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = black
+//                )
+//                Text(
+//                    text = "${stringResource(R.string.postedOn)} $formattedDate",
+//                    style = MaterialTheme.typography.labelSmall,
+//                    color = Color.Gray
+//                )
+//            }
 
             Spacer(Modifier.height(8.dp))
 
