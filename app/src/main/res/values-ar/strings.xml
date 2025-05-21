@@ -110,6 +110,7 @@
     <string name="unknownError">خطأ غير معروف</string>
     <string name="unknown">غير معروف</string>
     <string name="areYouSurePost">هل أنت متأكد من رغبتك في حذف المنشور؟</string>
+    <string name="areYouSureُEventHome">هل انت متأكد من رغبتك من في حذف هذه الحدث؟</string>
 
     <!--NotificationScreen-->
     <string name="noNotifications">لا يوجد تنبيهات</string>

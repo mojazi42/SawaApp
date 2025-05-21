@@ -4,16 +4,25 @@ import android.net.Uri
 import android.util.Log
 import com.example.sawaapplication.screens.event.domain.model.Event
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-
 class EventInCommunityRemote @Inject constructor(
-    private val firestore: FirebaseFirestore, private val firebaseAuth: FirebaseAuth
+    private val firestore: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
 ) {
+
+    // Helper to get reference to the event subcollection inside a community
+    private fun eventCollectionRef(communityId: String) =
+        firestore.collection("Community").document(communityId).collection("event")
+
+    /**
+     * Creates a new event in a community with image upload.
+     */
     suspend fun createEventInCommunity(
         communityId: String, event: Event, imageUri: Uri
     ) {
@@ -50,17 +59,15 @@ class EventInCommunityRemote @Inject constructor(
         }
     }
 
+    /**
+     * Fetch all events from a specific community.
+     */
     suspend fun fetchEventsFromCommunity(communityId: String): Result<List<Event>> {
         return try {
-            val snapshot = FirebaseFirestore.getInstance()
-                .collection("Community")
-                .document(communityId)
-                .collection("event")
-                .get()
-                .await()
+            val snapshot = eventCollectionRef(communityId).get().await()
 
             val events = snapshot.documents.mapNotNull { document ->
-                document.toObject(Event::class.java)?.copy(id = document.id) // <-- include doc ID
+                document.toObject(Event::class.java)?.copy(id = document.id)
             }
 
             Result.success(events)
@@ -69,18 +76,15 @@ class EventInCommunityRemote @Inject constructor(
         }
     }
 
+    /**
+     * Adds the current user to the joinedUsers list of an event.
+     */
     suspend fun joinEvent(communityId: String, eventId: String, userId: String): Result<Unit> {
         return try {
-            val eventRef = firestore.collection("Community")
-                .document(communityId)
-                .collection("event")
+            eventCollectionRef(communityId)
                 .document(eventId)
-
-            // Use arrayUnion to avoid duplicate entries
-            eventRef.update(
-                "joinedUsers",
-                com.google.firebase.firestore.FieldValue.arrayUnion(userId)
-            ).await()
+                .update("joinedUsers", FieldValue.arrayUnion(userId))
+                .await()
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -88,17 +92,15 @@ class EventInCommunityRemote @Inject constructor(
         }
     }
 
+    /**
+     * Removes the current user from the joinedUsers list of an event.
+     */
     suspend fun leaveEvent(communityId: String, eventId: String, userId: String): Result<Unit> {
         return try {
-            val eventRef = firestore.collection("Community")
-                .document(communityId)
-                .collection("event")
+            eventCollectionRef(communityId)
                 .document(eventId)
-
-            eventRef.update(
-                "joinedUsers",
-                com.google.firebase.firestore.FieldValue.arrayRemove(userId)
-            ).await()
+                .update("joinedUsers", FieldValue.arrayRemove(userId))
+                .await()
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -106,4 +108,45 @@ class EventInCommunityRemote @Inject constructor(
         }
     }
 
+    /**
+     * Deletes an event from the Firestore database.
+     */
+    suspend fun deleteEvent(communityId: String, eventId: String): Result<Unit> {
+        return try {
+            firestore.collection("Community")
+                .document(communityId)
+                .collection("event")
+                .document(eventId)
+                .delete()
+                .await()
+            Log.d("RemoteDelete", "Deleted $eventId from $communityId")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("RemoteDelete", "Failed to delete: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+
+    /**
+     * Updates specific fields of an event document in Firestore.
+     */
+    suspend fun updateEvent(
+        communityId: String,
+        eventId: String,
+        updatedData: Map<String, Any>
+    ): Result<Unit> {
+        return try {
+            eventCollectionRef(communityId)
+                .document(eventId)
+                .update(updatedData)
+                .await()
+
+            Log.d("Firebase", "Event updated: $eventId")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("Firebase", "Error updating event: ${e.message}")
+            Result.failure(e)
+        }
+    }
 }
