@@ -1,8 +1,11 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,13 +35,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditCommunityScreen(
     navController: NavController,
@@ -49,9 +60,23 @@ fun EditCommunityScreen(
     var description by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val launcher = rememberLauncherForActivityResult(
+    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> imageUri = uri }
+    ) { uri: Uri? ->
+        imageUri = uri
+    }
+
+    val success by viewModel.success.collectAsState()
+
+    LaunchedEffect(success) {
+        if (success) {
+            navController.popBackStack()
+        }
+    }
 
     LaunchedEffect(communityId) {
         viewModel.fetchCommunityDetail(communityId)
@@ -60,6 +85,31 @@ fun EditCommunityScreen(
     LaunchedEffect(communityDetail) {
         name = communityDetail?.name ?: ""
         description = communityDetail?.description ?: ""
+    }
+
+    // Photo Permission Dialog
+    if (showPhotoPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoPermissionDialog = false },
+            title = { Text("Photo Permission") },
+            text = { Text("We need access to your photos so you can add an image for the event.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.markPhotoPermissionRequested()
+                    photoPermissionState.launchPermissionRequest()
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text("Deny")
+                }
+            }
+        )
     }
 
     Column(
@@ -71,13 +121,41 @@ fun EditCommunityScreen(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .clickable { launcher.launch("image/*") },
+                .clickable {
+                    if (photoPermissionState.status.isGranted){
+                        imagePickerLauncher.launch("image/*")
+                    } else {
+                        if (viewModel.shouldRequestPhoto()) {
+                            showPhotoPermissionDialog = true
+                        } else {
+                            Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
             contentAlignment = Alignment.Center
         ) {
             if (imageUri != null) {
-                AsyncImage(model = imageUri, contentDescription = "New Image")
+//                AsyncImage(
+//                    model = imageUri,
+//                    contentDescription = "New Image"
+//                )
+                Image(
+                    painter = rememberAsyncImagePainter(imageUri),
+                    contentDescription = "New Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
             } else {
-                AsyncImage(model = communityDetail?.image, contentDescription = "Old Image")
+//                AsyncImage(
+//                    model = communityDetail?.image,
+//                    contentDescription = "Old Image"
+//                )
+                Image (
+                    painter = rememberAsyncImagePainter(communityDetail?.image),
+                    contentDescription = "Old Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
             }
             Icon(
                 Icons.Default.Edit,
@@ -108,7 +186,6 @@ fun EditCommunityScreen(
         Button(
             onClick = {
                 viewModel.updateCommunity(communityId, name, description, imageUri)
-                navController.popBackStack() // navigate back after update
             },
             modifier = Modifier.fillMaxWidth()
         ) {

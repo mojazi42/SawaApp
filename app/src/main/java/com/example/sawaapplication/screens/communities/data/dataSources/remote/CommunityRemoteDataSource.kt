@@ -89,7 +89,7 @@ class CommunityRemoteDataSource @Inject constructor(
             if (imageUri != null) {
                 try {
                     val imageRef = FirebaseStorage.getInstance().reference
-                        .child("communityImages/${firebaseAuth.currentUser?.uid}.jpg")
+                        .child("communityImages/${firebaseAuth.currentUser?.uid}_${System.currentTimeMillis()}.jpg")
 
                     imageRef.putFile(imageUri).await()
                     val newImageUrl = imageRef.downloadUrl.await().toString()
