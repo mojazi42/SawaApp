@@ -140,5 +140,8 @@
     <string name="yesImSure">نعم، متأكد</string>
     <string name="no">لا</string>
 
+    <!--Event Details-->
+    <string name="loading">تنزيل...</string>
+    <string name="viewLocation">عرض الموقع</string>
 
 </resources>
