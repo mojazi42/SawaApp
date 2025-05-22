@@ -5,16 +5,17 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -23,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,7 +47,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -63,6 +67,8 @@ fun EditCommunityScreen(
     var description by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var category = viewModel.category
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    val text = stringResource(R.string.photoPermissionToast)
 
     val communityTypes = remember {
         listOf(
@@ -91,9 +97,6 @@ fun EditCommunityScreen(
     }
 
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
-
-    val loading by viewModel.loading.collectAsState()
-
     var showPhotoPermissionDialog by remember { mutableStateOf(false) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -102,11 +105,12 @@ fun EditCommunityScreen(
         imageUri = uri
     }
 
+    val loading by viewModel.loading.collectAsState()
     val success by viewModel.success.collectAsState()
 
     LaunchedEffect(success) {
         if (success) {
-            navController.popBackStack()
+            navController.navigate(Screen.Community.route)
         }
     }
 
@@ -124,134 +128,178 @@ fun EditCommunityScreen(
     if (showPhotoPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPhotoPermissionDialog = false },
-            title = { Text("Photo Permission") },
-            text = { Text("We need access to your photos so you can add an image for the event.") },
+            title = { Text(stringResource(R.string.photoPermissionTitle)) },/** STRING */
+            text = { Text(stringResource(R.string.photoPermissionTextC)) },/** STRING */
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markPhotoPermissionRequested()
                     photoPermissionState.launchPermissionRequest()
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Allow")
+                    Text(stringResource(R.string.allow))/** STRING */
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.deny))/** STRING */
                 }
             }
         )
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)) {
-        // Image
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .clickable {
-                    if (photoPermissionState.status.isGranted){
-                        imagePickerLauncher.launch("image/*")
-                    } else {
-                        if (viewModel.shouldRequestPhoto()) {
-                            showPhotoPermissionDialog = true
-                        } else {
-                            Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            if (imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(imageUri),
-                    contentDescription = "New Image",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Image (
-                    painter = rememberAsyncImagePainter(communityDetail?.image),
-                    contentDescription = "Old Image",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-            Icon(
-                Icons.Default.Edit,
-                contentDescription = "Edit",
-                tint = Color.White)
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // Name
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Community Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Description
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-
-        CommunityTypeDropdown(
-            selectedText = selectedText,
-            onTypeSelected = {
-                selectedTypeIndex.value = it
-                viewModel.category = communityTypes[it]
-            },
-            communityTypes = communityTypes
-        )
-
-
-        if (loading){
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+        item {
+            // Image
             Box(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        if (photoPermissionState.status.isGranted) {
+                            imagePickerLauncher.launch("image/*")
+                        } else {
+                            if (viewModel.shouldRequestPhoto()) {
+                                showPhotoPermissionDialog = true
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    text,/** STRING */
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                if (imageUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(imageUri),
+                        contentDescription = "New Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = rememberAsyncImagePainter(communityDetail?.image),
+                        contentDescription = "Old Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.edit),
+                    tint = Color.White
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Name
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text(stringResource(R.string.communityName)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // Description
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text(stringResource(R.string.description)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+
+            CommunityTypeDropdown(
+                selectedText = selectedText,
+                onTypeSelected = {
+                    selectedTypeIndex.value = it
+                    viewModel.category = communityTypes[it]
+                },
+                communityTypes = communityTypes
+            )
+
+
+            if (loading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    viewModel.updateCommunity(communityId, name, description, category, imageUri)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text(stringResource(R.string.update))
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+//            Button(
+//                onClick = { navController.popBackStack() },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(56.dp)
+//            ) {
+//                Text(stringResource(R.string.cancel),)
+//            }
+
+            TextButton(
+                onClick = { navController.popBackStack() },
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                modifier =  Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text(stringResource(R.string.cancel))
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+                    showDeleteDialog = true
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text(stringResource(R.string.deleteCommunity), color = Color.White)
             }
         }
-
-        Spacer(Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                viewModel.updateCommunity(communityId, name, description, category ,imageUri)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Update")
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                viewModel.deleteCommunity(communityId)
-                navController.popBackStack()
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-        ) {
-            Text("Delete Community", color = Color.White)
-        }
-
+    }
+    if (showDeleteDialog) {
+        CustomConfirmationDialog(
+            message = stringResource(R.string.areYouSureDeleteCommunity),
+            onDismiss = { showDeleteDialog = false },
+            onConfirm = {
+                showDeleteDialog = false
+                viewModel.deleteCommunity(communityId, communityDetail?.image)
+            }
+        )
     }
 }

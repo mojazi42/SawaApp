@@ -287,13 +287,13 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun deleteCommunity(communityId: String) {
+    fun deleteCommunity(communityId: String, imageUrl: String?) {
         viewModelScope.launch {
             _loading.value = true
             try {
-                val result = deleteCommunityUseCase(communityId)
+                val result = deleteCommunityUseCase(communityId, imageUrl)
                 result.onSuccess {
-                    _success.value = true // Triggers UI nav
+                    _success.value = true
                 }.onFailure {
                     _error.value = "Failed to delete community: ${it.message}"
                 }

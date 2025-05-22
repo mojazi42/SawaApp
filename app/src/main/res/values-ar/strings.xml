@@ -90,6 +90,15 @@
     <string name="descriptionRequired">يجب إدخال الوصف</string>
     <string name="categoryRequired">يجب إدخال التصنيف</string>
 
+    <!--EditCommunity-->
+    <string name = "photoPermissionTitle">الوصول لألبوم الصور</string>
+    <string name = "photoPermissionTextC">نحتاج الوصول لألبوم الصور حتى يمكنك إضافة صورة للمجتمع</string>
+    <string name = "photoPermissionToast">الرجاء السماح للوصول لألبوم الصور من اعدادات هاتفك</string>
+    <string name = "edit">تعديل</string>
+    <string name = "update">حفظ التغييرات</string>
+    <string name = "deleteCommunity">حذف المجتمع</string>
+    <string name="areYouSureDeleteCommunity">هل أنت متأكد من رغبتك في حذف المجتمع؟ سيتم حذفه نهائيًا</string>
+
     <!--Community Types-->
     <string name="selectCommunityType">إختر نوع المجتمع</string>
     <string name="select">إختر</string>
