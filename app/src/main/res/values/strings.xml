@@ -149,4 +149,9 @@
     <!--CustomConfirmationDialog-->
     <string name="yesImSure">Yes, I\'m sure</string>
     <string name="no">No</string>
+
+    <!--Event Details-->
+    <string name="loading">loading...</string>
+    <string name="viewLocation">View Location</string>
+
 </resources>
