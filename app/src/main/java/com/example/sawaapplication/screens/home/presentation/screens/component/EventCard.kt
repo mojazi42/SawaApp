@@ -71,6 +71,11 @@ fun EventCard(
         return currentMillis > expiryMillis
     }
 
+    fun isEventFull(participantsLimit: Int, currentJoined: Int): Boolean {
+        return currentJoined >= participantsLimit
+    }
+    val isFull = isEventFull(participants, joinedUsers.size)
+
     val isExpired = remember(eventTimestamp) {
         eventTimestamp?.let { isEventExpired(it) } ?: false
     }
@@ -140,7 +145,8 @@ fun EventCard(
                         joined = joined,
                         onJoinClick = onJoinClick,
                         showCancel = showCancelButton,
-                        isExpired=isExpired
+                        isExpired = isExpired,
+                        isFull = isFull,
                     )
                 }
             }
@@ -216,12 +222,14 @@ fun JoinButton(
     joined: Boolean,
     onJoinClick: () -> Unit,
     showCancel: Boolean = false,
-    isExpired: Boolean
+    isExpired: Boolean,
+    isFull: Boolean
 ) {
     val isCancelVisible = showCancel && joined
-
+    val isFull = isFull && !joined
     val isButtonEnabled = when {
         isExpired -> false
+        isFull -> false
         isCancelVisible -> true
         joined -> false
         else -> true
@@ -239,6 +247,7 @@ fun JoinButton(
             contentColor = when {
                 isCancelVisible -> Color.Gray
                 joined -> Color.Gray
+                isFull -> Color.Gray
                 else -> Color.White
             }
         ),
@@ -249,6 +258,7 @@ fun JoinButton(
     ) {
         Text(
             text = when {
+                isFull -> "Join"
                 isExpired -> "Finished"
                 isCancelVisible -> "Leave"
                 joined -> "Joined"
