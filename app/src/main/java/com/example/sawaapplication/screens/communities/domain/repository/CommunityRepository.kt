@@ -11,5 +11,5 @@ interface CommunityRepository {
     suspend fun joinCommunity(communityId: String, userId: String): Result<Unit>
     suspend fun leaveCommunity(communityId: String, userId: String): Result<Unit>
     suspend fun updateCommunity(communityId: String, name: String, description: String, category : String, imageUri: Uri?): Result<Unit>
-    suspend fun deleteCommunity(communityId: String): Result<Unit>
+    suspend fun deleteCommunity(communityId: String, imageUrl: String?): Result<Unit>
 }

@@ -75,8 +75,8 @@ class CommunityRepositoryImpl @Inject constructor(
         return remoteDataSource.updateCommunity(communityId, name, description, category, imageUri)
     }
 
-    override suspend fun deleteCommunity(communityId: String): Result<Unit> {
-        return remoteDataSource.deleteCommunity(communityId)
+    override suspend fun deleteCommunity(communityId: String, imageUrl: String?): Result<Unit> {
+        return remoteDataSource.deleteCommunity(communityId, imageUrl)
     }
 
 

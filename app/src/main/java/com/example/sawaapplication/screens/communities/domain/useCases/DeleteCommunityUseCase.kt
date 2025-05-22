@@ -6,7 +6,7 @@ import javax.inject.Inject
 class DeleteCommunityUseCase @Inject constructor(
     private val repository: CommunityRepository
 ) {
-    suspend operator fun invoke(communityId: String): Result<Unit> {
-        return repository.deleteCommunity(communityId)
+    suspend operator fun invoke(communityId: String, imageUrl: String?): Result<Unit> {
+        return repository.deleteCommunity(communityId,imageUrl)
     }
 }
