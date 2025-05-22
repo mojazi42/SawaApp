@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
@@ -86,23 +87,57 @@ fun EventDetailScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
+        // Fixed header box (stays at the top)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(integerResource(R.integer.screenTopSpace).dp)
+                .background(MaterialTheme.colorScheme.background)
+                .align(Alignment.TopCenter),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    contentDescription = "Back",
+                    modifier = Modifier.size(integerResource(R.integer.backIconSize).dp)
+                )
+            }
+            Text(
+                text = community?.name ?: stringResource(R.string.loading),
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
+                modifier = Modifier.padding(horizontal = integerResource(R.integer.smallerSpace).dp)
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(integerResource(R.integer.padding).dp)
+                .padding(integerResource(R.integer.paddingEventScreen).dp)
                 .verticalScroll(state = rememberScrollState())
         ) {
 
             Spacer(Modifier.height(integerResource(R.integer.hugeSpace).dp))
 
-            AsyncImage(
-                model = event.imageUri,
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(integerResource(R.integer.round).dp)),
-                contentScale = ContentScale.FillWidth
-            )
+                    .padding(horizontal = integerResource(R.integer.paddingEventScreen).dp)
+            ) {
+                AsyncImage(
+                    model = event.imageUri,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                        .clip(RoundedCornerShape(integerResource(R.integer.round).dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Spacer(Modifier.height(integerResource(R.integer.smallerSpace).dp))
             val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
@@ -117,7 +152,8 @@ fun EventDetailScreen(
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                .padding(horizontal = integerResource(R.integer.paddingEventScreen).dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -172,12 +208,12 @@ fun EventDetailScreen(
                 text = event.title,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = integerResource(R.integer.padding).dp)
+                modifier = Modifier.padding(horizontal = integerResource(R.integer.paddingEventScreen).dp)
             )
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = integerResource(R.integer.padding).dp)
+                modifier = Modifier.padding(horizontal = integerResource(R.integer.paddingEventScreen).dp)
             )
 
             Spacer(modifier = Modifier.height(integerResource(R.integer.hugeSpace).dp))
@@ -191,9 +227,12 @@ fun EventDetailScreen(
                     }
                     startActivity(context, intent, null)
                 },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .width(230.dp)
+                    .height(40.dp)
+                    .align(Alignment.CenterHorizontally)
             ) {
-                Text(stringResource(R.string.viewLocation))
+                Text(stringResource(R.string.viewLocation), color = Color.White)
             }
         }
 
@@ -225,4 +264,5 @@ fun EventDetailScreen(
             }
         }
     }
+
 }
