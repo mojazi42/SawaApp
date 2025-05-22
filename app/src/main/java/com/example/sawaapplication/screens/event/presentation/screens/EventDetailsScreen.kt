@@ -291,5 +291,4 @@ fun EventDetailScreen(
             }
         }
     }
-
 }
