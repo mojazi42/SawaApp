@@ -219,8 +219,12 @@ fun JoinButton(
     isExpired: Boolean
 ) {
     val isCancelVisible = showCancel && joined
-    val isButtonEnabled = !isExpired && !joined
-    // disabled : !joined && (limit full)
+    val isButtonEnabled = when {
+        isExpired -> false
+        isCancelVisible -> true
+        joined -> false
+        else -> true
+    }    // disabled : !joined && (limit full)
     Button(
         onClick = onJoinClick,
         enabled = isButtonEnabled,
