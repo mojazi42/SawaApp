@@ -18,6 +18,8 @@ import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.Job
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -39,11 +41,19 @@ class CreateEventViewModel @Inject constructor(
     var location by mutableStateOf(GeoPoint(0.0, 0.0))
     var locationText by mutableStateOf("Location not set")
     private var job: Job? = null
-    val loading = mutableStateOf(false)
-    val success = mutableStateOf(false)
-    val error = mutableStateOf<String?>(null)
-    var isMapVisible by mutableStateOf(false)
 
+    // val loading = mutableStateOf(false)
+    // val success = mutableStateOf(false)
+    // val error = mutableStateOf<String?>(null)
+    var isMapVisible by mutableStateOf(false)
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
+    private val _success = MutableStateFlow(false)
+    val success: StateFlow<Boolean> = _success
 
     val membersLimit: Int?
         get() = membersLimitInput.toIntOrNull()
@@ -52,15 +62,22 @@ class CreateEventViewModel @Inject constructor(
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
     fun createEvent(communityId: String) {
-        if (loading.value) return
-        if (imageUri == null) {
-            error.value = "Please select an image."
+        if (loading.value) return // Prevent double submissions
 
+        if (imageUri == null) {
+            _error.value = "Please select an image."
             return
         }
 
+        if (communityId.isEmpty()) {
+            _error.value = "Community ID is missing."
+            return
+        }
 
-        val timeFormat = SimpleDateFormat("hh:mm", Locale.getDefault())
+        // Set loading to true
+        _loading.value = true
+
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // Change to 24-hour format
         val parsedTime = timeFormat.parse(eventTime)
 
         val calendar = Calendar.getInstance()
@@ -82,7 +99,7 @@ class CreateEventViewModel @Inject constructor(
         val event = Event(
             title = name.trim(),
             location = location,
-            date = Date(eventDate ?: System.currentTimeMillis()).toString(), // optional
+            date = Date(eventDate ?: System.currentTimeMillis()).toString(),
             time = finalTimestamp,
             description = description.trim(),
             memberLimit = membersLimit ?: 0,
@@ -92,21 +109,40 @@ class CreateEventViewModel @Inject constructor(
             longitude = location.longitude
         )
 
-
         job = viewModelScope.launch {
-            loading.value = true
+            _loading.value = true
             try {
                 createEventUseCase(communityId, event, imageUri!!)
-                success.value = true
-                Log.d("CreateEvent", "Event created successfully ${communityId}")
+                _success.value = true
+                Log.d("CreateEvent", "Event created successfully: $communityId")
             } catch (e: Exception) {
-                error.value = "Failed to create event: ${e.message}"
+                _error.value = "Failed to create event: ${e.message}"
                 Log.e("CreateEvent", "Error creating event", e)
             } finally {
-                loading.value = false
+                _loading.value = false
+            }
+        }
+
+
+    job = viewModelScope.launch {
+            _loading.value = true
+            try {
+                createEventUseCase(communityId, event, imageUri!!)
+                _success.value = true
+                Log.d("CreateEvent", "Event created successfully: $communityId")
+            } catch (e: Exception) {
+                _error.value = "Failed to create event: ${e.message}"
+                Log.e("CreateEvent", "Error creating event", e)
+            } finally {
+                _loading.value = false
             }
         }
     }
+
+    fun resetSuccess() {
+        _success.value = false
+    }
+
 
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()

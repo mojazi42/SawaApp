@@ -72,5 +72,63 @@ class CommunityRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun updateCommunity(
+        communityId: String,
+        name: String,
+        description: String,
+        category : String,
+        imageUri: Uri?
+    ): Result<Unit> {
+        return try {
+            val docRef = firestore.collection("Community").document(communityId)
+            val updates = mutableMapOf<String, Any>(
+                "name" to name,
+                "description" to description,
+                "category" to category
+            )
+
+            // If a new image was selected
+            if (imageUri != null) {
+                try {
+                    val imageRef = FirebaseStorage.getInstance().reference
+                        .child("communityImages/${firebaseAuth.currentUser?.uid}_${System.currentTimeMillis()}.jpg")
+
+                    imageRef.putFile(imageUri).await()
+                    val newImageUrl = imageRef.downloadUrl.await().toString()
+
+                    updates["image"] = newImageUrl
+                }catch (e: Exception) {
+                    Log.e("Firestore", "Image upload failed: ${e.message}", e)
+                    return Result.failure(e)
+                }
+            }
+            docRef.update(updates).await()
+            Log.d("Firestore", "Community $communityId updated")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Update failed: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteCommunity(communityId: String): Result<Unit> {
+        return try {
+            val communityDoc = firestore.collection("Community").document(communityId)
+
+            val snapshot = communityDoc.get().await()
+            val imageUrl = snapshot.getString("image")
+            imageUrl?.let {
+                FirebaseStorage.getInstance().getReferenceFromUrl(it).delete().await()
+            }
+
+            communityDoc.delete().await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("DeleteCommunity", "Failed to delete community: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
 }
 

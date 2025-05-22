@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.profile.screens
+package com.example.sawaapplication.screens.profile.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +41,7 @@ import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.home.presentation.screens.component.CustomTabRow
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
-import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+import com.example.sawaapplication.screens.profile.presentation.vm.ProfileViewModel
 
 @Composable
 fun UserAccount(
@@ -156,15 +156,14 @@ fun MyPostsTab(viewModel: HomeViewModel, navController: NavController, userId: S
                         val communityName = communityNames[post.communityId] ?: "Unknown"
                         val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
                         PostCard(
-                            post,
-                            communityName,
-                            userName,
-                            userImage,
+                            post = post,
+                            communityName = communityName,
+                            communityId = post.communityId,
+                            userName = userName,
+                            userImage = userImage,
                             onClick = {},
                             onLikeClick = { viewModel.likePost(post) },
-                            onDeleteClick = {
-                                viewModel.deletePost(post)
-                            },
+                            onDeleteClick = { viewModel.deletePost(post) },
                             navController = navController,
                             onUserImageClick = { viewModel.likePost(post) }
                         )
@@ -216,17 +215,16 @@ fun PostsTabLike(viewModel: HomeViewModel, navController: NavController, userId:
                         val communityName = communityNames[post.communityId] ?: "Unknown"
                         val (userName, userImage) = userDetails[post.userId] ?: ("Unknown" to "")
                         PostCard(
-                            post,
-                            communityName,
-                            userName,
-                            userImage,
+                            post = post,
+                            communityName = communityName,
+                            communityId = post.communityId,
+                            userName = userName,
+                            userImage = userImage,
                             onClick = {},
                             onLikeClick = { viewModel.likePost(post) },
+                            onDeleteClick = { viewModel.deletePost(post) },
                             navController = navController,
-                            onUserImageClick = { viewModel.likePost(post) },
-                            onDeleteClick = {
-                                viewModel.deletePost(post)
-                            },
+                            onUserImageClick = { viewModel.likePost(post) }
                         )
 
                         HorizontalDivider(

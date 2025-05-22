@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.profile.screens
+package com.example.sawaapplication.screens.profile.presentation.screens
 
 import android.app.Activity
 import android.content.Context

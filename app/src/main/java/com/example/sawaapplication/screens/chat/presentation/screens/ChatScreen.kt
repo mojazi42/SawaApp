@@ -141,9 +141,11 @@ fun ChatScreen(
                     bottom = innerPadding.calculateBottomPadding()
                 )
         ) {
-            ChatTopBarBanner(communityImage = communityImage) {
-                navController.popBackStack()
-            }
+            ChatTopBarBanner(
+                communityImage = communityImage,
+                onBackClick = { navController.popBackStack() },
+                onImageClick = { navController.navigate("community_screen/$communityId") }
+            )
 
             ChatMembersHeader(
                 communityName = communityName,
@@ -198,4 +200,5 @@ fun ChatScreen(
     ImagePreviewOverlay(previewImageUrl = previewImageUrl) {
         previewImageUrl = null
     }
+
 }

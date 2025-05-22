@@ -30,6 +30,8 @@ class CommunityViewModel @Inject constructor(
     private val createCommunityUseCase: CreateCommunityUseCase,
     private val getUserCreatedCommunitiesUseCase: GetUserCreatedCommunitiesUseCase,
     private val getCommunityByIdUseCase: GetCommunityByIdUseCase,
+    private val updateCommunityUseCase : UpdateCommunityUseCase,
+    private val deleteCommunityUseCase : DeleteCommunityUseCase,
     private val postRepository: PostRepository,
     private val permissionHandler: PermissionHandler,
     private val firebaseAuth: FirebaseAuth,
@@ -195,7 +197,9 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             val result = postRepository.getPostsForCommunity(communityId)
             result.onSuccess { posts ->
-                _communityPosts.value = posts.map {
+                _communityPosts.value = posts
+                    .sortedBy { it.createdAt }
+                    .map {
                     PostUiModel(
                         id = it.id,
                         username = it.username,
@@ -236,7 +240,7 @@ class CommunityViewModel @Inject constructor(
                     ))
                 }.await()
 
-                // ✅ Locally update the UI
+                // Locally update the UI
                 _communityPosts.update { posts ->
                     posts.map {
                         if (it.id == post.id) {
@@ -254,6 +258,49 @@ class CommunityViewModel @Inject constructor(
 
             } catch (e: Exception) {
                 Log.e("CommunityViewModel", "Failed to like post: ${e.message}")
+            }
+        }
+    }
+
+    fun updateCommunity(
+        communityId: String,
+        name: String,
+        description: String,
+        category : String,
+        imageUri: Uri?
+    ) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val result = updateCommunityUseCase(communityId, name, description,category, imageUri)
+                result.onSuccess {
+                    _success.value = true
+                    fetchCommunityDetail(communityId) // Refresh updated data
+                }.onFailure {
+                    _error.value = "Update failed: ${it.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Unexpected error: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun deleteCommunity(communityId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val result = deleteCommunityUseCase(communityId)
+                result.onSuccess {
+                    _success.value = true // Triggers UI nav
+                }.onFailure {
+                    _error.value = "Failed to delete community: ${it.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Unexpected error: ${e.message}"
+            } finally {
+                _loading.value = false
             }
         }
     }

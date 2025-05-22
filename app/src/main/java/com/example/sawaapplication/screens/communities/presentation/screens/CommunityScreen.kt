@@ -75,7 +75,7 @@ import com.example.sawaapplication.screens.event.presentation.screens.formatTime
 import com.example.sawaapplication.screens.event.presentation.screens.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
-import com.example.sawaapplication.screens.post.domain.model.PostUiModel
+import com.example.sawaapplication.screens.post.presentation.vmModels.CommunityPostsViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
@@ -91,6 +91,7 @@ fun CommunityScreen(
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel(),
     eventViewModel: FetchEventViewModel = hiltViewModel(),
+    communityPostsViewModel: CommunityPostsViewModel = hiltViewModel(),
     joinCommunityViewModel: ExploreCommunityViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
     onClick: (String) -> Unit,
@@ -98,18 +99,18 @@ fun CommunityScreen(
 ) {
     val context = LocalContext.current
     val fetchEventViewModel: FetchEventViewModel = hiltViewModel()
-//    val uiState = FakeCommunityUiState
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
 
-    val posts by viewModel.communityPosts.collectAsState()
+    val posts by communityPostsViewModel.communityPosts.collectAsState()
     var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
-    //val events by eventViewModel.events.collectAsState()
     val isUserJoined = communityDetail?.members?.contains(userId) == true
     val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
+
+    val isAdmin by viewModel.isAdmin.collectAsState()
 
 
     val events by fetchEventViewModel.events.collectAsState()
@@ -117,7 +118,7 @@ fun CommunityScreen(
     LaunchedEffect(communityId) {
         Log.d("DEBUG", "CommunityScreen launched with id: $communityId")
         viewModel.fetchCommunityDetail(communityId)
-        viewModel.fetchPostsForCommunity(communityId)
+        communityPostsViewModel.loadPosts(communityId)
         fetchEventViewModel.loadEvents(communityId)
     }
     LaunchedEffect(Unit) {
@@ -244,10 +245,10 @@ fun CommunityScreen(
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
-                    if ( communityDetail?.creatorId == userId ){
+                    if ( isAdmin ){
                         IconButton(
                             onClick = {
-                               // navController.navigate("edit_community/$communityId")
+                                navController.navigate("edit_community/$communityId")
                             },
                             modifier = Modifier
                                 .size(32.dp) // size of the clickable icon container
@@ -271,20 +272,20 @@ fun CommunityScreen(
                     Text(
                         text = it.name,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = black
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
                     text = "${communityDetail?.members?.size ?: 0} Members",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Gray
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
                 communityDetail?.let {
                     Text(
                         text = it.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = black,
+                        color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
                     )
@@ -292,7 +293,7 @@ fun CommunityScreen(
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
 
                 // Admin actions
-                if (communityDetail?.creatorId == userId) {
+                if (isAdmin) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -433,7 +434,7 @@ fun CommunityScreen(
 
                 TabRow(
                     selectedTabIndex = selectedTab,
-                    containerColor = white,
+                    containerColor = MaterialTheme.colorScheme.background,
                     indicator = { positions ->
                         TabRowDefaults.Indicator(
                             Modifier
@@ -451,7 +452,7 @@ fun CommunityScreen(
                                 Text(
                                     title,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (selectedTab == i) black else Gray
+                                    color = if (selectedTab == i) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
                         )

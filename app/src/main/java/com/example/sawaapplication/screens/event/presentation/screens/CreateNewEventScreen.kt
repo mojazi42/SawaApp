@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,8 +87,9 @@ fun CreateNewEventScreen(
     notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val success = viewModel.success.value
+    val success by viewModel.success.collectAsState()
     val communityID = viewModel.communityId
+    val loading by viewModel.loading.collectAsState()
 
 
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -172,7 +175,7 @@ fun CreateNewEventScreen(
             // Navigate back to previous screen
             navController.popBackStack()
 
-            viewModel.success.value = false
+            viewModel.resetSuccess()
         } else {
             Toast.makeText(context, "Event creation failed", Toast.LENGTH_SHORT).show()
         }
@@ -453,6 +456,17 @@ fun CreateNewEventScreen(
                     }
                 }
             }
+        }
+    }
+
+    if (loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }
