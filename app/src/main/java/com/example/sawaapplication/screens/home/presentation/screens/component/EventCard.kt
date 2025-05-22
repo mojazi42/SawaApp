@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.google.firebase.Timestamp
 
 
 @Composable
@@ -54,12 +56,24 @@ fun EventCard(
     date: String,
     participants: Int,
     joined: Boolean,
+    eventTimestamp: Timestamp?,
     onJoinClick: () -> Unit,
     showCancelButton: Boolean = false,
     joinedUsers: List<String> = emptyList(),
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    fun isEventExpired(eventTime: Timestamp): Boolean {
+        val eventMillis = eventTime.toDate().time
+        val expiryMillis = eventMillis + 60 * 60 * 1000 // Add 1 hour
+        val currentMillis = System.currentTimeMillis()
+
+        return currentMillis > expiryMillis
+    }
+
+    val isExpired = remember(eventTimestamp) {
+        eventTimestamp?.let { isEventExpired(it) } ?: false
+    }
 
     OutlinedCard(
         modifier = modifier
@@ -125,7 +139,8 @@ fun EventCard(
                     JoinButton(
                         joined = joined,
                         onJoinClick = onJoinClick,
-                        showCancel = showCancelButton
+                        showCancel = showCancelButton,
+                        isExpired=isExpired
                     )
                 }
             }
@@ -200,12 +215,15 @@ fun EventCard(
 fun JoinButton(
     joined: Boolean,
     onJoinClick: () -> Unit,
-    showCancel: Boolean = false
+    showCancel: Boolean = false,
+    isExpired: Boolean
 ) {
     val isCancelVisible = showCancel && joined
-
+    val isButtonEnabled = !isExpired && !joined
+    // disabled : !joined && (limit full)
     Button(
         onClick = onJoinClick,
+        enabled = isButtonEnabled,
         shape = RoundedCornerShape(30),
         colors = ButtonDefaults.buttonColors(
             containerColor = when {
@@ -226,6 +244,7 @@ fun JoinButton(
     ) {
         Text(
             text = when {
+                isExpired -> "Finished"
                 isCancelVisible -> "Leave"
                 joined -> "Joined"
                 else -> "Join"

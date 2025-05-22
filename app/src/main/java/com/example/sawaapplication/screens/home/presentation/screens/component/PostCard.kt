@@ -160,8 +160,11 @@ fun PostCard(
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.clickable {
-                            navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
-                        }
+                            if(post.userId == currentUserId){
+                                navController.navigate(Screen.Profile.route)
+                            }else{
+                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                            }                        }
                     )
                     Text(
                         text = "${stringResource(R.string.postedOn)} $formattedDate",
