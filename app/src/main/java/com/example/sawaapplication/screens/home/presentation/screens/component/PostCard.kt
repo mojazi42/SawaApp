@@ -149,6 +149,7 @@ fun PostCard(
                                     navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
                                 }
                             },
+                        contentScale = ContentScale.Crop,
 
                     )
                 }
