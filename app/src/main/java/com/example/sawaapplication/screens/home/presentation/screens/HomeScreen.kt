@@ -233,8 +233,8 @@ fun MyEventsTab(
                         onClick = {
                             navController.navigate("event_detail/${event.communityId}/${event.id}")
 
-                        }
-                       // modifier = Modifier.padding(8.dp)
+                        },
+                        eventTimestamp = event.time
                     )
 
                 }
