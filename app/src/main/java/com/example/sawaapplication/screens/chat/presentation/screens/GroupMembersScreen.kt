@@ -91,6 +91,7 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
+                            .clickable { navController.navigate("community_screen/$communityId") }
                     ) {
                         AsyncImage(
                             model = communityImage,
@@ -163,14 +164,14 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                    navController.navigate(
-                                        if (member.userId == chatViewModel.currentUserId) {
-                                            Screen.Profile.route
-                                        } else {
-                                            Screen.UserAccount.createRoute(userId = member.userId)
-                                        }
-                                    )
-                                }
+                                        navController.navigate(
+                                            if (member.userId == chatViewModel.currentUserId) {
+                                                Screen.Profile.route
+                                            } else {
+                                                Screen.UserAccount.createRoute(userId = member.userId)
+                                            }
+                                        )
+                                    }
 
                             ) {
                                 AsyncImage(

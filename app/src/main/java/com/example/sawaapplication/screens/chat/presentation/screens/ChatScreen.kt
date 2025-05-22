@@ -148,9 +148,11 @@ fun ChatScreen(
             )
 
             ChatMembersHeader(
+                communityId = communityId,
                 communityName = communityName,
                 members = communityMembers,
-                onClick = { navController.navigate("groupMembers/$communityId") }
+                onClick = { navController.navigate("groupMembers/$communityId") },
+                onNavigateToCommunity = { id -> navController.navigate("community_screen/$id") }
             )
 
             if (uiMessages.isEmpty()) {

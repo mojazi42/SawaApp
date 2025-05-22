@@ -28,15 +28,18 @@ import com.example.sawaapplication.screens.chat.domain.model.ChatUserInfo
 
 @Composable
 fun ChatMembersHeader(
+    communityId: String,
     communityName: String,
     members: List<ChatUserInfo>,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onNavigateToCommunity: (String) -> Unit
 ) {
     Text(
         text = communityName,
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onNavigateToCommunity(communityId) }
     )
 
     LazyRow(
