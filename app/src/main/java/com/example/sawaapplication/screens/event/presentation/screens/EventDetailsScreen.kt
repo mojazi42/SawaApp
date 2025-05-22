@@ -262,6 +262,34 @@ fun EventDetailScreen(
                 )
             }
         }
+
+        // Fixed header box (stays at the top)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(integerResource(R.integer.screenTopSpace).dp)
+                .background(MaterialTheme.colorScheme.background)
+                .align(Alignment.TopCenter),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = community?.name ?: stringResource(R.string.loading),
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1,
+                modifier = Modifier.padding(horizontal = integerResource(R.integer.smallerSpace).dp)
+            )
+
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    contentDescription = "Back",
+                    modifier = Modifier.size(integerResource(R.integer.backIconSize).dp)
+                )
+            }
+        }
     }
 
 }
