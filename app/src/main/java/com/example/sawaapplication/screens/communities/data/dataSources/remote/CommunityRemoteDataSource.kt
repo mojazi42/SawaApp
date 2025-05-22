@@ -111,23 +111,50 @@ class CommunityRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun deleteCommunity(communityId: String): Result<Unit> {
-        return try {
-            val communityDoc = firestore.collection("Community").document(communityId)
+    suspend fun deleteCommunity(communityId: String, imageUrl: String?): Result<Unit> {
 
-            val snapshot = communityDoc.get().await()
-            val imageUrl = snapshot.getString("image")
-            imageUrl?.let {
-                FirebaseStorage.getInstance().getReferenceFromUrl(it).delete().await()
+        return try {
+            // 1. Attempt to delete the image (if any)
+            if (!imageUrl.isNullOrBlank()) {
+                try {
+                    val imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+                    imageRef.delete().await()
+                } catch (e: Exception) {
+                    // If the image doesn't exist, log and move on
+                    Log.w("DeleteCommunity", "Image not found or already deleted: ${e.message}")
+                }
             }
 
-            communityDoc.delete().await()
+            // 2. Delete Firestore document
+            FirebaseFirestore.getInstance()
+                .collection("Community")
+                .document(communityId)
+                .delete()
+                .await()
 
+            Log.d("DeleteCommunity", "Community $communityId deleted")
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e("DeleteCommunity", "Failed to delete community: ${e.message}", e)
             Result.failure(e)
         }
+
+//        return try {
+//            val communityDoc = firestore.collection("Community").document(communityId)
+//
+//            val snapshot = communityDoc.get().await()
+//            val imageUrl = snapshot.getString("image")
+//            imageUrl?.let {
+//                FirebaseStorage.getInstance().getReferenceFromUrl(it).delete().await()
+//            }
+//
+//            communityDoc.delete().await()
+//
+//            Result.success(Unit)
+//        } catch (e: Exception) {
+//            Log.e("DeleteCommunity", "Failed to delete community: ${e.message}", e)
+//            Result.failure(e)
+//        }
     }
 
 }

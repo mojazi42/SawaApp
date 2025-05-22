@@ -107,6 +107,17 @@
     <string name="descriptionRequired">Description is Required</string>
     <string name="categoryRequired">Category is Required</string>
 
+    <!--EditCommunity-->
+    <string name = "photoPermissionTitle">Photo Permission</string>
+    <string name = "photoPermissionTextC">We need access to your photos so you can add an image for the community.</string>
+    <string name = "photoPermissionToast">Please allow photo access in settings</string>
+    <string name = "edit">Edit</string>
+    <string name = "update">Update</string>
+    <string name = "deleteCommunity">Delete Community</string>
+    <string name="areYouSureDeleteCommunity">Are you sure you want to delete this community?</string>
+
+
+
     <!--CreateNewEventScreen-->
     <string name="locationPermission">Location Permission</string>
     <string name="askLocationPermission">We need your location to pick the event location. Would you like to allow access?</string>
