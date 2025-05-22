@@ -205,11 +205,21 @@ fun EventCard(
                         modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
                     )
                     Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
+
                     Text(
                         text = "${participants}/${joinedUsers.size}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
+
+                    if (joinedUsers.size >= participants) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Full",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary// Orange
+                        )
+                    }
                 }
             }
         }
