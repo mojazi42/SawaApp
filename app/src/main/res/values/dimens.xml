@@ -7,6 +7,7 @@
     <integer name="largeSpace">20</integer>
     <integer name="largerSpace">24</integer>
     <integer name="extraLargeSpace">32</integer>
+    <integer name="hugeSpace">64</integer>
 
     <!-- space between button and text filed-->
     <integer name="buttonTextFieldSpace">24</integer>
@@ -196,5 +197,12 @@
     <integer name="postContentSize">200</integer>
     <integer name="postContentRoundedCornerShape">8</integer>
     <integer name="postSelectedImageRoundedCornerShape">12</integer>
+
+    <!--Event Details-->
+    <integer name="screenTopSpace">56</integer>
+    <integer name="backIconSize">40</integer>
+    <integer name="round">12</integer>
+    <integer name="membersIconSize">20</integer>
+    <integer name="paddingEventScreen">8</integer>
 
 </resources>

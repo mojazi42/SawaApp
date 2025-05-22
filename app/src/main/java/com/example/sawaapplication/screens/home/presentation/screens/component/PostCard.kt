@@ -52,6 +52,7 @@ import java.util.Locale
 fun PostCard(
     post: Post,
     communityName: String = "",
+    communityId: String,
     userName: String = "",
     userImage: String,
     onClick: () -> Unit,
@@ -59,7 +60,9 @@ fun PostCard(
     onUserImageClick: () -> Unit,
     onDeleteClick: (Post) -> Unit,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCommunityClick: ((String) -> Unit)? = null
+
 ) {
     // State to track if the post is liked
 
@@ -87,11 +90,16 @@ fun PostCard(
     Card(
         shape = RoundedCornerShape(integerResource(R.integer.cardRoundedCornerShape).dp),
         elevation = CardDefaults.cardElevation(integerResource(R.integer.cardElevation).dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
             .padding(horizontal = integerResource(R.integer.cardHorizontalPadding).dp)
+            .border(
+                width = 1.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(integerResource(R.integer.cardRoundedCornerShape).dp)
+            )
     ) {
         Column(modifier = Modifier.padding(integerResource(R.integer.padding).dp)) {
 
@@ -111,7 +119,12 @@ fun PostCard(
                 Text(
                     text = communityName,
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray
+                    color = Color.Gray,
+                    modifier = Modifier.clickable {
+                        if (onCommunityClick != null) {
+                            onCommunityClick(communityId)
+                        }
+                    }
                 )
             }
 

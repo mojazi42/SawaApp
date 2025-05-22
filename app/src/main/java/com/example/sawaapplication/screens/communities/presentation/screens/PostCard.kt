@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -51,9 +52,14 @@ fun PostCard(
         }
     }
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(integerResource(R.integer.cardRoundedCornerShape).dp)
+            ),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = white),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(integerResource(R.integer.postCardElevation).dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -98,36 +104,6 @@ fun PostCard(
                 }
             }
 
-
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                AsyncImage(
-//                    model = post.userAvatarUrl,
-//                    contentDescription = "${post.username} avatar",
-//                    modifier = Modifier
-//                        .size(36.dp)
-//                        .clip(CircleShape)
-//                        .clickable {
-//                            if(post.userId == currentUserId){
-//                            navController.navigate(Screen.Profile.route)
-//                            }else{
-//                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
-//                            }
-//                        },
-//                    contentScale = ContentScale.Crop
-//                )
-//                Spacer(Modifier.width(8.dp))
-//                Text(
-//                    text = post.username,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = black
-//                )
-//                Text(
-//                    text = "${stringResource(R.string.postedOn)} $formattedDate",
-//                    style = MaterialTheme.typography.labelSmall,
-//                    color = Color.Gray
-//                )
-//            }
-
             Spacer(Modifier.height(8.dp))
 
             // Post content
@@ -135,7 +111,7 @@ fun PostCard(
                 Text(
                     text = post.content,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = black,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))

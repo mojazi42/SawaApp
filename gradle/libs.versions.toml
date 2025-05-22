@@ -36,6 +36,8 @@ mapsCompose = "4.3.3"
 places = "3.5.0"
 playServicesMaps = "19.0.0"
 kotlinx-serialization = "1.6.3"
+coreI18n = "1.0.0"
+threetenabp = "1.4.5"
 
 
 [libraries]
@@ -86,6 +88,8 @@ firebase-storage = { group = "com.google.firebase", name = "firebase-storage", v
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
+threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,7 +1,5 @@
 package com.example.sawaapplication.screens.post.domain.model
 
-import java.util.Date
-
 data class PostUiModel(
     val id: String,
     val username: String,
