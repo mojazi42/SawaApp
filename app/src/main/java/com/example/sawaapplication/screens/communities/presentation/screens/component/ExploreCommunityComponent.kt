@@ -76,11 +76,9 @@ fun CommunityCard(
 
             }
             joinButton()
-
         }
 
     }
-
 
 }
 

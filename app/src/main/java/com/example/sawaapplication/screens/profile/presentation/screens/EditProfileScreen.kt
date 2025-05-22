@@ -107,17 +107,9 @@ fun EditProfileScreen(
         about = aboutState ?: ""
     }
 
-//    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
-
     val isArabic by themeViewModel.isArabic.collectAsState()
-
-//    val imagePickerLauncher =
-//        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-//            imageUri = it
-//        }
-
     val logOutViewModel: LogOutViewModel = hiltViewModel()
 
     Column(
