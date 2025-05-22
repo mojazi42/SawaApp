@@ -163,7 +163,7 @@ fun ChatScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text("No messages yet.", style = MaterialTheme.typography.bodyLarge)
-                }
+                }// challenge is challenge is challenge ;)
             } else {
                 LazyColumn(
                     state = listState,
