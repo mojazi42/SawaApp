@@ -2,8 +2,6 @@ package com.example.sawaapplication.screens.communities.domain.useCases
 
 import android.net.Uri
 import com.example.sawaapplication.screens.communities.data.dataSources.remote.CommunityRemoteDataSource
-import com.example.sawaapplication.screens.communities.domain.repository.CommunityRepository
-import com.example.sawaapplication.screens.post.domain.repository.PostRepository
 import javax.inject.Inject
 
 class UpdateCommunityUseCase @Inject constructor(

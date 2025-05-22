@@ -1,19 +1,16 @@
 package com.example.sawaapplication.screens.notification.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.sawaapplication.core.sharedPreferences.NotificationPreferences
 import com.example.sawaapplication.screens.notification.domain.model.Notification
 import com.example.sawaapplication.screens.notification.domain.useCases.FetchNotificationsUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.MarkNotificationsAsReadUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.NotifyCommunityOfEventUseCase
+import com.example.sawaapplication.screens.notification.domain.useCases.ObserveUnreadNotificationsUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendEventCreatedNotificationUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendLikeNotificationUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendProfileUpdateNotificationUseCase
-import com.example.sawaapplication.core.sharedPreferences.NotificationPreferences
-import com.example.sawaapplication.screens.notification.domain.useCases.ObserveUnreadNotificationsUseCase
 import com.example.sawaapplication.screens.post.domain.model.Post
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

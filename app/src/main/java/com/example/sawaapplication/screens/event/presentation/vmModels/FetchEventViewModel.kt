@@ -84,6 +84,4 @@ class FetchEventViewModel @Inject constructor(
             }
         }
     }
-
-
 }

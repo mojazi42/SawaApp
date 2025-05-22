@@ -1,11 +1,7 @@
 package com.example.sawaapplication.screens.chat.presentation.vmModels
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.authentication.domain.repository.AuthRepository
