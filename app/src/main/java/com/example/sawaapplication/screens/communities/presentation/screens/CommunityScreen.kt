@@ -510,7 +510,8 @@ fun CommunityScreen(
                                 }
                             },
                             showCancelButton = true,
-                            modifier = Modifier.padding(4.dp)
+                            modifier = Modifier.padding(4.dp),
+                            eventTimestamp = event.time
                         )
                     }
                 }
