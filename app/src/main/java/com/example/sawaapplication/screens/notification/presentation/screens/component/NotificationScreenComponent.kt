@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,30 +57,34 @@ fun NotificationCard(
 
             Spacer(modifier = Modifier.width(integerResource(R.integer.largeSpace).dp))
 
-            // Notification Content (center)
+            // Main content (center)
             Column(modifier = Modifier.weight(1f)) {
-                if (!name.isNullOrBlank()) {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        if (!name.isNullOrBlank()) {
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(integerResource(R.integer.extraSmallSpace).dp))
+                        }
 
-                Spacer(modifier = Modifier.height(integerResource(R.integer.extraSmallSpace).dp))
+                        Text(
+                            text = action,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = action,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    Spacer(modifier = Modifier.width(integerResource(R.integer.actionTimeSpacer).dp))
-
+                    // Time on the top right
                     Text(
                         text = time,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
+                        modifier = Modifier.padding(start = 8.dp)
                     )
                 }
             }
