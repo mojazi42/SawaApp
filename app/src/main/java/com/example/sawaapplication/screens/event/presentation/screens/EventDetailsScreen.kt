@@ -113,6 +113,7 @@ fun EventDetailScreen(
                 modifier = Modifier.padding(horizontal = integerResource(R.integer.smallerSpace).dp)
             )
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -232,6 +233,34 @@ fun EventDetailScreen(
                     .align(Alignment.CenterHorizontally)
             ) {
                 Text(stringResource(R.string.viewLocation), color = Color.White)
+            }
+        }
+
+        // Fixed header box (stays at the top)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(integerResource(R.integer.screenTopSpace).dp)
+                .background(MaterialTheme.colorScheme.background)
+                .align(Alignment.TopCenter),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = community?.name ?: stringResource(R.string.loading),
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1,
+                modifier = Modifier.padding(horizontal = integerResource(R.integer.smallerSpace).dp)
+            )
+
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    contentDescription = "Back",
+                    modifier = Modifier.size(integerResource(R.integer.backIconSize).dp)
+                )
             }
         }
     }
