@@ -302,5 +302,4 @@ fun EditCommunityScreen(
             }
         )
     }
-
 }

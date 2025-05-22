@@ -77,9 +77,7 @@ import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEven
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.post.presentation.vmModels.CommunityPostsViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import com.example.sawaapplication.ui.theme.Gray
 import com.example.sawaapplication.ui.theme.PrimaryOrange
-import com.example.sawaapplication.ui.theme.black
 import com.example.sawaapplication.ui.theme.white
 import com.google.firebase.auth.FirebaseAuth
 import java.net.URLEncoder

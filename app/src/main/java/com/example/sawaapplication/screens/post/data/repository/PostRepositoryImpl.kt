@@ -1,14 +1,10 @@
 package com.example.sawaapplication.screens.post.data.repository
 
 import android.net.Uri
-import android.util.Log
-
 import com.example.sawaapplication.screens.post.data.dataSources.remote.PostsInCommunityRemote
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.screens.post.domain.repository.PostRepository
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(

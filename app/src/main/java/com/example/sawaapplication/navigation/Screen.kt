@@ -32,10 +32,4 @@ sealed class Screen(val route: String) {
         fun createRoute(imageUrl: String): String =
             "fullscreen/${URLEncoder.encode(imageUrl, "utf-8")}"
     }
-    //    @Serializable
-//    data object CreateNewEvent : Screen("create_event/{communityId}") {
-//        fun passCommunityId(communityId: String): String {
-//            return "create_event/$communityId"
-//        }
-    //  }
 }

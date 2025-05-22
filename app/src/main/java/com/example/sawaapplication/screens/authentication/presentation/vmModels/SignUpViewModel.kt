@@ -3,8 +3,6 @@ package com.example.sawaapplication.screens.authentication.presentation.vmModels
 import android.content.Context
 import android.widget.Toast
 import com.example.sawaapplication.screens.authentication.domain.useCases.SignUpUseCase
-
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

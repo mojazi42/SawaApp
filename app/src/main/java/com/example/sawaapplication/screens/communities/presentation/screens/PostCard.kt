@@ -104,36 +104,6 @@ fun PostCard(
                 }
             }
 
-
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                AsyncImage(
-//                    model = post.userAvatarUrl,
-//                    contentDescription = "${post.username} avatar",
-//                    modifier = Modifier
-//                        .size(36.dp)
-//                        .clip(CircleShape)
-//                        .clickable {
-//                            if(post.userId == currentUserId){
-//                            navController.navigate(Screen.Profile.route)
-//                            }else{
-//                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
-//                            }
-//                        },
-//                    contentScale = ContentScale.Crop
-//                )
-//                Spacer(Modifier.width(8.dp))
-//                Text(
-//                    text = post.username,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = black
-//                )
-//                Text(
-//                    text = "${stringResource(R.string.postedOn)} $formattedDate",
-//                    style = MaterialTheme.typography.labelSmall,
-//                    color = Color.Gray
-//                )
-//            }
-
             Spacer(Modifier.height(8.dp))
 
             // Post content
