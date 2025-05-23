@@ -1,27 +1,25 @@
 package com.example.sawaapplication.screens.home.presentation.vmModels
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.event.domain.model.Event
 import com.example.sawaapplication.screens.event.domain.useCases.GetAllEventInCommunity
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.google.firebase.auth.FirebaseAuth
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
+import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -424,19 +422,15 @@ class HomeViewModel @Inject constructor(
                             .get()
                             .await()
 
-                        val events = eventsSnapshot.documents.mapNotNull { doc ->
+                        eventsSnapshot.documents.mapNotNull { doc ->
                             val event = doc.toObject(Event::class.java)
                             if (event != null && userId in event.joinedUsers) {
                                 event.copy(id = doc.id, communityId = communityId)
-                            } else {
-                                null
-                            }
+                            } else null
                         }
-                        events
                     }
                 }
 
-                // Await all joined events fetches
                 val eventsList = joinedEventsDeferred.awaitAll().flatten()
                 _joinedEvents.value = eventsList
 

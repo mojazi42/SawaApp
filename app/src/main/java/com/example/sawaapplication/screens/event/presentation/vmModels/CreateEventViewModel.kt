@@ -15,18 +15,25 @@ import java.util.Date
 import javax.inject.Inject
 import android.util.Log
 import com.example.sawaapplication.core.permissions.PermissionHandler
+import com.example.sawaapplication.screens.event.domain.repository.EventRepository
+import com.example.sawaapplication.screens.event.presentation.screens.toMap
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.Job
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 
+
 @HiltViewModel
 class CreateEventViewModel @Inject constructor(
     private val createEventUseCase: CreateEventUseCase,
-    private val permissionHandler: PermissionHandler
+    private val permissionHandler: PermissionHandler,
+    private val eventRepository : EventRepository
+
 ) : ViewModel() {
 
     var communityId by mutableStateOf<String?>("")
@@ -43,6 +50,18 @@ class CreateEventViewModel @Inject constructor(
     val success = mutableStateOf(false)
     val error = mutableStateOf<String?>(null)
     var isMapVisible by mutableStateOf(false)
+    var editingEvent: Event? = null
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    val events: StateFlow<List<Event>> = _events
+
+
+    init {
+        val dateString = "2024-05-23" // your input
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        val date = formatter.parse(dateString)
+        eventDate = date?.time
+    }
 
 
     val membersLimit: Int?
@@ -93,6 +112,9 @@ class CreateEventViewModel @Inject constructor(
         )
 
 
+
+
+
         job = viewModelScope.launch {
             loading.value = true
             try {
@@ -107,6 +129,88 @@ class CreateEventViewModel @Inject constructor(
             }
         }
     }
+    fun loadEventForEdit(event: Event) {
+        name = event.title
+        description = event.description
+        location = event.location
+        locationText = "${event.location.latitude}, ${event.location.longitude}"
+        eventDate = event.time?.toDate()?.time
+
+        // Format Timestamp to "HH:mm"
+        eventTime = event.time?.toDate()?.let {
+            SimpleDateFormat("HH:mm", Locale.getDefault()).format(it)
+        } ?: ""
+
+        membersLimitInput = event.memberLimit.toString()
+
+        imageUri = if (event.imageUri.isNotEmpty()) Uri.parse(event.imageUri) else null
+    }
+    fun updateEvent(eventId: String) {
+        job = viewModelScope.launch {
+            loading.value = true
+            try {
+                val timeFormat = SimpleDateFormat("hh:mm", Locale.getDefault())
+                val parsedTime = timeFormat.parse(eventTime)
+
+                val calendar = Calendar.getInstance()
+                calendar.timeInMillis = eventDate ?: System.currentTimeMillis()
+
+                parsedTime?.let {
+                    val timeCal = Calendar.getInstance()
+                    timeCal.time = it
+                    calendar.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY))
+                    calendar.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE))
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MILLISECOND, 0)
+                }
+
+                val finalTimestamp = Timestamp(calendar.time)
+
+                val updatedEvent = Event(
+                    id = eventId,
+                    title = name.trim(),
+                    description = description.trim(),
+                    location = location,
+                    date = Date(eventDate ?: System.currentTimeMillis()).toString(),
+                    time = finalTimestamp,
+                    memberLimit = membersLimit ?: 0,
+                    createdBy = uid,
+                    imageUri = imageUri?.toString().orEmpty(),
+                    latitude = location.latitude,
+                    longitude = location.longitude
+
+                )
+
+                val cid = communityId ?: return@launch
+                Log.d("EventUpdate", "cid=$cid, eventId=$eventId")
+
+                eventRepository.updateEvent(cid, eventId, updatedEvent.toMap())
+                Log.d("EventUpdate", "Update sent for eventId=$eventId with data=${updatedEvent.toMap()}")
+                success.value = true
+            } catch (e: Exception) {
+                error.value = e.message
+            } finally {
+                loading.value = false
+            }
+        }
+    }
+
+
+
+    suspend fun fetchEventById(eventId: String, communityId: String): Event? {
+        return try {
+            val event = eventRepository.getEventById(communityId, eventId)
+            editingEvent = event
+            event
+        } catch (e: Exception) {
+            Log.e("EditEvent", "Error fetching event: ${e.message}")
+            null
+        }
+    }
+
+
+
+
 
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()

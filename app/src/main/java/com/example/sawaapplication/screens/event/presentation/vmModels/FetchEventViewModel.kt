@@ -34,6 +34,9 @@ class FetchEventViewModel @Inject constructor(
     private val _joinResult = MutableStateFlow<Result<Unit>?>(null)
     val joinResult: StateFlow<Result<Unit>?> = _joinResult
 
+    private val _event = MutableStateFlow<Event?>(null)
+    val event: StateFlow<Event?> = _event
+
     fun loadEvents(communityId: String) {
         viewModelScope.launch {
             _loading.value = true
@@ -107,7 +110,28 @@ class FetchEventViewModel @Inject constructor(
                 Log.e("UpdateEvent", "Error: ${result.exceptionOrNull()?.message}")
             }
         }
+
     }
+    suspend fun fetchEventById(communityId: String, eventId: String): Event? {
+        return try {
+            eventRepository.getEventById(communityId, eventId)
+        } catch (e: Exception) {
+            Log.e("FetchEvent", "Failed to fetch event: ${e.message}")
+            null
+        }
+    }
+
+    fun fetchEventByIdAsync(communityId: String, eventId: String) {
+        viewModelScope.launch {
+            try {
+                _event.value = eventRepository.getEventById(communityId, eventId)
+            } catch (e: Exception) {
+                Log.e("FetchEvent", "Failed to fetch event: ${e.message}")
+            }
+        }
+    }
+
+
 
 
 
