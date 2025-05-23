@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
@@ -29,10 +28,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.domain.model.Community
-import com.example.sawaapplication.ui.theme.Gray
-import com.example.sawaapplication.ui.theme.black
-import com.example.sawaapplication.ui.theme.lightGray
-import com.example.sawaapplication.ui.theme.white
 
 @Composable
 fun MyCommunitiesCard(

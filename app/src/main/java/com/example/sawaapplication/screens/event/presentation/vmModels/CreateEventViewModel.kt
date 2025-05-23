@@ -46,10 +46,13 @@ class CreateEventViewModel @Inject constructor(
     var location by mutableStateOf(GeoPoint(0.0, 0.0))
     var locationText by mutableStateOf("Location not set")
     private var job: Job? = null
-    val loading = mutableStateOf(false)
-    val success = mutableStateOf(false)
-    val error = mutableStateOf<String?>(null)
+
+    // val loading = mutableStateOf(false)
+    // val success = mutableStateOf(false)
+    // val error = mutableStateOf<String?>(null)
     var isMapVisible by mutableStateOf(false)
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
     var editingEvent: Event? = null
     private val _events = MutableStateFlow<List<Event>>(emptyList())
     val events: StateFlow<List<Event>> = _events
@@ -63,6 +66,11 @@ class CreateEventViewModel @Inject constructor(
         eventDate = date?.time
     }
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
+    private val _success = MutableStateFlow(false)
+    val success: StateFlow<Boolean> = _success
 
     val membersLimit: Int?
         get() = membersLimitInput.toIntOrNull()
@@ -71,15 +79,20 @@ class CreateEventViewModel @Inject constructor(
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
     fun createEvent(communityId: String) {
-        if (loading.value) return
-        if (imageUri == null) {
-            error.value = "Please select an image."
+        if (loading.value) return // Prevent double submissions
 
+        if (imageUri == null) {
+            _error.value = "Please select an image."
+            return
+        }
+
+        if (communityId.isEmpty()) {
+            _error.value = "Community ID is missing."
             return
         }
 
 
-        val timeFormat = SimpleDateFormat("hh:mm", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // Change to 24-hour format
         val parsedTime = timeFormat.parse(eventTime)
 
         val calendar = Calendar.getInstance()
@@ -101,7 +114,7 @@ class CreateEventViewModel @Inject constructor(
         val event = Event(
             title = name.trim(),
             location = location,
-            date = Date(eventDate ?: System.currentTimeMillis()).toString(), // optional
+            date = Date(eventDate ?: System.currentTimeMillis()).toString(),
             time = finalTimestamp,
             description = description.trim(),
             memberLimit = membersLimit ?: 0,
@@ -115,17 +128,18 @@ class CreateEventViewModel @Inject constructor(
 
 
 
-        job = viewModelScope.launch {
-            loading.value = true
+
+    job = viewModelScope.launch {
+            _loading.value = true
             try {
                 createEventUseCase(communityId, event, imageUri!!)
-                success.value = true
-                Log.d("CreateEvent", "Event created successfully ${communityId}")
+                _success.value = true
+                Log.d("CreateEvent", "Event created successfully: $communityId")
             } catch (e: Exception) {
-                error.value = "Failed to create event: ${e.message}"
+                _error.value = "Failed to create event: ${e.message}"
                 Log.e("CreateEvent", "Error creating event", e)
             } finally {
-                loading.value = false
+                _loading.value = false
             }
         }
     }
@@ -147,9 +161,9 @@ class CreateEventViewModel @Inject constructor(
     }
     fun updateEvent(eventId: String) {
         job = viewModelScope.launch {
-            loading.value = true
+            _loading.value = true
             try {
-                val timeFormat = SimpleDateFormat("hh:mm", Locale.getDefault())
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
                 val parsedTime = timeFormat.parse(eventTime)
 
                 val calendar = Calendar.getInstance()
@@ -186,11 +200,11 @@ class CreateEventViewModel @Inject constructor(
 
                 eventRepository.updateEvent(cid, eventId, updatedEvent.toMap())
                 Log.d("EventUpdate", "Update sent for eventId=$eventId with data=${updatedEvent.toMap()}")
-                success.value = true
+                _success.value = true
             } catch (e: Exception) {
-                error.value = e.message
+                _error.value = e.message
             } finally {
-                loading.value = false
+                _loading.value = false
             }
         }
     }
@@ -211,6 +225,10 @@ class CreateEventViewModel @Inject constructor(
 
 
 
+
+    fun resetSuccess() {
+        _success.value = false
+    }
 
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()

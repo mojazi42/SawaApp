@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,7 +92,10 @@ fun CreateNewEventScreen(
     onUpdateClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val success = viewModel.success.value
+    val success by viewModel.success.collectAsState()
+    val communityID = viewModel.communityId
+    val loading by viewModel.loading.collectAsState()
+
 
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
@@ -122,16 +127,16 @@ fun CreateNewEventScreen(
         }
     }
 
-    // React to success
-    LaunchedEffect(success) {
-        if (success) {
-            notificationViewModel.notifyEventCreated(viewModel.name)
-            notificationViewModel.notifyCommunityMembers(communityId, viewModel.name)
-            Toast.makeText(context, context.getString(R.string.eventCreated), Toast.LENGTH_SHORT).show()
-            navController.popBackStack()
-            viewModel.success.value = false
-        }
-    }
+//    // React to success
+//    LaunchedEffect(success) {
+//        if (success) {
+//            notificationViewModel.notifyEventCreated(viewModel.name)
+//            notificationViewModel.notifyCommunityMembers(communityId, viewModel.name)
+//            Toast.makeText(context, context.getString(R.string.eventCreated), Toast.LENGTH_SHORT).show()
+//            navController.popBackStack()
+//            viewModel.success.value = false
+//        }
+//    }
 
     // Photo Permission Dialog
     if (showPhotoPermissionDialog) {
@@ -171,8 +176,57 @@ fun CreateNewEventScreen(
                 TextButton(onClick = { showPermissionDialog = false }) {
                     Text(stringResource(R.string.deny))
                 }
-            }
-        )
+            })
+    }
+    // Photo Permission Dialog
+    if (showPhotoPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoPermissionDialog = false },
+            title = { Text(stringResource(R.string.photoPermission)) },
+            text = { Text(stringResource(R.string.askPhotoPermission)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.markPhotoPermissionRequested()
+                    photoPermissionState.launchPermissionRequest()
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text(stringResource(R.string.allow))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text(stringResource(R.string.deny))
+                }
+            })
+    }
+
+    val eventCreated = stringResource(R.string.eventCreated)
+    LaunchedEffect(communityId, success) {
+        viewModel.communityId = communityId
+        if (success) {
+            // Notify creator about the event creation
+            notificationViewModel.notifyEventCreated(viewModel.name)
+
+            // Notify community members about the new event
+            notificationViewModel.notifyCommunityMembers(
+                communityId = communityId,
+                eventName = viewModel.name
+            )
+
+            // Show success toast message
+            Toast.makeText(context, eventCreated, Toast.LENGTH_SHORT).show()
+
+            // Navigate back to previous screen
+            navController.popBackStack()
+
+            viewModel.resetSuccess()
+        } else {
+            Toast.makeText(context, "Event creation failed", Toast.LENGTH_SHORT).show()
+        }
+
+
     }
 
     Column(
@@ -428,6 +482,17 @@ fun CreateNewEventScreen(
                     }
                 }
             }
+        }
+    }
+
+    if (loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }

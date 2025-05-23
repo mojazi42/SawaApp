@@ -42,7 +42,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +49,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
-import com.example.sawaapplication.screens.post.presentation.vmModels.CreatePostViewModel
+import com.example.sawaapplication.screens.post.presentation.vmModels.CommunityPostsViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -63,15 +62,15 @@ fun CreatePostScreen(
     communityId: String
 ) {
     val context = LocalContext.current
-    val createPostViewModel: CreatePostViewModel = hiltViewModel()
+    val communityPostsViewModel: CommunityPostsViewModel = hiltViewModel()
     val communityViewModel: CommunityViewModel = hiltViewModel()
-    val isLoading by createPostViewModel.loading.collectAsState()
+    val isLoading by communityPostsViewModel.loading.collectAsState()
 
     val communityDetails by communityViewModel.communityDetail.collectAsState()
     val communityImage = communityDetails?.image.orEmpty()
     val communityName = communityDetails?.name.orEmpty()
 
-    val imageUri by remember { derivedStateOf { createPostViewModel.imageUri } }
+    val imageUri by remember { derivedStateOf { communityPostsViewModel.imageUri } }
     val coroutineScope = rememberCoroutineScope()
 
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
@@ -80,11 +79,11 @@ fun CreatePostScreen(
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> createPostViewModel.imageUri = uri }
+    ) { uri: Uri? -> communityPostsViewModel.imageUri = uri }
 
     // Launch fetch
     LaunchedEffect(communityId) {
-        createPostViewModel.communityId = communityId
+        communityPostsViewModel.communityId = communityId
         communityViewModel.fetchCommunityDetail(communityId)
     }
 
@@ -96,7 +95,7 @@ fun CreatePostScreen(
             text = { Text(stringResource(R.string.askPhotoPermission)) },
             confirmButton = {
                 TextButton(onClick = {
-                    createPostViewModel.markPhotoPermissionRequested()
+                    communityPostsViewModel.markPhotoPermissionRequested()
                     photoPermissionState.launchPermissionRequest()
                     showPhotoPermissionDialog = false
                 }) {
@@ -141,7 +140,7 @@ fun CreatePostScreen(
             }
             Button(onClick = {
                 coroutineScope.launch {
-                    val success = createPostViewModel.createPost(communityId)
+                    val success = communityPostsViewModel.createPost(communityId)
                     if (success) {
                         navController.navigate("community_screen/$communityId") {
                             popUpTo("create_post/$communityId") { inclusive = true }
@@ -181,8 +180,8 @@ fun CreatePostScreen(
 
         // Post Input
         OutlinedTextField(
-            value = createPostViewModel.content,
-            onValueChange = { createPostViewModel.content = it },
+            value = communityPostsViewModel.content,
+            onValueChange = { communityPostsViewModel.content = it },
             placeholder = {
                 Text(stringResource(R.string.postContentPlaceholder), color = Color.Gray)
             },
@@ -210,7 +209,7 @@ fun CreatePostScreen(
                         if (photoPermissionState.status.isGranted) {
                             imagePickerLauncher.launch("image/*")
                         } else {
-                            if (createPostViewModel.shouldRequestPhoto()) {
+                            if (communityPostsViewModel.shouldRequestPhoto()) {
                                 showPhotoPermissionDialog = true
                             } else {
                                 Toast.makeText(

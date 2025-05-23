@@ -16,7 +16,7 @@ data class Event(
     val joinedUsers: List<String> = emptyList(),
     val communityId: String = "", // for fetch events
     val participants: Int = 0 ,// for fetch events
-    val latitude: Double = 0.0,      // ✅ Add this
-    val longitude: Double = 0.0,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )
 

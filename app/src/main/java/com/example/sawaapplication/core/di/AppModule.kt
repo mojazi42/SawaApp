@@ -25,9 +25,14 @@ import com.example.sawaapplication.screens.post.data.dataSources.remote.PostsInC
 import com.example.sawaapplication.screens.post.data.repository.PostRepositoryImpl
 import com.example.sawaapplication.screens.post.domain.repository.PostRepository
 import com.example.sawaapplication.screens.post.domain.useCases.CreatePostUseCase
+import com.example.sawaapplication.screens.profile.dataSources.remote.ProfileRemoteDataSource
+import com.example.sawaapplication.screens.profile.domain.repository.ProfileRepository
+import com.example.sawaapplication.screens.profile.domain.useCases.FetchAboutMeUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.example.sawaapplication.screens.profile.dataSources.repository.ProfileRepositoryImpl
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -151,10 +156,9 @@ object AppModule {
 
     @Provides
     fun providePostRepository(
-        postRemoteDataSource: PostsInCommunityRemote, firestore: FirebaseFirestore,
+        postRemoteDataSource: PostsInCommunityRemote
     ): PostRepository {
         return PostRepositoryImpl(postRemoteDataSource,
-            firestore
             )
     }
 
@@ -190,4 +194,25 @@ object AppModule {
     ): MassageRemoteDataSource =
         MassageRemoteDataSource(firestore, storage)
 
+
+    @Provides
+    fun provideProfileRemoteDataSource(
+        firestore: FirebaseFirestore
+    ): ProfileRemoteDataSource {
+        return ProfileRemoteDataSource(
+            firestore)
+    }
+    @Provides
+    fun provideProfileRepository(
+        profileRemoteDataSource: ProfileRemoteDataSource
+    ): ProfileRepository {
+        return ProfileRepositoryImpl(profileRemoteDataSource
+        )
+    }
+    @Provides
+    fun provideFetchAboutMeUseCase(
+        profileRepository: ProfileRepository
+    ): FetchAboutMeUseCase {
+        return FetchAboutMeUseCase(profileRepository)
+    }
 }

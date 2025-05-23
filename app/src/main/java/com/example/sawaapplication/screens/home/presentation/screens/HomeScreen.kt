@@ -137,6 +137,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                         PostCard(
                             post,
                             communityName,
+                            communityId = post.communityId, // make sure this is available
                             userName,
                             userImage,
                             onClick = {},
@@ -148,7 +149,10 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                                 viewModel.deletePost(post)
                             },
                             navController = navController,
-                            onUserImageClick = { viewModel.likePost(post) }
+                            onUserImageClick = { viewModel.likePost(post) },
+                            onCommunityClick = { communityId ->
+                                navController.navigate("community_screen/$communityId")
+                            }
                         )
 
                         HorizontalDivider(
@@ -238,6 +242,7 @@ fun MyEventsTab(
                         onClick = {
                             navController.navigate("event_detail/${event.communityId}/${event.id}")
                         },
+                        eventTimestamp = event.time, // ← Just a comma here
                         onEditClick = {
                             navController.navigate("edit_event/${event.communityId}/${event.id}")
                         },

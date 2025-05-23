@@ -9,7 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class PostsInCommunityRemote @Inject constructor(
@@ -68,31 +70,41 @@ class PostsInCommunityRemote @Inject constructor(
                 .collection("posts")
                 .get()
                 .await()
+            val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
 
-            val posts = snapshot.documents.mapNotNull { doc ->
+            val uiModels = snapshot.documents.mapNotNull { doc ->
                 val post = doc.toObject(Post::class.java) ?: return@mapNotNull null
-                val userSnapshot = firestore.collection("Users").document(post.userId).get().await()
-                val userName = userSnapshot.getString("name") ?: "Unknown"
-                val profileImage = userSnapshot.getString("profileImage") ?: ""
+
+                val userDoc = firestore.collection("User")
+                    .document(post.userId)
+                    .get()
+                    .await()
+
+                val username = userDoc.getString("name") ?: "Unknown"
+                val avatarUrl = userDoc.getString("image") ?: ""
 
                 PostUiModel(
                     id = post.id,
-                    username = userName,
-                    userAvatarUrl = profileImage,
+                    username = username,
+                    userAvatarUrl = avatarUrl,
                     postImageUrl = post.imageUri,
                     content = post.content,
                     likes = post.likes,
                     likedBy = post.likedBy,
                     userId = post.userId,
-                    communityId = post.communityId
-                )
-            }
+                    communityId = post.communityId,
+                    createdAt = post.createdAt
+                    )
+            }.sortedByDescending { parser.parse(it.createdAt) ?: Date(0) }
 
-            Result.success(posts)
+            Result.success(uiModels)
         } catch (e: Exception) {
+            Log.e("PostRepository", "Error fetching posts: ${e.message}", e)
             Result.failure(e)
         }
+
     }
+
 }
 
 

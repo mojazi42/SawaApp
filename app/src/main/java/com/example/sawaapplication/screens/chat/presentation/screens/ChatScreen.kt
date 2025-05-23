@@ -141,14 +141,18 @@ fun ChatScreen(
                     bottom = innerPadding.calculateBottomPadding()
                 )
         ) {
-            ChatTopBarBanner(communityImage = communityImage) {
-                navController.popBackStack()
-            }
+            ChatTopBarBanner(
+                communityImage = communityImage,
+                onBackClick = { navController.popBackStack() },
+                onImageClick = { navController.navigate("community_screen/$communityId") }
+            )
 
             ChatMembersHeader(
+                communityId = communityId,
                 communityName = communityName,
                 members = communityMembers,
-                onClick = { navController.navigate("groupMembers/$communityId") }
+                onClick = { navController.navigate("groupMembers/$communityId") },
+                onNavigateToCommunity = { id -> navController.navigate("community_screen/$id") }
             )
 
             if (uiMessages.isEmpty()) {
@@ -198,4 +202,5 @@ fun ChatScreen(
     ImagePreviewOverlay(previewImageUrl = previewImageUrl) {
         previewImageUrl = null
     }
+
 }

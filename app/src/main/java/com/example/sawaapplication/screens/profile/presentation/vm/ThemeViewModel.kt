@@ -1,11 +1,9 @@
-package com.example.sawaapplication.screens.profile.vm
+package com.example.sawaapplication.screens.profile.presentation.vm
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.sawaapplication.core.sharedPreferences.ThemeManager
 import com.example.sawaapplication.core.sharedpreferences.LanguageManager
-//import com.example.sawaapplication.core.sharedPreferences.ThemeManager
-//import com.example.sawaapplication.core.sharedpreferences.LanguageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
