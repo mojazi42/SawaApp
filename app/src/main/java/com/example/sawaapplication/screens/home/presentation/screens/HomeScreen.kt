@@ -235,7 +235,6 @@ fun MyEventsTab(
                         isEditable = event.createdBy == userId,
                         joined = event.joinedUsers.contains(userId),
                         onJoinClick = {
-                            //leave event
                             selectedEventId = event.id
                             selectedCommunityId = event.communityId
                             showLeaveEventDialog = true
@@ -243,9 +242,7 @@ fun MyEventsTab(
                         showCancelButton = true,
                         onClick = {
                             navController.navigate("event_detail/${event.communityId}/${event.id}")
-
                         },
-                       // modifier = Modifier.padding(8.dp)
                         onEditClick = {
                             navController.navigate("edit_event/${event.communityId}/${event.id}")
                         },
@@ -259,10 +256,27 @@ fun MyEventsTab(
                         },
                         eventTimestamp = event.time
                     )
-
                 }
             }
         }
+
+        if (showDeleteEventDialog && deleteEventId != null && deleteCommunityId != null) {
+            CustomConfirmationDialog(
+                message = stringResource(R.string.`areYouSureُEventHome`),
+                onConfirm = {
+                    eventViewModel.deleteEvent(deleteCommunityId!!, deleteEventId!!)
+                    showDeleteEventDialog = false
+                    deleteEventId = null
+                    deleteCommunityId = null
+                },
+                onDismiss = {
+                    showDeleteEventDialog = false
+                    deleteEventId = null
+                    deleteCommunityId = null
+                }
+            )
+        }
+
         if (showDeleteEventDialog && deleteEventId != null && deleteCommunityId != null) {
             CustomConfirmationDialog(
                 message = stringResource(R.string.`areYouSureُEventHome`), // or hardcode it if not in strings.xml

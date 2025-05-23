@@ -500,7 +500,8 @@ fun CommunityScreen(
                             joined = event.joinedUsers.contains(userId),
                             isEditable = event.createdBy == userId,
                             onEditClick = {
-                                navController.navigate("edit_event/${event.id}")
+                                navController.navigate("edit_event/${communityId}/${event.id}")
+                                Log.d("Event Id","Navigating to edit event: ${event.id} in community: $communityId")
                             },
                             onDeleteClick = {
                                 selectedEventId = event.id

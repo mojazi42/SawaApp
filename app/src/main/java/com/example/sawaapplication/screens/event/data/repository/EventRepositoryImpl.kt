@@ -46,4 +46,10 @@ class EventRepositoryImpl @Inject constructor(
     ): Result<Unit> {
         return remoteDataSource.updateEvent(communityId, eventId, updatedData)
     }
+    override suspend fun getEventById(communityId: String, eventId: String): Event {
+        return remoteDataSource.getEventById(communityId, eventId)
+    }
+
+
+
 }

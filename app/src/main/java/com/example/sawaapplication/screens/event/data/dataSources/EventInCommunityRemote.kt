@@ -24,7 +24,9 @@ class EventInCommunityRemote @Inject constructor(
      * Creates a new event in a community with image upload.
      */
     suspend fun createEventInCommunity(
-        communityId: String, event: Event, imageUri: Uri
+        communityId: String,
+        event: Event,
+        imageUri: Uri
     ) {
         val user = firebaseAuth.currentUser
         if (user == null) {
@@ -32,32 +34,34 @@ class EventInCommunityRemote @Inject constructor(
             return
         }
 
-        val storageRef =
-            FirebaseStorage.getInstance().reference.child("eventImages/${user.uid}_${System.currentTimeMillis()}.jpg")
+        val storageRef = FirebaseStorage.getInstance()
+            .reference
+            .child("eventImages/${user.uid}_${System.currentTimeMillis()}.jpg")
 
         try {
-            // Upload image to Firebase Storage
+            // Upload image
             storageRef.putFile(imageUri).await()
 
-            // Get the download URL of the uploaded image
+            // Get URL
             val imageUrl = storageRef.downloadUrl.await()
 
-            // Create updated event with the image URL
+            // Update event with image URL
             val updatedEvent = event.copy(imageUri = imageUrl.toString())
 
-            // Reference to Firestore subcollection for events
-            firestore.collection("Community")  // Ensure consistency in collection name
-                .document(communityId).collection("event").document()
-                .set(updatedEvent, SetOptions.merge())
+            // Create docRef and save to Firestore
+            val docRef = firestore.collection("Community")
+                .document(communityId)
+                .collection("event")
+                .document()
 
+            docRef.set(updatedEvent.copy(id = docRef.id), SetOptions.merge()).await()
 
-            Log.d("Firebase", "Event created successfully in community: $communityId")
-
+            Log.d("Firebase", "Event created with ID: ${docRef.id}")
         } catch (e: Exception) {
-            // Handle any errors
             Log.e("Firebase", "Error creating event: ${e.message}")
         }
     }
+
 
     /**
      * Fetch all events from a specific community.
@@ -67,14 +71,17 @@ class EventInCommunityRemote @Inject constructor(
             val snapshot = eventCollectionRef(communityId).get().await()
 
             val events = snapshot.documents.mapNotNull { document ->
-                document.toObject(Event::class.java)?.copy(id = document.id)
+                document.toObject(Event::class.java)?.copy(id = document.id, communityId = communityId)
             }
 
             Result.success(events)
         } catch (e: Exception) {
+            Log.e("EventFetch", "Error fetching events: ${e.message}")
             Result.failure(e)
         }
     }
+
+
 
     /**
      * Adds the current user to the joinedUsers list of an event.
@@ -131,22 +138,44 @@ class EventInCommunityRemote @Inject constructor(
     /**
      * Updates specific fields of an event document in Firestore.
      */
+// Updates specific fields of an event document in Firestore.
     suspend fun updateEvent(
         communityId: String,
         eventId: String,
         updatedData: Map<String, Any>
     ): Result<Unit> {
+        if (communityId.isBlank() || eventId.isBlank()) {
+            Log.e("Firebase", "Invalid communityId or eventId. Cannot update event.")
+            return Result.failure(IllegalArgumentException("communityId and eventId must not be blank"))
+        }
+
         return try {
-            eventCollectionRef(communityId)
+            firestore.collection("Community")
+                .document(communityId)
+                .collection("event")
                 .document(eventId)
                 .update(updatedData)
                 .await()
 
             Log.d("Firebase", "Event updated: $eventId")
+            Log.d("FirestoreUpdate", "Updating $eventId with $updatedData")
+
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("Firebase", "Error updating event: ${e.message}")
+            Log.e("Firebase", "Error updating event: ${e.message}", e)
             Result.failure(e)
         }
+    }
+
+    // EventInCommunityRemoteImpl.kt (implementation)
+    suspend fun getEventById(communityId: String, eventId: String): Event {
+        val snapshot = firestore.collection("Community")
+            .document(communityId)
+            .collection("event")
+            .document(eventId)
+            .get()
+            .await()
+
+        return snapshot.toObject(Event::class.java)!!.copy(id = snapshot.id)
     }
 }
