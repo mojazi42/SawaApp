@@ -40,6 +40,7 @@ import com.example.sawaapplication.screens.notification.presentation.screens.Not
 import com.example.sawaapplication.screens.communities.presentation.screens.NewCommunity
 import com.example.sawaapplication.screens.communities.presentation.screens.MyCommunitiesScreen
 import com.example.sawaapplication.screens.event.presentation.screens.CreateNewEventScreen
+import com.example.sawaapplication.screens.event.presentation.screens.EditEventScreen
 import com.example.sawaapplication.screens.event.presentation.screens.EventDetailScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
 import com.example.sawaapplication.screens.post.presentation.screens.CreatePostScreen
@@ -258,6 +259,24 @@ fun AppNavigation(
                     )
                 }
             }
+            composable(
+                "edit_event/{communityId}/{eventId}",
+                arguments = listOf(
+                    navArgument("communityId") { type = NavType.StringType },
+                    navArgument("eventId") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: return@composable
+                val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
+
+                EditEventScreen(
+                    navController = navController,
+                    eventId = eventId,
+                    communityId = communityId
+                )
+            }
+
+
 
         }
     }
