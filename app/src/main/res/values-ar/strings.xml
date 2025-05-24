@@ -59,7 +59,7 @@
     <string name="myCommunities">مجتمعاتي</string>
 
     <!--Create new event-->
-    <string name="newEvent">دث جديد</string>
+    <string name="newEvent">حدث جديد</string>
     <string name="eventName">اسم الحدث</string>
     <string name="eventDescription">وصف الحدث</string>
     <string name="eventMembersLimit">عدد للحضور</string>
