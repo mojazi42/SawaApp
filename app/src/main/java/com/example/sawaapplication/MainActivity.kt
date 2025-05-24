@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
         // Use this method to prompt for push notifications.
         // We recommend removing this method after testing and instead use In-App Messages to prompt for notification permission.
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             OneSignal.Notifications.requestPermission(true)
         }
 
