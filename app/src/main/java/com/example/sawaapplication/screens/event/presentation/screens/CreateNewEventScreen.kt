@@ -2,7 +2,6 @@ package com.example.sawaapplication.screens.event.presentation.screens
 
 import android.Manifest
 import android.net.Uri
-import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -97,19 +96,6 @@ fun CreateNewEventScreen(
     val communityID = viewModel.communityId
     val loading by viewModel.loading.collectAsState()
 
-    // Request POST_NOTIFICATIONS permission on Android 13+
-    val postNotificationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            // Optional: handle if granted or not
-        }
-    )
-
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            postNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
 
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
@@ -232,14 +218,6 @@ fun CreateNewEventScreen(
             // Show success toast message
             Toast.makeText(context, eventCreated, Toast.LENGTH_SHORT).show()
 
-           // Schedule reminder notification 10 mins before event
-            notificationViewModel.scheduleEventReminder(
-                eventName = viewModel.name,
-                eventDateMillis = viewModel.eventDate ?: 0L,
-                eventTime = viewModel.eventTime,
-                context = context.applicationContext,
-            )
-
             // Navigate back to previous screen
             navController.popBackStack()
 
@@ -247,6 +225,7 @@ fun CreateNewEventScreen(
         } else {
             Toast.makeText(context, "Event creation failed", Toast.LENGTH_SHORT).show()
         }
+
 
     }
 
