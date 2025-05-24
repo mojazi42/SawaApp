@@ -9,6 +9,7 @@ data class PostUiModel(
     val likes: Int = 0,
     val likedBy: List<String> = emptyList(),
     val userId: String = "",
+    val createdAt: String ="",
     val communityId: String = ""
 )
 

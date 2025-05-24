@@ -1,21 +1,16 @@
 package com.example.sawaapplication.screens.notification.presentation.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.sawaapplication.core.sharedPreferences.NotificationPreferences
 import com.example.sawaapplication.screens.notification.domain.model.Notification
 import com.example.sawaapplication.screens.notification.domain.useCases.FetchNotificationsUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.MarkNotificationsAsReadUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.NotifyCommunityOfEventUseCase
+import com.example.sawaapplication.screens.notification.domain.useCases.ObserveUnreadNotificationsUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendEventCreatedNotificationUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendLikeNotificationUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendProfileUpdateNotificationUseCase
-import com.example.sawaapplication.core.sharedPreferences.NotificationPreferences
-import com.example.sawaapplication.screens.notification.domain.useCases.ObserveUnreadNotificationsUseCase
-import com.example.sawaapplication.screens.notification.domain.useCases.ScheduleEventReminderUseCase
 import com.example.sawaapplication.screens.post.domain.model.Post
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,8 +25,7 @@ class NotificationViewModel @Inject constructor(
     private val notifyCommunityOfEventUseCase: NotifyCommunityOfEventUseCase,
     private val sendLikeNotificationUseCase: SendLikeNotificationUseCase,
     private val notificationPreferences: NotificationPreferences,
-    private val observeUnreadNotificationsUseCase: ObserveUnreadNotificationsUseCase,
-    private val scheduleEventReminderUseCase: ScheduleEventReminderUseCase
+    private val observeUnreadNotificationsUseCase: ObserveUnreadNotificationsUseCase
 ) : ViewModel() {
 
     private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
@@ -73,10 +67,6 @@ class NotificationViewModel @Inject constructor(
 
     fun notifyLike(post: Post) {
         sendLikeNotificationUseCase(post)
-    }
-
-    fun scheduleEventReminder(eventName: String, eventDateMillis: Long, eventTime: String, context: Context) {
-        scheduleEventReminderUseCase(eventName, eventDateMillis, eventTime, context, )
     }
 
     private fun observeUnread() {

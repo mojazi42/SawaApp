@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.home.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,19 +44,7 @@ import com.example.sawaapplication.screens.notification.presentation.viewmodels.
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.ui.res.stringResource
-import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
-import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import com.example.sawaapplication.utils.getCityNameFromGeoPoint
-import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
-import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.utils.getCityNameFromGeoPoint
+import com.google.firebase.messaging.reporting.MessagingClientEvent
 
 @Composable
 fun HomeScreen(
@@ -64,6 +53,7 @@ fun HomeScreen(
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
+    var eventToDelete by remember { mutableStateOf<MessagingClientEvent.Event?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -100,6 +90,8 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
     val notificationViewModel: NotificationViewModel = hiltViewModel()
 
     val postLikedUserId = viewModel.postLikedEvent.collectAsState().value
+
+
 
     // Trigger a notification whenever a post is liked by a user
     LaunchedEffect(postLikedUserId) {
@@ -145,6 +137,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                         PostCard(
                             post,
                             communityName,
+                            communityId = post.communityId, // make sure this is available
                             userName,
                             userImage,
                             onClick = {},
@@ -156,7 +149,10 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                                 viewModel.deletePost(post)
                             },
                             navController = navController,
-                            onUserImageClick = { viewModel.likePost(post) }
+                            onUserImageClick = { viewModel.likePost(post) },
+                            onCommunityClick = { communityId ->
+                                navController.navigate("community_screen/$communityId")
+                            }
                         )
 
                         HorizontalDivider(
@@ -188,6 +184,11 @@ fun MyEventsTab(
     var selectedEventId by remember { mutableStateOf<String?>(null) }
     var selectedCommunityId by remember { mutableStateOf<String?>(null) }
     val communityNames by viewModel.communityNames.collectAsState() // fetch community names
+
+
+    var showDeleteEventDialog by remember { mutableStateOf(false) }
+    var deleteEventId by remember { mutableStateOf<String?>(null) }
+    var deleteCommunityId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchJoinedEvents()
@@ -230,9 +231,9 @@ fun MyEventsTab(
                         community = communityName,
                         time = timeFormatted,
                         date = formattedDate,
+                        isEditable = event.createdBy == userId,
                         joined = event.joinedUsers.contains(userId),
                         onJoinClick = {
-                            //leave event
                             selectedEventId = event.id
                             selectedCommunityId = event.communityId
                             showLeaveEventDialog = true
@@ -240,14 +241,56 @@ fun MyEventsTab(
                         showCancelButton = true,
                         onClick = {
                             navController.navigate("event_detail/${event.communityId}/${event.id}")
-
+                        },
+                        eventTimestamp = event.time, // ← Just a comma here
+                        onEditClick = {
+                            navController.navigate("edit_event/${event.communityId}/${event.id}")
+                        },
+                        onDeleteClick = {
+                            deleteEventId = event.id
+                            deleteCommunityId = event.communityId
+                            showDeleteEventDialog = true
                         }
-                       // modifier = Modifier.padding(8.dp)
                     )
-
                 }
             }
         }
+
+        if (showDeleteEventDialog && deleteEventId != null && deleteCommunityId != null) {
+            CustomConfirmationDialog(
+                message = stringResource(R.string.`areYouSureُEventHome`),
+                onConfirm = {
+                    eventViewModel.deleteEvent(deleteCommunityId!!, deleteEventId!!)
+                    showDeleteEventDialog = false
+                    deleteEventId = null
+                    deleteCommunityId = null
+                },
+                onDismiss = {
+                    showDeleteEventDialog = false
+                    deleteEventId = null
+                    deleteCommunityId = null
+                }
+            )
+        }
+
+        if (showDeleteEventDialog && deleteEventId != null && deleteCommunityId != null) {
+            CustomConfirmationDialog(
+                message = stringResource(R.string.`areYouSureُEventHome`), // or hardcode it if not in strings.xml
+                onConfirm = {
+                    eventViewModel.deleteEvent(deleteCommunityId!!, deleteEventId!!)
+                    showDeleteEventDialog = false
+                    deleteEventId = null
+                    deleteCommunityId = null
+                },
+                onDismiss = {
+                    showDeleteEventDialog = false
+                    deleteEventId = null
+                    deleteCommunityId = null
+                }
+            )
+        }
+
+
         //Dialog for confirm leaving an event
         if (showLeaveEventDialog && selectedEventId != null && selectedCommunityId != null) {
             CustomConfirmationDialog(

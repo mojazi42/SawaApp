@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.event.domain.model.Event
+import com.example.sawaapplication.screens.event.domain.repository.EventRepository
 import com.example.sawaapplication.screens.event.domain.useCases.GetAllEventInCommunity
 import com.example.sawaapplication.screens.event.domain.useCases.JoinEventUseCase
 import com.example.sawaapplication.screens.event.domain.useCases.LeaveEventUseCase
@@ -17,7 +18,8 @@ import javax.inject.Inject
 class FetchEventViewModel @Inject constructor(
     private val getAllEventInCommunity: GetAllEventInCommunity,
     private val joinEventUseCase: JoinEventUseCase,
-    private val leaveEventUseCase: LeaveEventUseCase
+    private val leaveEventUseCase: LeaveEventUseCase,
+    private val eventRepository: EventRepository
 ) : ViewModel() {
 
     private val _events = MutableStateFlow<List<Event>>(emptyList())
@@ -31,6 +33,9 @@ class FetchEventViewModel @Inject constructor(
 
     private val _joinResult = MutableStateFlow<Result<Unit>?>(null)
     val joinResult: StateFlow<Result<Unit>?> = _joinResult
+
+    private val _event = MutableStateFlow<Event?>(null)
+    val event: StateFlow<Event?> = _event
 
     fun loadEvents(communityId: String) {
         viewModelScope.launch {
@@ -84,6 +89,51 @@ class FetchEventViewModel @Inject constructor(
             }
         }
     }
+
+    fun deleteEvent(communityId: String, eventId: String) {
+        viewModelScope.launch {
+            val result = eventRepository.deleteEvent(communityId, eventId)
+            if (result.isSuccess) {
+                _events.value = _events.value.filterNot { it.id == eventId }
+            } else {
+                Log.e("DeleteEvent", "Error: ${result.exceptionOrNull()?.message}")
+            }
+        }
+    }
+
+    fun updateEvent(communityId: String, eventId: String, updatedData: Map<String, Any>) {
+        viewModelScope.launch {
+            val result = eventRepository.updateEvent(communityId, eventId, updatedData)
+            if (result.isSuccess) {
+                loadEvents(communityId)
+            } else {
+                Log.e("UpdateEvent", "Error: ${result.exceptionOrNull()?.message}")
+            }
+        }
+
+    }
+    suspend fun fetchEventById(communityId: String, eventId: String): Event? {
+        return try {
+            eventRepository.getEventById(communityId, eventId)
+        } catch (e: Exception) {
+            Log.e("FetchEvent", "Failed to fetch event: ${e.message}")
+            null
+        }
+    }
+
+    fun fetchEventByIdAsync(communityId: String, eventId: String) {
+        viewModelScope.launch {
+            try {
+                _event.value = eventRepository.getEventById(communityId, eventId)
+            } catch (e: Exception) {
+                Log.e("FetchEvent", "Failed to fetch event: ${e.message}")
+            }
+        }
+    }
+
+
+
+
 
 
 }

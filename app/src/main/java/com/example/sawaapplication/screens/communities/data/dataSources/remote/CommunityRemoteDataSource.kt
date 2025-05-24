@@ -72,5 +72,89 @@ class CommunityRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun updateCommunity(
+        communityId: String,
+        name: String,
+        description: String,
+        category : String,
+        imageUri: Uri?
+    ): Result<Unit> {
+        return try {
+            val docRef = firestore.collection("Community").document(communityId)
+            val updates = mutableMapOf<String, Any>(
+                "name" to name,
+                "description" to description,
+                "category" to category
+            )
+
+            // If a new image was selected
+            if (imageUri != null) {
+                try {
+                    val imageRef = FirebaseStorage.getInstance().reference
+                        .child("communityImages/${firebaseAuth.currentUser?.uid}_${System.currentTimeMillis()}.jpg")
+
+                    imageRef.putFile(imageUri).await()
+                    val newImageUrl = imageRef.downloadUrl.await().toString()
+
+                    updates["image"] = newImageUrl
+                }catch (e: Exception) {
+                    Log.e("Firestore", "Image upload failed: ${e.message}", e)
+                    return Result.failure(e)
+                }
+            }
+            docRef.update(updates).await()
+            Log.d("Firestore", "Community $communityId updated")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Update failed: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteCommunity(communityId: String, imageUrl: String?): Result<Unit> {
+
+        return try {
+
+            deleteSubCollection(communityId, "posts")
+            deleteSubCollection(communityId, "event")
+            deleteSubCollection(communityId, "messages")
+
+            if (!imageUrl.isNullOrBlank()) {
+                try {
+                    val imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+                    imageRef.delete().await()
+                } catch (e: Exception) {
+                    // If the image doesn't exist, log and move on
+                    Log.w("DeleteCommunity", "Image not found or already deleted: ${e.message}")
+                }
+            }
+
+            FirebaseFirestore.getInstance()
+                .collection("Community")
+                .document(communityId)
+                .delete()
+                .await()
+
+            Log.d("DeleteCommunity", "Community $communityId deleted")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("DeleteCommunity", "Failed to delete community: ${e.message}", e)
+            Result.failure(e)
+        }
+
+    }
+
+    // To delete all the "posts" "events" and "chats" that are related to a community
+    suspend fun deleteSubCollection(communityId: String, subCollection: String) {
+        val collectionRef = firestore.collection("Community")
+            .document(communityId)
+            .collection(subCollection)
+
+        val documents = collectionRef.get().await()
+        for (doc in documents) {
+            doc.reference.delete().await()
+        }
+    }
+
 }
 

@@ -1,51 +1,29 @@
 package com.example.sawaapplication.navigation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import coil.compose.rememberAsyncImagePainter
-import com.example.sawaapplication.R
 import androidx.navigation.navArgument
 import com.example.sawaapplication.core.sharedPreferences.AuthPreferences
 import com.example.sawaapplication.navigation.bottomBar.CustomBottomBar
-import com.example.sawaapplication.navigation.topBar.TopBar
 import com.example.sawaapplication.navigation.topBar.getTopBar
 import com.example.sawaapplication.screens.authentication.presentation.screens.LoginScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.ResetPasswordScreen
@@ -55,24 +33,26 @@ import com.example.sawaapplication.screens.chat.presentation.screens.ChatScreen
 import com.example.sawaapplication.screens.chat.presentation.screens.GroupMembersScreen
 import com.example.sawaapplication.screens.chat.presentation.screens.ViewChatsScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.CommunityScreen
+import com.example.sawaapplication.screens.communities.presentation.screens.EditCommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.NewCommunity
 import com.example.sawaapplication.screens.communities.presentation.screens.MyCommunitiesScreen
 import com.example.sawaapplication.screens.event.presentation.screens.CreateNewEventScreen
+import com.example.sawaapplication.screens.event.presentation.screens.EditEventScreen
 import com.example.sawaapplication.screens.event.presentation.screens.EventDetailScreen
 import com.example.sawaapplication.screens.onboarding.presentation.screens.OnBoardingScreen
 import com.example.sawaapplication.screens.post.presentation.screens.CreatePostScreen
-import com.example.sawaapplication.screens.profile.screens.EditProfileScreen
-import com.example.sawaapplication.screens.profile.screens.ProfileScreen
-import com.example.sawaapplication.screens.profile.screens.UserAccount
-import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
+import com.example.sawaapplication.screens.profile.presentation.screens.EditProfileScreen
+import com.example.sawaapplication.screens.profile.presentation.screens.ProfileScreen
+import com.example.sawaapplication.screens.profile.presentation.screens.UserAccount
+import com.example.sawaapplication.screens.profile.presentation.vm.ProfileViewModel
 import java.net.URLDecoder
 import com.example.sawaapplication.screens.post.presentation.screens.FullscreenImageScreen
 
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AppNavigation(
@@ -127,22 +107,6 @@ fun AppNavigation(
             startDestination = if (tokenState.isNullOrEmpty()) Screen.SplashScreen.route else Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-//            composable(
-//                route = "community_screen/{communityId}",
-//                arguments = listOf(navArgument("communityId") { type = NavType.StringType })
-//            ) { backStackEntry ->
-//                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
-//                CommunityScreen(
-//                    communityId = communityId,
-//                    onBackPressed = { navController.popBackStack() },
-//                    onClick = { imageUrl ->
-//                        val encoded = URLEncoder.encode(imageUrl, "utf-8")
-//                        navController.navigate( FullscreenImage.createRoute(encoded) )
-//                    },
-//                    navController = navController
-//                )
-//            }
-
 
             composable(Screen.SplashScreen.route) {
                 SplashScreen(navController)
@@ -226,6 +190,11 @@ fun AppNavigation(
                 )
             }
 
+            composable("edit_community/{communityId}") { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: ""
+                EditCommunityScreen(communityId = communityId, navController = navController)
+            }
+
 
 // 2) Full-screen by postId
             composable(
@@ -290,6 +259,23 @@ fun AppNavigation(
                     )
                 }
             }
+            composable(
+                "edit_event/{communityId}/{eventId}",
+                arguments = listOf(
+                    navArgument("communityId") { type = NavType.StringType },
+                    navArgument("eventId") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val communityId = backStackEntry.arguments?.getString("communityId") ?: return@composable
+                val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
+
+                EditEventScreen(
+                    navController = navController,
+                    eventId = eventId,
+                    communityId = communityId
+                )
+            }
+
 
 
         }
@@ -299,7 +285,6 @@ fun AppNavigation(
 val bottomBarScreens = listOf(
     Screen.Home,
     Screen.Explore,
-    //Screen.Notification,
     Screen.Community,
     Screen.Chats
 )

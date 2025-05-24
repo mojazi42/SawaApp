@@ -59,7 +59,7 @@
     <string name="myCommunities">مجتمعاتي</string>
 
     <!--Create new event-->
-    <string name="newEvent">دث جديد</string>
+    <string name="newEvent">حدث جديد</string>
     <string name="eventName">اسم الحدث</string>
     <string name="eventDescription">وصف الحدث</string>
     <string name="eventMembersLimit">عدد للحضور</string>
@@ -86,6 +86,33 @@
     <string name="tapToUploadImage">انقر لرفع صورة</string>
     <string name="communityName">إسم المجتمع</string>
     <string name="newCommDescription">الوصف</string>
+    <string name="nameRequired">يجب إدخال الاسم</string>
+    <string name="descriptionRequired">يجب إدخال الوصف</string>
+    <string name="categoryRequired">يجب إدخال التصنيف</string>
+
+    <!--EditCommunity-->
+    <string name = "photoPermissionTitle">الوصول لألبوم الصور</string>
+    <string name = "photoPermissionTextC">نحتاج الوصول لألبوم الصور حتى يمكنك إضافة صورة للمجتمع</string>
+    <string name = "photoPermissionToast">الرجاء السماح للوصول لألبوم الصور من اعدادات هاتفك</string>
+    <string name = "edit">تعديل</string>
+    <string name = "update">حفظ التغييرات</string>
+    <string name = "deleteCommunity">حذف المجتمع</string>
+    <string name="areYouSureDeleteCommunity">هل أنت متأكد من رغبتك في حذف المجتمع؟ سيتم حذفه نهائيًا</string>
+
+    <!--Community Types-->
+    <string name="selectCommunityType">إختر نوع المجتمع</string>
+    <string name="select">إختر</string>
+    <string name="sports">رياضة</string>
+    <string name="gaming">قيمنق</string>
+    <string name="petsAnimals">حيوانات أليفة</string>
+    <string name="techGadgets">التكنولوجيا</string>
+    <string name="moviesTVShows">الأفلام والمسلسلات</string>
+    <string name="booksLiterature">كتب</string>
+    <string name="travelAdventure">السفر والمغامرة</string>
+    <string name="healthWellness">الصحة</string>
+    <string name="artCreativity">الإبداع والفن</string>
+    <string name="funny">المرح</string>
+    <string name="other">غير ذلك</string>
 
     <!-- Event Card Screen-->
     <string name="upcomingEvents">الأحداث القادمة</string>
@@ -110,6 +137,7 @@
     <string name="unknownError">خطأ غير معروف</string>
     <string name="unknown">غير معروف</string>
     <string name="areYouSurePost">هل أنت متأكد من رغبتك في حذف المنشور؟</string>
+    <string name="areYouSureُEventHome">هل انت متأكد من رغبتك من في حذف هذه الحدث؟</string>
 
     <!--NotificationScreen-->
     <string name="noNotifications">لا يوجد تنبيهات</string>
@@ -122,5 +150,8 @@
     <string name="yesImSure">نعم، متأكد</string>
     <string name="no">لا</string>
 
+    <!--Event Details-->
+    <string name="loading">تنزيل...</string>
+    <string name="viewLocation">عرض الموقع</string>
 
 </resources>

@@ -30,6 +30,8 @@ class CommunityViewModel @Inject constructor(
     private val createCommunityUseCase: CreateCommunityUseCase,
     private val getUserCreatedCommunitiesUseCase: GetUserCreatedCommunitiesUseCase,
     private val getCommunityByIdUseCase: GetCommunityByIdUseCase,
+    private val updateCommunityUseCase : UpdateCommunityUseCase,
+    private val deleteCommunityUseCase : DeleteCommunityUseCase,
     private val postRepository: PostRepository,
     private val permissionHandler: PermissionHandler,
     private val firebaseAuth: FirebaseAuth,
@@ -42,6 +44,7 @@ class CommunityViewModel @Inject constructor(
     var imageUri by mutableStateOf<Uri?>(null)
     var name by mutableStateOf("")
     var description by mutableStateOf("")
+    var category by mutableStateOf("")
 
     // Current user ID from Firebase
     val currentUserId = firebaseAuth.currentUser?.uid ?: ""
@@ -73,12 +76,11 @@ class CommunityViewModel @Inject constructor(
     private val _communityPosts = MutableStateFlow<List<PostUiModel>>(emptyList())
     val communityPosts: StateFlow<List<PostUiModel>> = _communityPosts
 
+    // Holds the current search text
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText
 
-    val filteredCreatedCommunities = combine(_searchText, _createdCommunities) { query, list ->
-        if (query.isBlank()) list else list.filter { it.name.contains(query, ignoreCase = true) }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    var selectedFilter by mutableStateOf<CommunityFilterType>(CommunityFilterType.DEFAULT)
 
     fun onSearchTextChange(newText: String) {
         _searchText.value = newText
@@ -86,8 +88,10 @@ class CommunityViewModel @Inject constructor(
 
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
+
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
+
 
 
     // Creates a new community, uploads its image, and updates state
@@ -95,13 +99,14 @@ class CommunityViewModel @Inject constructor(
         name: String,
         description: String,
         imageUri: Uri?,
+        category: String,
         currentUserId: String
     ) {
         if (_loading.value) return
         job = viewModelScope.launch {
             _loading.value = true
             try {
-                val result = createCommunityUseCase(name, description, imageUri, currentUserId)
+                val result = createCommunityUseCase(name=name, description=description, category=category, imageUri=imageUri, currentUserId)
                 result.onSuccess {
                     fetchCreatedCommunities(currentUserId) // Refresh list after successful creation
                     _success.value = true
@@ -116,6 +121,44 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
+    // Filtered list based on search text
+    val filteredCreatedCommunities: StateFlow<List<Community>> =
+        combine(_searchText, _createdCommunities) { query, communities ->
+
+            var filtered = if (query.isBlank()) {
+                communities
+            } else {
+                communities.filter {
+                    it.name.contains(query, ignoreCase = true)
+                }
+            }
+
+            when (val filter = selectedFilter) {
+                is CommunityFilterType.DEFAULT -> {
+                    filtered = filtered.sortedBy { it.createdAt.toLongOrNull() ?: Long.MAX_VALUE }
+                }
+
+                is CommunityFilterType.MOST_POPULAR -> {
+                    filtered = filtered.sortedByDescending { it.members.size }
+                }
+
+                is CommunityFilterType.MOST_RECENT -> {
+                    filtered = filtered.sortedByDescending { it.createdAt.toLongOrNull() ?: 0L }
+                }
+
+                is CommunityFilterType.Category -> {
+                    filtered = filtered.filter {
+                        it.category.equals(filter.categoryName, ignoreCase = true)
+                    }
+                }
+            }
+
+            filtered
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+
+
+    // Fetches communities where the current user is a member
     fun fetchCreatedCommunities(userId: String) {
         viewModelScope.launch {
             _loading.value = true
@@ -154,7 +197,9 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             val result = postRepository.getPostsForCommunity(communityId)
             result.onSuccess { posts ->
-                _communityPosts.value = posts.map {
+                _communityPosts.value = posts
+                    .sortedBy { it.createdAt }
+                    .map {
                     PostUiModel(
                         id = it.id,
                         username = it.username,
@@ -195,7 +240,7 @@ class CommunityViewModel @Inject constructor(
                     ))
                 }.await()
 
-                // ✅ Locally update the UI
+                //  Locally update the UI
                 _communityPosts.update { posts ->
                     posts.map {
                         if (it.id == post.id) {
@@ -213,6 +258,49 @@ class CommunityViewModel @Inject constructor(
 
             } catch (e: Exception) {
                 Log.e("CommunityViewModel", "Failed to like post: ${e.message}")
+            }
+        }
+    }
+
+    fun updateCommunity(
+        communityId: String,
+        name: String,
+        description: String,
+        category : String,
+        imageUri: Uri?
+    ) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val result = updateCommunityUseCase(communityId, name, description,category, imageUri)
+                result.onSuccess {
+                    _success.value = true
+                    fetchCommunityDetail(communityId) // Refresh updated data
+                }.onFailure {
+                    _error.value = "Update failed: ${it.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Unexpected error: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun deleteCommunity(communityId: String, imageUrl: String?) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val result = deleteCommunityUseCase(communityId, imageUrl)
+                result.onSuccess {
+                    _success.value = true
+                }.onFailure {
+                    _error.value = "Failed to delete community: ${it.message}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Unexpected error: ${e.message}"
+            } finally {
+                _loading.value = false
             }
         }
     }

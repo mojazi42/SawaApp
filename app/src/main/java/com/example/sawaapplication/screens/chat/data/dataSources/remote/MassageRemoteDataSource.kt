@@ -37,7 +37,7 @@ class MassageRemoteDataSource @Inject constructor(
             // Upload image to Firebase Storage if provided
             if (imageUri != null) {
                 val storageRef = storage.reference
-                    .child("chats/$communityId/${UUID.randomUUID()}.jpg")  // ✅ remove the extra quote
+                    .child("chats/$communityId/${UUID.randomUUID()}.jpg")
 
                 storageRef.putFile(imageUri).await()
                 imageUrl = storageRef.downloadUrl.await().toString()

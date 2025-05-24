@@ -1,6 +1,6 @@
 package com.example.sawaapplication.screens.chat.domain.useCases
 
-import android.util.Log
+
 import com.example.sawaapplication.screens.chat.domain.model.ChatUserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await

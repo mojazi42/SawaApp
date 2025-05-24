@@ -7,6 +7,7 @@ data class Community(
     val image: String = "",
     val creatorId: String = "",
     val members: List<String> = emptyList(),
+    val category : String = "",
     val createdAt: String = "",
     val updatedAt: String = ""
 )

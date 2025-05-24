@@ -156,10 +156,9 @@ object AppModule {
 
     @Provides
     fun providePostRepository(
-        postRemoteDataSource: PostsInCommunityRemote, firestore: FirebaseFirestore,
+        postRemoteDataSource: PostsInCommunityRemote
     ): PostRepository {
         return PostRepositoryImpl(postRemoteDataSource,
-            firestore
             )
     }
 

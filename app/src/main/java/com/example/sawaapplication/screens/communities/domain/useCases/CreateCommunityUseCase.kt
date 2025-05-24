@@ -9,7 +9,7 @@ class CreateCommunityUseCase @Inject constructor(
     private val repository: CommunityRepository
 ) {
     suspend operator fun invoke(
-        name: String, description: String, imageUri: Uri?, creatorId: String
+        name: String, description: String, category: String, imageUri: Uri?, creatorId: String
     ): Result<Unit> {
         if (imageUri == null) return Result.failure(Exception("Image URI is null"))
 
@@ -17,6 +17,7 @@ class CreateCommunityUseCase @Inject constructor(
             name = name,
             description = description,
             image = "",
+            category = category,
             creatorId = creatorId,
             members = listOf(creatorId),
             createdAt = System.currentTimeMillis().toString(),
@@ -27,4 +28,3 @@ class CreateCommunityUseCase @Inject constructor(
     }
 
 }
-
