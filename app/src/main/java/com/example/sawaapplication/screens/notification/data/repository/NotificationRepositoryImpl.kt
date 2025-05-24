@@ -1,6 +1,5 @@
 package com.example.sawaapplication.screens.notification.data.repository
 
-import android.content.Context
 import com.example.sawaapplication.screens.notification.data.dataSources.NotificationRemoteDataSource
 import com.example.sawaapplication.screens.notification.domain.model.Notification
 import com.example.sawaapplication.screens.notification.domain.repository.NotificationRepository
@@ -43,18 +42,8 @@ class NotificationRepositoryImpl @Inject constructor(
         remote.observeUnreadNotifications(listener)
     }
 
-    override fun scheduleEventReminder(
-        eventName: String,
-        eventDateMillis: Long,
-        eventTime: String,
-        context: Context
-    ) {
-        remote.scheduleEventReminder(
-            eventName,
-            eventDateMillis,
-            eventTime,
-            context,
-        )
+    override fun remindUpcomingCommunityEvents() {
+        remote.remindCommunityMembersAboutUpcomingEvent()
     }
 
 

@@ -8,6 +8,7 @@ import com.example.sawaapplication.screens.notification.domain.useCases.FetchNot
 import com.example.sawaapplication.screens.notification.domain.useCases.MarkNotificationsAsReadUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.NotifyCommunityOfEventUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.ObserveUnreadNotificationsUseCase
+import com.example.sawaapplication.screens.notification.domain.useCases.RemindUpcomingEventsUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendEventCreatedNotificationUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendLikeNotificationUseCase
 import com.example.sawaapplication.screens.notification.domain.useCases.SendProfileUpdateNotificationUseCase
@@ -31,6 +32,7 @@ class NotificationViewModel @Inject constructor(
     private val notificationPreferences: NotificationPreferences,
     private val observeUnreadNotificationsUseCase: ObserveUnreadNotificationsUseCase,
     private val scheduleEventReminderUseCase: ScheduleEventReminderUseCase
+    private val remindUpcomingEventsUseCase: RemindUpcomingEventsUseCase
 ) : ViewModel() {
 
     private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
@@ -42,6 +44,7 @@ class NotificationViewModel @Inject constructor(
     init {
         fetchNotifications()
         observeUnread()
+        remindUpcomingEvents()
     }
 
     fun fetchNotifications() {
@@ -74,6 +77,10 @@ class NotificationViewModel @Inject constructor(
         sendLikeNotificationUseCase(post)
     }
 
+    fun remindUpcomingEvents() {
+        remindUpcomingEventsUseCase()
+    }
+
     fun scheduleEventReminder(eventName: String, eventDateMillis: Long, eventTime: String, context: Context) {
         scheduleEventReminderUseCase(eventName, eventDateMillis, eventTime, context, )
     }
@@ -82,6 +89,5 @@ class NotificationViewModel @Inject constructor(
         observeUnreadNotificationsUseCase { hasUnread ->
             _hasUnreadNotifications.value = hasUnread
         }
-
     }
 }
