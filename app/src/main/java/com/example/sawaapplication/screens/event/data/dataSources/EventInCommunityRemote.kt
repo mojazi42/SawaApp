@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import javax.inject.Inject
 
 class EventInCommunityRemote @Inject constructor(
@@ -92,6 +93,12 @@ class EventInCommunityRemote @Inject constructor(
                 .document(eventId)
                 .update("joinedUsers", FieldValue.arrayUnion(userId))
                 .await()
+
+            // for event reminder in notification
+            val eventSnap   = eventCollectionRef(communityId).document(eventId).get().await()
+            val eventTime   = eventSnap.getTimestamp("time")!!
+            val eventTitle  = eventSnap.getString("title")!!
+            recordEventJoin(userId, eventId, eventTitle, eventTime.toDate())
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -177,5 +184,27 @@ class EventInCommunityRemote @Inject constructor(
             .await()
 
         return snapshot.toObject(Event::class.java)!!.copy(id = snapshot.id)
+    }
+    // Event Reminder
+    suspend fun recordEventJoin(
+        userId: String,
+        eventId: String,
+        eventTitle: String,
+        startTime: Date
+    ) {
+        val reminder = mapOf(
+            "userId"    to userId,
+            "type"      to "event_reminder",
+            "eventId"   to eventId,
+            "startTime" to startTime,
+            "responded" to false,
+            "message"   to "Did you attend \"$eventTitle\"?",
+            "timestamp" to FieldValue.serverTimestamp()
+        )
+        firestore
+            .collection("Notification")
+            .document(eventId)
+            .set(reminder, SetOptions.merge())
+            .await()
     }
 }

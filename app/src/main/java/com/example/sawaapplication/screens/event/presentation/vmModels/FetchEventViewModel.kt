@@ -8,10 +8,12 @@ import com.example.sawaapplication.screens.event.domain.repository.EventReposito
 import com.example.sawaapplication.screens.event.domain.useCases.GetAllEventInCommunity
 import com.example.sawaapplication.screens.event.domain.useCases.JoinEventUseCase
 import com.example.sawaapplication.screens.event.domain.useCases.LeaveEventUseCase
+import com.example.sawaapplication.screens.event.domain.useCases.RecordEventJoinUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,7 +21,8 @@ class FetchEventViewModel @Inject constructor(
     private val getAllEventInCommunity: GetAllEventInCommunity,
     private val joinEventUseCase: JoinEventUseCase,
     private val leaveEventUseCase: LeaveEventUseCase,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val recordEventJoinUseCase: RecordEventJoinUseCase,
 ) : ViewModel() {
 
     private val _events = MutableStateFlow<List<Event>>(emptyList())
@@ -131,9 +134,13 @@ class FetchEventViewModel @Inject constructor(
         }
     }
 
-
-
-
-
-
+    fun recordEventJoin(userId: String, eventId: String, eventTitle: String, startTime: Date) {
+        viewModelScope.launch {
+            try {
+                recordEventJoinUseCase(userId, eventId, eventTitle, startTime)
+            } catch (e: Exception) {
+                Log.e("EventVM", "Failed to mark attendance", e)
+            }
+        }
+    }
 }
