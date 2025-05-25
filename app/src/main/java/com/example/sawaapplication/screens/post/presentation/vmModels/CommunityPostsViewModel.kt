@@ -42,50 +42,6 @@ class CommunityPostsViewModel @Inject constructor(
     private val uid: String
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
-//    private val username: String
-//        get() = firebaseAuth.currentUser?.displayName ?: "Anonymous"
-//
-//    private val userIcon: String
-//        get() = firebaseAuth.currentUser?.photoUrl?.toString() ?: ""
-
-//    fun createPost(communityId: String) {
-//        if (communityId.isBlank()) {
-//            Log.e("CreatePost", "Missing communityId. Cannot create post.")
-//            return
-//        }
-//
-//        val postContent = content.trim()
-//
-//        if (postContent.isBlank() && imageUri == null) {
-//            Log.e("CreatePost", "Post must have content or image.")
-//            return
-//        }
-//
-//        val post = Post(
-//            content = postContent,
-//            createdAt = Date().toString(),
-//            imageUri = "", // Will be updated after upload
-//            userId = uid,
-//            communityId = communityId,
-//
-//
-//        )
-//
-//        viewModelScope.launch {
-//            try {
-//                Log.d("CreatePost", "Creating post in communityId: $communityId")
-//                createPostUseCase(communityId, post, imageUri)
-//                Log.d("CreatePost", "Post created successfully")
-//
-//                // Reset form after successful creation
-//                content = ""
-//                imageUri = null
-//
-//            } catch (e: Exception) {
-//                Log.e("CreatePost", "Error creating post: ${e.message}", e)
-//            }
-//        }
-//    }
 
     suspend fun createPost(communityId: String): Boolean {
         if (communityId.isBlank()) {
@@ -138,7 +94,6 @@ class CommunityPostsViewModel @Inject constructor(
                 }
         }
     }
-
 
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
