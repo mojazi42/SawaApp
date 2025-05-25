@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
@@ -75,6 +76,8 @@ fun EventDetailScreen(
 
     val event = viewModel.getEventById(eventId)
     val context = LocalContext.current
+    val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+    val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
 
     if (event == null) {
         Text(
@@ -97,16 +100,6 @@ fun EventDetailScreen(
                 .align(Alignment.TopCenter),
             contentAlignment = Alignment.Center
         ) {
-            IconButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier.size(integerResource(R.integer.backIconSize).dp)
-                )
-            }
             Text(
                 text = community?.name ?: stringResource(R.string.loading),
                 style = MaterialTheme.typography.titleLarge,
@@ -258,9 +251,13 @@ fun EventDetailScreen(
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
-                    imageVector = Icons.Default.ChevronLeft,
+                    imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    modifier = Modifier.size(integerResource(R.integer.backIconSize).dp)
+                    modifier = Modifier
+                        .size(integerResource(R.integer.backIconSize).dp)
+                        .graphicsLayer {
+                            scaleX = if (isRtl) -1f else 1f
+                        }
                 )
             }
         }
