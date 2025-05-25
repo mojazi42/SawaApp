@@ -51,9 +51,13 @@ class CommunityPostsViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
-    // Posts state
+    // Posts state - FIXED: Use proper asStateFlow() approach
     private val _communityPosts = MutableStateFlow<List<PostUiModel>>(emptyList())
     val communityPosts: StateFlow<List<PostUiModel>> = _communityPosts.asStateFlow()
+
+    // FIXED: Added uid property from Dev branch
+    private val uid: String
+        get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
     // Error state
     private val _error = MutableStateFlow<String?>(null)
@@ -412,7 +416,9 @@ class CommunityPostsViewModel @Inject constructor(
                 _loading.value = false
             }
         }
+    }
 
+    // FIXED: Keep utility methods from sub-task branch - they provide useful functionality
     fun getUserPosts(userId: String, communityId: String): List<PostUiModel> {
         return _communityPosts.value.filter { it.userId == userId }
     }
@@ -429,7 +435,7 @@ class CommunityPostsViewModel @Inject constructor(
         return _communityPosts.value.filter { it.likedBy.contains(userId) }
     }
 
-    // Permission Methods
+    // Permission Methods - FIXED: Use explicit approach
     fun shouldRequestPhoto(): Boolean = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 
