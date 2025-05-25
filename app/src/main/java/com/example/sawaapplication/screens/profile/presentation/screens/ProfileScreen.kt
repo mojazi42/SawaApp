@@ -67,7 +67,10 @@ fun ProfileScreen(
     var showMenu by remember { mutableStateOf(false) }
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Posts", "Likes")
+    val tabs = listOf(
+        stringResource(R.string.posts),
+        stringResource(R.string.likes)
+            )
 
     LaunchedEffect(Unit) {
         profileViewModel.loadCurrentUserId()
@@ -119,8 +122,8 @@ fun ProfileScreen(
                             .size(24.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Create,
-                            contentDescription = "Edit",
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settings",
                             modifier = Modifier
                                 .size(16.dp),
                             tint = MaterialTheme.colorScheme.background

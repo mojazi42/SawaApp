@@ -104,7 +104,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
     }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchAllPosts()
+        viewModel.loadAllPosts()
     }
 
 
