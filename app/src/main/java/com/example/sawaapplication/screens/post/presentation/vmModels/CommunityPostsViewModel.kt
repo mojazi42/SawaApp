@@ -412,7 +412,6 @@ class CommunityPostsViewModel @Inject constructor(
                 _loading.value = false
             }
         }
-    }
 
     fun getUserPosts(userId: String, communityId: String): List<PostUiModel> {
         return _communityPosts.value.filter { it.userId == userId }

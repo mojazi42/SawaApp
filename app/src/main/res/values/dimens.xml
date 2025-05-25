@@ -129,6 +129,7 @@
     <integer name="buttonElevation">4</integer>
     <integer name="iconSize">20</integer>
     <integer name="tabRowHeight">4</integer>
+    <integer name="roundValue">4</integer>
 
     <!--ChatScreen-->
     <integer name="topBarPadding">12</integer>
@@ -200,9 +201,14 @@
 
     <!--Event Details-->
     <integer name="screenTopSpace">56</integer>
-    <integer name="backIconSize">40</integer>
+    <integer name="backIconSize">24</integer>
     <integer name="round">12</integer>
     <integer name="membersIconSize">20</integer>
     <integer name="paddingEventScreen">8</integer>
+
+    <!--Bottom bar-->
+    <integer name="IconSize">44</integer>
+    <integer name="IconShadowElevation">16</integer>
+
 
 </resources>

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,10 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,6 +62,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -80,6 +86,7 @@ import com.example.sawaapplication.ui.theme.PrimaryOrange
 import com.example.sawaapplication.ui.theme.white
 import com.google.firebase.auth.FirebaseAuth
 import java.net.URLEncoder
+import kotlin.math.round
 
 // Data class for dialog states
 private data class DialogState(
@@ -105,6 +112,16 @@ fun CommunityScreen(
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var selectedTab by remember { mutableIntStateOf(0) }
     var dialogState by remember { mutableStateOf(DialogState()) }
+    val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
+
+    val posts by communityPostsViewModel.communityPosts.collectAsState()
+    var joinedEvent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
+    var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
+    val communityDetail by viewModel.communityDetail.collectAsState()
+    val isUserJoined = communityDetail?.members?.contains(userId) == true
+    val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var eventToDelete by remember { mutableStateOf<MessagingClientEvent.Event?>(null) }
 
     // Collect States
     val uiState = CommunityScreenState(
@@ -130,6 +147,19 @@ fun CommunityScreen(
         }
     }
 
+    //Dialog for confirm leaving an event
+    if (showLeaveCommunityDialog) {
+        CustomConfirmationDialog(
+            message = stringResource(R.string.areYouSureCommunity),
+            onDismiss = {
+                showLeaveCommunityDialog = false
+            },
+            onConfirm = {
+                joinCommunityViewModel.leaveCommunity(communityId, userId)
+                viewModel.fetchCommunityDetail(communityId)
+                showLeaveCommunityDialog = false
+            },
+        )
     // Event Handlers
     val eventHandlers = CommunityEventHandlers(
         onLeaveCommunity = {
@@ -169,6 +199,24 @@ fun CommunityScreen(
 
     Scaffold(
         topBar = {
+            val layoutDirection = LocalLayoutDirection.current
+            val isRtl = layoutDirection == LayoutDirection.Rtl
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack,
+                            contentDescription = "Back" ,
+                            modifier = Modifier.graphicsLayer {
+                                scaleX = if (isRtl) -1f else 1f
+                            })
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
+                title = {},
+                windowInsets = WindowInsets(integerResource(R.integer.zero))
+            )
             CommunityTopBar(onBackPressed = { navController.popBackStack() })
         },
         floatingActionButton = {
@@ -189,6 +237,80 @@ fun CommunityScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
+                Box(
+                    modifier = Modifier
+                        .size(integerResource(R.integer.photoBoxSize).dp),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    AsyncImage(
+                        model = communityDetail?.image,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    if ( isAdmin ){
+                        IconButton(
+                            onClick = {
+                                navController.navigate("edit_community/$communityId")
+                            },
+                            modifier = Modifier
+                                .size(32.dp) // size of the clickable icon container
+                                .background(
+                                    color = Color(0xFFFF5722),
+                                    shape = CircleShape
+                                )
+                                .padding(4.dp) // inner padding for the icon
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Create,
+                                contentDescription = "Edit",
+                                modifier = Modifier.size(16.dp),
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.name,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                Text(
+                    text = "${communityDetail?.members?.size ?: 0} Members",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+//                Spacer(Modifier.height(integerResource(R.integer.extraSmallSpace).dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.category,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
+                            .clip(RoundedCornerShape(integerResource(R.integer.roundValue).dp))
+                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                            .padding(horizontal = integerResource(R.integer.extraSmallSpace).dp)
+                    )
+                }
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
+                    )
+                }
+                Spacer(Modifier.height(integerResource(R.integer.itemSpacerH).dp))
                 CommunityHeader(
                     communityDetail = uiState.communityDetail,
                     isAdmin = uiState.isAdmin,

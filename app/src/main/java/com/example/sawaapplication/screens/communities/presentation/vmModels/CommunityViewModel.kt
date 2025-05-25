@@ -86,8 +86,6 @@ class CommunityViewModel @Inject constructor(
         _searchText.value = newText
     }
 
-    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
-    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
@@ -106,7 +104,8 @@ class CommunityViewModel @Inject constructor(
         job = viewModelScope.launch {
             _loading.value = true
             try {
-                val result = createCommunityUseCase(name=name, description=description, category=category, imageUri=imageUri, currentUserId)
+                val result = createCommunityUseCase(name=name, description=description,
+                    category=category, imageUri=imageUri, currentUserId)
                 result.onSuccess {
                     fetchCreatedCommunities(currentUserId) // Refresh list after successful creation
                     _success.value = true
