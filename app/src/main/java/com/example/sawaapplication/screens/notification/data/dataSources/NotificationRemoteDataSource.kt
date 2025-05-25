@@ -278,16 +278,21 @@ class NotificationRemoteDataSource @Inject constructor(
 
             val startTs = doc.getTimestamp("startTime")?.toDate()?.time
                 ?: return@mapNotNull null
-            if (startTs + 60*60*1000 > now) return@mapNotNull null
+            if (startTs + 60 * 60 * 1000 > now) return@mapNotNull null
+
+            val message = doc.getString("message") ?: return@mapNotNull null
+
+            // Send OneSignal push notification to the user
+            sendPushNotificationToUser(userId, message)
 
             Notification(
-                id        = doc.id,
-                message   = doc.getString("message") ?: return@mapNotNull null,
+                id = doc.id,
+                message = message,
                 timestamp = doc.getTimestamp("timestamp")!!.toDate(),
-                userId    = userId,
-                isRead    = doc.getBoolean("isRead") ?: false,
-                type      = "event_reminder",
-                eventId   = doc.getString("eventId"),
+                userId = userId,
+                isRead = doc.getBoolean("isRead") ?: false,
+                type = "event_reminder",
+                eventId = doc.getString("eventId"),
                 startTime = doc.getTimestamp("startTime"),
                 responded = false
             )
