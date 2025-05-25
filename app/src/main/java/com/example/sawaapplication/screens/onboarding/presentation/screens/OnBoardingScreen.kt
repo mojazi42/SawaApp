@@ -2,6 +2,11 @@ package com.example.sawaapplication.screens.onboarding.presentation.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -103,6 +108,17 @@ fun OnboardingPageV2(
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(page) { visible = true }
 
+    val infiniteTransition = rememberInfiniteTransition()
+
+    val imageSize by infiniteTransition.animateFloat(
+        initialValue = 200.0f,
+        targetValue = 250.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1600, delayMillis = 200,easing = FastOutLinearInEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
     SawaApplicationTheme(dynamicColor = false) {
         Column(
             modifier = Modifier
@@ -111,19 +127,27 @@ fun OnboardingPageV2(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn(animationSpec = tween(1000)),
-                exit = fadeOut(animationSpec = tween(500))
-            ) {
-                Image(
-                    painter = painterResource(id = images[page]),
-                    contentDescription = "Onboarding Image",
-                    modifier = Modifier.size(if (isTablet) integerResource(id= R.integer.tabletOnboardingImage).dp else integerResource(id= R.integer.onboardingImage).dp)
-                )
-            }
 
-            Spacer(modifier = Modifier.height(integerResource(id=R.integer.mediumSpace).dp))
+            val fixedImageHeight = 250.dp
+            Box(
+                modifier = Modifier
+                    .height(fixedImageHeight)
+                    .fillMaxWidth()
+                ,
+                contentAlignment = Alignment.Center
+            ) {
+                this@Column.AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(animationSpec = tween(1000)),
+                    exit = fadeOut(animationSpec = tween(500))
+                ) {
+                    Image(
+                        painter = painterResource(id = images[page]),
+                        contentDescription = "Onboarding Image",
+                        modifier = Modifier.size(imageSize.dp)
+                    )
+                }
+            }
 
             Text(
                 text = titles[page],
@@ -133,7 +157,7 @@ fun OnboardingPageV2(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(integerResource(id=R.integer.smallerSpace).dp))
+            Spacer(modifier = Modifier.height(integerResource(id=R.integer.mediumSpace).dp))
 
             Text(
                 text = descriptions[page],
@@ -142,7 +166,7 @@ fun OnboardingPageV2(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(integerResource(id= R.integer.Space).dp))
+            Spacer(modifier = Modifier.height(integerResource(id=R.integer.smallerSpace).dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -164,6 +188,8 @@ fun OnboardingPageV2(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(integerResource(id= R.integer.Space).dp))
 
             if (page == 2) {
                 Spacer(modifier = Modifier.height(integerResource(id= R.integer.extraLargeSpace).dp))
