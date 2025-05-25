@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.ArrowCircleLeft
 import androidx.compose.material3.Icon
@@ -211,7 +212,7 @@ fun getTopBar(
                     navIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(28.dp)
@@ -229,7 +230,7 @@ fun getTopBar(
                     navIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(28.dp)
@@ -263,7 +264,7 @@ fun getTopBar(
                     navIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(28.dp)

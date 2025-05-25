@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.outlined.AddLocation
 import androidx.compose.material3.Button
@@ -101,7 +102,7 @@ fun EventDetailScreen(
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
-                    imageVector = Icons.Default.ChevronLeft,
+                    imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
                     modifier = Modifier.size(integerResource(R.integer.backIconSize).dp)
                 )
