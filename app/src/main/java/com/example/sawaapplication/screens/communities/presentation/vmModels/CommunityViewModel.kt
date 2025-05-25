@@ -86,8 +86,6 @@ class CommunityViewModel @Inject constructor(
         _searchText.value = newText
     }
 
-    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
-    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
