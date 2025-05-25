@@ -85,6 +85,7 @@
     <!--CommunityScreen-->
     <string name="posts">Posts</string>
     <string name="events">Events</string>
+    <string name="likes">Likes</string>
     <string name="chat">Chat</string>
     <string name="joinCommunity">Join Community</string>
     <string name="areYouSureEvent">Are you sure you want to leave this event?</string>
@@ -154,5 +155,11 @@
     <!--Event Details-->
     <string name="loading">loading...</string>
     <string name="viewLocation">View Location</string>
+
+    <!--Bottom Navigation-->
+    <string name="Home">Home</string>
+    <string name="Explore">Explore</string>
+    <string name="Communities">Communities</string>
+    <string name="Chats">Chats</string>
 
 </resources>
