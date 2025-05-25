@@ -21,6 +21,8 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = DarkBorder, //Community Card border
     onSecondaryContainer = lightGray,
     onPrimaryContainer= lightGray,
+    tertiaryContainer = DarkHighlighter,
+
     )
 
 private val LightColorScheme = lightColorScheme(
@@ -34,6 +36,7 @@ private val LightColorScheme = lightColorScheme(
     inverseSurface = secondOrange,
     inverseOnSurface = thirdOrange,
     background = white,
+    tertiaryContainer = LightHighlighter,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

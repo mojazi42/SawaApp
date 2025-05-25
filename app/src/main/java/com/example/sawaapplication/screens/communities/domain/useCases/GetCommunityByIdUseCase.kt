@@ -18,6 +18,7 @@ class GetCommunityByIdUseCase @Inject constructor(
                 description = domainCommunity.description,
                 image = domainCommunity.image,
                 creatorId = domainCommunity.creatorId,
+                category = domainCommunity.category,
                 members = domainCommunity.members,
                 createdAt = domainCommunity.createdAt,
                 updatedAt = domainCommunity.updatedAt
