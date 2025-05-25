@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -84,6 +85,7 @@ import com.example.sawaapplication.ui.theme.white
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.reporting.MessagingClientEvent
 import java.net.URLEncoder
+import kotlin.math.round
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,7 +107,7 @@ fun CommunityScreen(
     val tabs = listOf(stringResource(R.string.posts), stringResource(R.string.events))
 
     val posts by communityPostsViewModel.communityPosts.collectAsState()
-    var joinedevent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
+    var joinedEvent by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     var joined by remember { mutableStateOf(false) }// we need to get the dynamic initial value
     val communityDetail by viewModel.communityDetail.collectAsState()
     val isUserJoined = communityDetail?.members?.contains(userId) == true
@@ -145,25 +147,6 @@ fun CommunityScreen(
     }
 
     //Dialog for confirm leaving an event
-    if (showLeaveEventDialog && selectedEventId != null) {
-        CustomConfirmationDialog(
-            message = stringResource(R.string.areYouSureEvent),
-            onConfirm = {
-                eventViewModel.leaveEvent(
-                    communityId = communityId,
-                    eventId = selectedEventId!!,
-                    userId = userId
-                )
-                showLeaveEventDialog = false
-                selectedEventId = null
-            },
-            onDismiss = {
-                showLeaveEventDialog = false
-                selectedEventId = null
-            }
-        )
-    }
-
     if (showLeaveCommunityDialog) {
         CustomConfirmationDialog(
             message = stringResource(R.string.areYouSureCommunity),
@@ -281,8 +264,22 @@ fun CommunityScreen(
                 Text(
                     text = "${communityDetail?.members?.size ?: 0} Members",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
+//                Spacer(Modifier.height(integerResource(R.integer.extraSmallSpace).dp))
+                communityDetail?.let {
+                    Text(
+                        text = it.category,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
+                            .clip(RoundedCornerShape(integerResource(R.integer.roundValue).dp))
+                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                            .padding(horizontal = integerResource(R.integer.extraSmallSpace).dp)
+                    )
+                }
                 Spacer(Modifier.height(integerResource(R.integer.itemSpacerH2nd).dp))
                 communityDetail?.let {
                     Text(

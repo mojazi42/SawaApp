@@ -32,6 +32,7 @@ fun ExploreCommunityCardList(
                 communityName = community.name,
                 communityMember = community.members.size,
                 communityImage = rememberAsyncImagePainter(community.image),
+                communityCategory = community.category,
                 joinButton = {
                     JoinButton(
                         isJoined = isJoined,

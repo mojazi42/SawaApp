@@ -36,6 +36,7 @@ fun CommunityCard(
     communityName: String,
     communityMember : Int,
     communityImage: Painter,
+    communityCategory: String,
     joinButton : @Composable () -> Unit,
     onClick: () -> Unit
 ) {
@@ -72,6 +73,13 @@ fun CommunityCard(
 
                 Text(
                     text = "${communityMember} Members",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Light
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = communityCategory,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Light
                 )
