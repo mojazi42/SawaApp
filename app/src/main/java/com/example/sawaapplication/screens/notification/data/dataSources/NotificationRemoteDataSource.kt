@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaType
 import org.json.JSONArray
 import org.json.JSONObject
@@ -35,7 +36,13 @@ class NotificationRemoteDataSource @Inject constructor(
                     return@addSnapshotListener
                 }
 
-                val notifications = snapshot?.documents?.mapNotNull { doc ->
+                val notifications = snapshot
+                    ?.documents
+                    //filter out any reminder docs
+                    ?.filter { doc ->
+                        doc.getString("type") != "event_reminder"
+                    }
+                    ?.mapNotNull { doc ->
                     val message = doc.getString("message") ?: return@mapNotNull null
                     val timestamp =
                         doc.getTimestamp("timestamp")?.toDate() ?: return@mapNotNull null
@@ -255,5 +262,65 @@ class NotificationRemoteDataSource @Inject constructor(
                 listener(snapshot?.isEmpty == false)
             }
     }
+    //Event Reminder
+    // Fetch reminders (start+1h passed, not yet responded)
+    suspend fun getPendingReminders(userId: String): List<Notification> {
+        val snapshot = firestore.collection("Notification")      // <-- singular
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("type", "event_reminder")
+            .get()
+            .await()
 
+        val now = System.currentTimeMillis()
+        return snapshot.documents.mapNotNull { doc ->
+            val responded = doc.getBoolean("responded") ?: false
+            if (responded) return@mapNotNull null
+
+            val startTs = doc.getTimestamp("startTime")?.toDate()?.time
+                ?: return@mapNotNull null
+            if (startTs + 60*60*1000 > now) return@mapNotNull null
+
+            Notification(
+                id        = doc.id,
+                message   = doc.getString("message") ?: return@mapNotNull null,
+                timestamp = doc.getTimestamp("timestamp")!!.toDate(),
+                userId    = userId,
+                isRead    = doc.getBoolean("isRead") ?: false,
+                type      = "event_reminder",
+                eventId   = doc.getString("eventId"),
+                startTime = doc.getTimestamp("startTime"),
+                responded = false
+            )
+        }
+    }
+
+    // Mark attendance reminder responded & record
+    suspend fun respondToReminder(
+        userId: String,
+        notificationId: String,
+        attended: Boolean
+    ) {
+        //eventId from the reminder doc
+        val docSnap = firestore.collection("Notification")
+            .document(notificationId)
+            .get()
+            .await()
+        val eventId = docSnap.getString("eventId")
+            ?: throw IllegalStateException("Reminder $notificationId has no eventId")
+
+        //responded=true, and if Yes, add eventId to attendance
+        val batch = firestore.batch()
+        val notifRef = firestore.collection("Notification").document(notificationId)
+        batch.update(notifRef, "responded", true)
+
+        if (attended) {
+            val userRef = firestore.collection("User").document(userId)
+            batch.update(
+                userRef,
+                "eventAttendance.eventIds",
+                FieldValue.arrayUnion(eventId)
+            )
+        }
+        batch.commit().await()
+    }
 }
