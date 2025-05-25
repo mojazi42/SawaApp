@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -70,7 +71,10 @@ fun ProfileScreen(
     var showMenu by remember { mutableStateOf(false) }
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Posts", "Likes")
+    val tabs = listOf(
+        stringResource(R.string.posts),
+        stringResource(R.string.likes)
+            )
 
     val badges by profileViewModel.awardedBadges.collectAsState()
     val attended by profileViewModel.attendedCount.collectAsState()
@@ -84,7 +88,6 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         profileViewModel.loadCurrentUserId()
     }
-
     LaunchedEffect(selectedTabIndex, userCurrentId) {
         if (userCurrentId.isNotEmpty()) {
             when (selectedTabIndex) {
@@ -101,102 +104,75 @@ fun ProfileScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        IconButton(
-            onClick = { showMenu = !showMenu },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-        ) {
-            Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
+        Box(modifier = Modifier.fillMaxSize()) {
 
-            DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(integerResource(R.integer.profilePadding).dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                DropdownMenuItem(
-                    text = { Text("Dark Mode") },
-                    onClick = {
+                Spacer(Modifier.height(integerResource(R.integer.topSpacing).dp))
 
-                        showMenu = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Log Out") },
-                    onClick = {
-                        showMenu = false
-                        logOutViewModel.preformLogOut(navController)
-                    }
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(integerResource(R.integer.profilePadding).dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(integerResource(R.integer.topSpacing).dp))
-
-            Box(
-                modifier = Modifier.size(integerResource(R.integer.photoBoxSize).dp)
-            ) {
-
-                Image(
-                    painter = if (imageUrl != null)
-                        rememberAsyncImagePainter(imageUrl)
-                    else
-                        painterResource(id = R.drawable.ic_launcher_background),
-                    contentDescription = "Profile image",
-                    contentScale = ContentScale.Crop,
-
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(integerResource(R.integer.photoBoxSize).dp)
-                )
-
-                IconButton(
-                    onClick = { navController.navigate(Screen.EditProfile.route) },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .background(
-                            color = Color(0xFFFF5722),
-                            shape = RoundedCornerShape(48.dp)
-                        )
-                        .size(24.dp)
+                Box(
+                    modifier = Modifier.size(integerResource(R.integer.photoBoxSize).dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Create,
-                        contentDescription = "Edit",
+
+                    Image(
+                        painter = if (imageUrl != null)
+                            rememberAsyncImagePainter(imageUrl)
+                        else
+                            painterResource(id = R.drawable.ic_launcher_background),
+                        contentDescription = "Profile image",
+                        contentScale = ContentScale.Crop,
+
                         modifier = Modifier
-                            .size(16.dp),
-                        tint = MaterialTheme.colorScheme.background
+                            .clip(CircleShape)
+                            .size(integerResource(R.integer.photoBoxSize).dp)
                     )
+
+                    IconButton(
+                        onClick = { navController.navigate(Screen.EditProfile.route) },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .background(
+                                color = Color(0xFFFF5722),
+                                shape = RoundedCornerShape(48.dp)
+                            )
+                            .size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settings",
+                            modifier = Modifier
+                                .size(16.dp),
+                            tint = MaterialTheme.colorScheme.background
+                        )
+                    }
                 }
-            }
 
-            Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
-            Text(
-                text = userName ?: "Unknown",
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
+                Text(
+                    text = userName ?: "Unknown",
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
 
-            Text(
-                text = userEmail ?: "No email",
-                textAlign = TextAlign.Center,
-                fontSize = integerResource(R.integer.textSize1).sp
-            )
-            Spacer(Modifier.height(8.dp))
+                Text(
+                    text = userEmail ?: "No email",
+                    textAlign = TextAlign.Center,
+                    fontSize = integerResource(R.integer.textSize1).sp
+                )
+                Spacer(Modifier.height(8.dp))
 
-            Text(
-                text = stringResource(id = R.string.aboutMe),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                fontSize = integerResource(R.integer.textSize2).sp
-            )
+                Text(
+                    text = stringResource(id = R.string.aboutMe),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = integerResource(R.integer.textSize2).sp
+                )
 
             Text(
                 text = aboutMe ?: "",
@@ -249,5 +225,6 @@ fun ProfileScreen(
             }
         }
     }
+}
 }
 

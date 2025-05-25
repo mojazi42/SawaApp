@@ -1,6 +1,8 @@
 package com.example.sawaapplication.screens.chat.presentation.screens
 
+import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -14,10 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,10 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.chat.presentation.screens.chatComponent.ChatBubble
 import com.example.sawaapplication.screens.chat.presentation.screens.chatComponent.ChatInputBar
 import com.example.sawaapplication.screens.chat.presentation.screens.chatComponent.ChatMembersHeader
@@ -39,13 +46,19 @@ import com.example.sawaapplication.screens.chat.presentation.screens.chatCompone
 import com.example.sawaapplication.screens.chat.presentation.screens.chatComponent.ImagePreviewOverlay
 import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChatScreen(
     communityId: String,
     navController: NavController
 ) {
+
+    val context = LocalContext.current
     val communityViewModel: CommunityViewModel = hiltViewModel()
     val chatViewModel: ChatViewModel = hiltViewModel()
 
@@ -66,6 +79,11 @@ fun ChatScreen(
     var previewImageUrl by remember { mutableStateOf<String?>(null) }
 
     val listState = rememberLazyListState()
+
+    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
+    val askPhotoPermissionText = stringResource(R.string.askPhotoPermissionFromSettings)
+
     val photoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
         selectedImageUri = it
     }
@@ -94,6 +112,29 @@ fun ChatScreen(
             .forEach { chatViewModel.fetchSenderInfo(it) }
     }
 
+    // Show permission dialog
+    if (showPhotoPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoPermissionDialog = false },
+            title = { Text(stringResource(R.string.photoPermission)) },
+            text = { Text(stringResource(R.string.askPhotoPermission)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    chatViewModel.markPhotoPermissionRequested()
+                    photoPermissionState.launchPermissionRequest()
+                    showPhotoPermissionDialog = false
+                }) {
+                    Text(stringResource(R.string.allow))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPhotoPermissionDialog = false }) {
+                    Text(stringResource(R.string.deny))
+                }
+            }
+        )
+    }
+
     if (loading) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -114,7 +155,21 @@ fun ChatScreen(
                 messageText = messageText,
                 onMessageChange = { messageText = it },
                 selectedImageUri = selectedImageUri,
-                onPickImageClick = { photoPickerLauncher.launch("image/*") },
+                onPickImageClick = {
+                    if (photoPermissionState.status.isGranted) {
+                        photoPickerLauncher.launch("image/*")
+                    } else {
+                        if (chatViewModel.shouldRequestPhoto()) {
+                            showPhotoPermissionDialog = true
+                        } else {
+                            Toast.makeText(
+                                context,
+                                askPhotoPermissionText,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                },
                 onSendClick = {
                     if (messageText.isNotBlank() || selectedImageUri != null) {
                         chatViewModel.sendMessage(
@@ -163,7 +218,7 @@ fun ChatScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text("No messages yet.", style = MaterialTheme.typography.bodyLarge)
-                }
+                }// challenge is challenge is challenge ;)
             } else {
                 LazyColumn(
                     state = listState,

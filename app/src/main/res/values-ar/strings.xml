@@ -59,7 +59,7 @@
     <string name="myCommunities">مجتمعاتي</string>
 
     <!--Create new event-->
-    <string name="newEvent">دث جديد</string>
+    <string name="newEvent">حدث جديد</string>
     <string name="eventName">اسم الحدث</string>
     <string name="eventDescription">وصف الحدث</string>
     <string name="eventMembersLimit">عدد للحضور</string>
@@ -71,6 +71,7 @@
     <!--CommunityScreen-->
     <string name="posts">المنشورات</string>
     <string name="events">الأحداث</string>
+    <string name="likes">الإعجابات</string>
     <string name="chat">المحادثات</string>
     <string name="joinCommunity">إنضم للمجتمع</string>
     <string name="areYouSureEvent">هل أنت متأكد من رغبتك في مغادرة الحدث؟</string>
@@ -153,5 +154,11 @@
     <!--Event Details-->
     <string name="loading">تنزيل...</string>
     <string name="viewLocation">عرض الموقع</string>
+
+    <!--Bottom Navigation-->
+    <string name="Home">الرئيسية</string>
+    <string name="Explore">استكشف</string>
+    <string name="Communities">المجتمعات</string>
+    <string name="Chats">المحادثات</string>
 
 </resources>

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.ArrowCircleLeft
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
@@ -180,9 +182,25 @@ fun getTopBar(
                 TopBar(
                     title = stringResource(R.string.notification),
                     imageUrl = imageUrl,
-                    onProfileClick = { navController.navigate(Screen.Profile.route) }
-                )
+                    navIcon = {
+                        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+                        val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .graphicsLayer {
+                                        scaleX = if (isRtl) -1f else 1f
+                                    }
+                            )
+                        }
+                    })
+
             }
+
         }
 
         Screen.EditProfile.route -> {
@@ -191,12 +209,18 @@ fun getTopBar(
                     title = stringResource(R.string.editProfile),
                     imageUrl = imageUrl,
                     navIcon = {
+                        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+                        val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .graphicsLayer {
+                                        scaleX = if (isRtl) -1f else 1f
+                                    }
                             )
                         }
                     },
@@ -209,12 +233,18 @@ fun getTopBar(
                 TopBar(
                     title = "",
                     navIcon = {
+                        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+                        val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .graphicsLayer {
+                                        scaleX = if (isRtl) -1f else 1f
+                                    }
                             )
                         }
                     },
@@ -227,12 +257,18 @@ fun getTopBar(
                 TopBar(
                     title = "",
                     navIcon = {
+                        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+                        val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .graphicsLayer {
+                                        scaleX = if (isRtl) -1f else 1f
+                                    }
                             )
                         }
                     },
@@ -261,12 +297,18 @@ fun getTopBar(
                 TopBar(
                     title = stringResource(R.string.groupMembers),
                     navIcon = {
+                        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+                        val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .graphicsLayer {
+                                        scaleX = if (isRtl) -1f else 1f
+                                    }
                             )
                         }
                     }

@@ -114,7 +114,11 @@ class CommunityRemoteDataSource @Inject constructor(
     suspend fun deleteCommunity(communityId: String, imageUrl: String?): Result<Unit> {
 
         return try {
-            // 1. Attempt to delete the image (if any)
+
+            deleteSubCollection(communityId, "posts")
+            deleteSubCollection(communityId, "event")
+            deleteSubCollection(communityId, "messages")
+
             if (!imageUrl.isNullOrBlank()) {
                 try {
                     val imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
@@ -125,7 +129,6 @@ class CommunityRemoteDataSource @Inject constructor(
                 }
             }
 
-            // 2. Delete Firestore document
             FirebaseFirestore.getInstance()
                 .collection("Community")
                 .document(communityId)
@@ -139,22 +142,18 @@ class CommunityRemoteDataSource @Inject constructor(
             Result.failure(e)
         }
 
-//        return try {
-//            val communityDoc = firestore.collection("Community").document(communityId)
-//
-//            val snapshot = communityDoc.get().await()
-//            val imageUrl = snapshot.getString("image")
-//            imageUrl?.let {
-//                FirebaseStorage.getInstance().getReferenceFromUrl(it).delete().await()
-//            }
-//
-//            communityDoc.delete().await()
-//
-//            Result.success(Unit)
-//        } catch (e: Exception) {
-//            Log.e("DeleteCommunity", "Failed to delete community: ${e.message}", e)
-//            Result.failure(e)
-//        }
+    }
+
+    // To delete all the "posts" "events" and "chats" that are related to a community
+    suspend fun deleteSubCollection(communityId: String, subCollection: String) {
+        val collectionRef = firestore.collection("Community")
+            .document(communityId)
+            .collection(subCollection)
+
+        val documents = collectionRef.get().await()
+        for (doc in documents) {
+            doc.reference.delete().await()
+        }
     }
 
 }

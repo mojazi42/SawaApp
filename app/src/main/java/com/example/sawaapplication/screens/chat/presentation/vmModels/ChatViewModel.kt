@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sawaapplication.core.permissions.PermissionHandler
 import com.example.sawaapplication.screens.authentication.domain.repository.AuthRepository
 import com.example.sawaapplication.screens.chat.domain.model.ChatUserInfo
 import com.example.sawaapplication.screens.chat.domain.model.Message
@@ -32,7 +33,8 @@ class ChatViewModel @Inject constructor(
     private val fetchUnreadMessagesUseCase: FetchUnreadMessagesUseCase,
     private val markMessagesAsReadUseCase: MarkMessagesAsReadUseCase,
     private val getSenderInfoUseCase: GetSenderInfoUseCase,
-    private val getCommunityMembersUseCase: GetCommunityMembersUseCase
+    private val getCommunityMembersUseCase: GetCommunityMembersUseCase,
+    private val permissionHandler: PermissionHandler,
 ) : ViewModel() {
 
     // --- existing state flows ---
@@ -194,6 +196,9 @@ class ChatViewModel @Inject constructor(
             ?.let { sdf.format(it) }
             ?: ""
     }
+
+    fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
+    fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 
     // --- UI helper types ---
     enum class MessageType {

@@ -22,7 +22,9 @@ private val DarkColorScheme = darkColorScheme(
     onSecondaryContainer = lightGray,
     onPrimaryContainer = lightGray,
     surfaceContainer = DarkContainer,
-)
+    tertiaryContainer = DarkHighlighter,
+
+    )
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryOrange,
@@ -36,6 +38,7 @@ private val LightColorScheme = lightColorScheme(
     inverseOnSurface = thirdOrange,
     background = white,
     surfaceContainer = Beige,
+    tertiaryContainer = LightHighlighter,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

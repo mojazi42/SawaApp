@@ -35,8 +35,8 @@ fun ChatTopBarBanner(
             model = communityImage,
             contentDescription = "Community Banner",
             modifier = Modifier
-                .fillMaxSize()
-                .clickable { onImageClick() },
+                .fillMaxSize(),
+//                .clickable { onImageClick() },
             contentScale = ContentScale.Crop
         )
         IconButton(
