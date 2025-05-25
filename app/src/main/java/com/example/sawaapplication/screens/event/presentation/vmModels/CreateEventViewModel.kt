@@ -51,6 +51,8 @@ class CreateEventViewModel @Inject constructor(
     // val success = mutableStateOf(false)
     // val error = mutableStateOf<String?>(null)
     var isMapVisible by mutableStateOf(false)
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
     var editingEvent: Event? = null
     private val _events = MutableStateFlow<List<Event>>(emptyList())
     val events: StateFlow<List<Event>> = _events
@@ -63,8 +65,6 @@ class CreateEventViewModel @Inject constructor(
         val date = formatter.parse(dateString)
         eventDate = date?.time
     }
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -91,8 +91,6 @@ class CreateEventViewModel @Inject constructor(
             return
         }
 
-        // Set loading to true
-        _loading.value = true
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // Change to 24-hour format
         val parsedTime = timeFormat.parse(eventTime)
@@ -126,22 +124,6 @@ class CreateEventViewModel @Inject constructor(
             longitude = location.longitude
         )
 
-
-        job = viewModelScope.launch {
-            _loading.value = true
-            try {
-                createEventUseCase(communityId, event, imageUri!!)
-                _success.value = true
-                Log.d("CreateEvent", "Event created successfully: $communityId")
-            } catch (e: Exception) {
-                _error.value = "Failed to create event: ${e.message}"
-                Log.e("CreateEvent", "Error creating event", e)
-            } finally {
-                _loading.value = false
-            }
-        }
-
-
     job = viewModelScope.launch {
             _loading.value = true
             try {
@@ -174,9 +156,9 @@ class CreateEventViewModel @Inject constructor(
     }
     fun updateEvent(eventId: String) {
         job = viewModelScope.launch {
-            loading.value = true
+            _loading.value = true
             try {
-                val timeFormat = SimpleDateFormat("hh:mm", Locale.getDefault())
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
                 val parsedTime = timeFormat.parse(eventTime)
 
                 val calendar = Calendar.getInstance()
@@ -213,11 +195,11 @@ class CreateEventViewModel @Inject constructor(
 
                 eventRepository.updateEvent(cid, eventId, updatedEvent.toMap())
                 Log.d("EventUpdate", "Update sent for eventId=$eventId with data=${updatedEvent.toMap()}")
-                success.value = true
+                _success.value = true
             } catch (e: Exception) {
-                error.value = e.message
+                _error.value = e.message
             } finally {
-                loading.value = false
+                _loading.value = false
             }
         }
     }

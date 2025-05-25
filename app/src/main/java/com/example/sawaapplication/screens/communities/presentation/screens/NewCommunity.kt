@@ -232,11 +232,6 @@ fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommuni
 
         CommunityTypeDropdown(
             selectedText=selectedText,
-            selectedIndex = selectedTypeIndex,
-            onTypeSelected = {
-                selectedTypeIndex = it
-                viewModel.category = communityTypes[it]
-            },
             onTypeSelected = {
                 selectedTypeIndex = it
                 viewModel.category = communityTypes[it]

@@ -46,7 +46,6 @@ import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.reporting.MessagingClientEvent
 
-
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -243,6 +242,7 @@ fun MyEventsTab(
                         onClick = {
                             navController.navigate("event_detail/${event.communityId}/${event.id}")
                         },
+                        eventTimestamp = event.time, // ← Just a comma here
                         onEditClick = {
                             navController.navigate("edit_event/${event.communityId}/${event.id}")
                         },
@@ -251,10 +251,6 @@ fun MyEventsTab(
                             deleteCommunityId = event.communityId
                             showDeleteEventDialog = true
                         }
-
-
-                        },
-                        eventTimestamp = event.time
                     )
                 }
             }

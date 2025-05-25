@@ -52,9 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
-import com.example.sawaapplication.screens.event.domain.model.Event
-import com.example.sawaapplication.screens.profile.vm.ProfileViewModel
 import com.google.firebase.Timestamp
+import com.example.sawaapplication.screens.event.domain.model.Event
 
 
 @Composable
@@ -73,10 +72,10 @@ fun EventCard(
     showCancelButton: Boolean = false,
     joinedUsers: List<String> = emptyList(),
     onClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
     isEditable: Boolean = false,
     onEditClick: () -> Unit = {},
-    onDeleteClick: () -> Unit = {}
+    onDeleteClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     fun isEventExpired(eventTime: Timestamp): Boolean {
         val eventMillis = eventTime.toDate().time

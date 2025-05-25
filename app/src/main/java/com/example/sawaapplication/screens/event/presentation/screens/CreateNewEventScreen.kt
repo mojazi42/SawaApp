@@ -97,7 +97,6 @@ fun CreateNewEventScreen(
     val loading by viewModel.loading.collectAsState()
 
 
-
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
 
@@ -128,16 +127,16 @@ fun CreateNewEventScreen(
         }
     }
 
-    // React to success
-    LaunchedEffect(success) {
-        if (success) {
-            notificationViewModel.notifyEventCreated(viewModel.name)
-            notificationViewModel.notifyCommunityMembers(communityId, viewModel.name)
-            Toast.makeText(context, context.getString(R.string.eventCreated), Toast.LENGTH_SHORT).show()
-            navController.popBackStack()
-            viewModel.success.value = false
-        }
-    }
+//    // React to success
+//    LaunchedEffect(success) {
+//        if (success) {
+//            notificationViewModel.notifyEventCreated(viewModel.name)
+//            notificationViewModel.notifyCommunityMembers(communityId, viewModel.name)
+//            Toast.makeText(context, context.getString(R.string.eventCreated), Toast.LENGTH_SHORT).show()
+//            navController.popBackStack()
+//            viewModel.success.value = false
+//        }
+//    }
 
     // Photo Permission Dialog
     if (showPhotoPermissionDialog) {

@@ -86,6 +86,8 @@ class CommunityViewModel @Inject constructor(
         _searchText.value = newText
     }
 
+    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
+    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
@@ -154,9 +156,6 @@ class CommunityViewModel @Inject constructor(
             filtered
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-
-    fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
-    fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 
 
     // Fetches communities where the current user is a member
@@ -241,7 +240,7 @@ class CommunityViewModel @Inject constructor(
                     ))
                 }.await()
 
-                // Locally update the UI
+                //  Locally update the UI
                 _communityPosts.update { posts ->
                     posts.map {
                         if (it.id == post.id) {
