@@ -129,6 +129,7 @@
     <integer name="buttonElevation">4</integer>
     <integer name="iconSize">20</integer>
     <integer name="tabRowHeight">4</integer>
+    <integer name="roundValue">4</integer>
 
     <!--ChatScreen-->
     <integer name="topBarPadding">12</integer>
