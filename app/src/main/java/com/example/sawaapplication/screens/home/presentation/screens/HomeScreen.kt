@@ -1,6 +1,5 @@
 package com.example.sawaapplication.screens.home.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,8 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +44,7 @@ import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEven
 import com.example.sawaapplication.screens.home.presentation.screens.component.CustomTabRow
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
+import com.example.sawaapplication.screens.home.presentation.vmModels.EventFilterType
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
@@ -189,6 +195,8 @@ fun MyEventsTab(
     var showDeleteEventDialog by remember { mutableStateOf(false) }
     var deleteEventId by remember { mutableStateOf<String?>(null) }
     var deleteCommunityId by remember { mutableStateOf<String?>(null) }
+    val filteredList = viewModel.filteredEvents
+    var isFilterMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchJoinedEvents()
@@ -203,6 +211,43 @@ fun MyEventsTab(
 
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 40.dp, end = 16.dp)
+                .zIndex(1f)
+        ) {
+            IconButton(onClick = { isFilterMenuExpanded = true }) {
+                Icon(Icons.Default.FilterList, contentDescription = "Filter")
+            }
+
+            DropdownMenu(
+                expanded = isFilterMenuExpanded,
+                onDismissRequest = { isFilterMenuExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("All Events") },
+                    onClick = {
+                        viewModel.setFilter(EventFilterType.DEFAULT)
+                        isFilterMenuExpanded = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Join Events") },
+                    onClick = {
+                        viewModel.setFilter(EventFilterType.Still)
+                        isFilterMenuExpanded = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Finished Events") },
+                    onClick = {
+                        viewModel.setFilter(EventFilterType.Fineshed)
+                        isFilterMenuExpanded = false
+                    }
+                )
+            }
+        }
         when {
             loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
 
@@ -215,7 +260,7 @@ fun MyEventsTab(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(top = 72.dp, bottom = 56.dp)
             ) {
-                items(events) { event ->
+                items(filteredList) { event ->
                     val communityName = communityNames[event.communityId] ?: "Unknown Community"
                     val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
                     val formattedDate = formatDateString(event.date)

@@ -237,5 +237,32 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+    private val _selectedFilter = MutableStateFlow<EventFilterType>(EventFilterType.DEFAULT)
+    val selectedFilter: StateFlow<EventFilterType> = _selectedFilter
 
+    fun setFilter(filter: EventFilterType) {
+        _selectedFilter.value = filter
+    }
+
+    val filteredEvents: List<Event>
+        get() {
+            val now = System.currentTimeMillis()
+            return when (selectedFilter.value) {
+                EventFilterType.Fineshed ->
+                    joinedEvents.value.filter { (it.time?.toDate()?.time ?: 0L) < now }
+
+                EventFilterType.Still ->
+                    joinedEvents.value.filter { (it.time?.toDate()?.time ?: Long.MAX_VALUE) > now }
+
+                EventFilterType.DEFAULT ->
+                    joinedEvents.value
+            }.sortedBy { it.time?.toDate()?.time ?: Long.MAX_VALUE }
+        }
 }
+
+sealed class EventFilterType {
+    object DEFAULT : EventFilterType()
+    object Fineshed : EventFilterType()
+    object Still : EventFilterType()
+}
+
