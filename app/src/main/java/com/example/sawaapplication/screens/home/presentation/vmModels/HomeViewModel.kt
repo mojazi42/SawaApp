@@ -5,27 +5,36 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.event.domain.model.Event
 import com.example.sawaapplication.screens.event.domain.useCases.GetAllEventInCommunity
+import com.example.sawaapplication.screens.home.domain.useCases.DeletePostUseCase
+import com.example.sawaapplication.screens.home.domain.useCases.FetchAllPostsUseCase
+import com.example.sawaapplication.screens.home.domain.useCases.FetchCommunityNamesUseCase
+import com.example.sawaapplication.screens.home.domain.useCases.FetchJoinedEventsUseCase
+import com.example.sawaapplication.screens.home.domain.useCases.FetchLikedPostsByUserUseCase
+import com.example.sawaapplication.screens.home.domain.useCases.FetchPostsByUserUseCase
+import com.example.sawaapplication.screens.home.domain.useCases.FetchUserDetailsUseCase
+import com.example.sawaapplication.screens.home.domain.useCases.LikePostUseCase
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore,
     private val getAllEventInCommunity: GetAllEventInCommunity,
+    private val fetchAllPostsUseCase: FetchAllPostsUseCase,
+    private val fetchCommunityNamesUseCase: FetchCommunityNamesUseCase,
+    private val fetchUserDetailsUseCase: FetchUserDetailsUseCase,
+    private val likePostUseCase: LikePostUseCase,
+    private val deletePostUseCase: DeletePostUseCase,
+    private val fetchJoinedEventsUseCase: FetchJoinedEventsUseCase,
+    private val fetchPostsByUserUseCase: FetchPostsByUserUseCase,
+    private val fetchLikedPostsByUserUseCase: FetchLikedPostsByUserUseCase
 ) : ViewModel() {
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
@@ -63,88 +72,20 @@ class HomeViewModel @Inject constructor(
         return _events.value.find { it.id == eventId }
     }
 
-    private suspend fun getUserCommunityIds(userId: String): List<String> {
-        return try {
-            val snapshot = firestore.collection("Community").get().await()
-            snapshot.documents
-                .filter { doc ->
-                    val members = doc.get("members") as? List<*> ?: emptyList<Any>()
-                    userId in members
-                }
-                .map { it.id } // FireStore document ID is the communityId
-        } catch (e: Exception) {
-            Log.e("HomeViewModel", "Error fetching user communities: ${e.message}")
-            emptyList()
-        }
-    }
-
-    fun fetchAllPosts() {
+    fun loadAllPosts() {
         viewModelScope.launch {
             _loading.value = true
+
             try {
-                val currentUserId = firebaseAuth.currentUser?.uid
-
-                if (currentUserId == null) {
-                    _error.value = "User not logged in"
-                    _loading.value = false
-                    return@launch
-                }
-
-                val userCommunityIds = getUserCommunityIds(currentUserId)
-
-                if (userCommunityIds.isEmpty()) {
-                    _posts.value = emptyList()
-                    return@launch
-                }
-
-                val postsList = mutableListOf<Post>()
-                val docIdMap = mutableMapOf<Post, String>()
-
-                // Fetch posts concurrently for each community
-                val postDeferreds = userCommunityIds.map { communityId ->
-                    async {
-                        val postSnapshot = firestore
-                            .collection("Community")
-                            .document(communityId)
-                            .collection("posts")
-                            .get()
-                            .await()
-
-                        postSnapshot.documents.forEach { doc ->
-                            val post = doc.toObject(Post::class.java)
-                            if (post != null) {
-                                postsList.add(post)
-                                docIdMap[post] = doc.id
-                            }
-                        }
-                    }
-                }
-
-                postDeferreds.awaitAll()
-
-                val sortedPosts = postsList.sortedByDescending { post ->
-                    try {
-                        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
-                        dateFormat.parse(post.createdAt)
-                    } catch (e: Exception) {
-                        // If the date format is incorrect, log the error and keep original post order
-                        Log.e("HomeViewModel", "Error parsing date for post: ${post.createdAt}")
-                        null
-                    }
-                }
-
-                _posts.value = sortedPosts
+                val (postsList, docIdMap) = fetchAllPostsUseCase()
+                _posts.value = postsList
                 _postDocumentIds.value = docIdMap
 
-                val communityIds = sortedPosts.map { it.communityId }.distinct()
-                val userIds = sortedPosts.map { it.userId }.distinct()
+                val communityIds = postsList.map { it.communityId }.distinct()
+                val userIds = postsList.map { it.userId }.distinct()
 
-                val communityNamesDeferred = async { fetchCommunityNames(communityIds) }
-                val userDetailsDeferred = async { fetchUserDetails(userIds) }
-
-                communityNamesDeferred.await()
-                userDetailsDeferred.await()
-
+                loadCommunityNames(communityIds)
+                loadUserDetails(userIds)
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -153,165 +94,86 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
-    private suspend fun fetchCommunityNames(communityIds: List<String>) = coroutineScope {
-        try {
-            val namesList = communityIds.map { id ->
-                async {
-                    try {
-                        val snapshot = firestore.collection("Community").document(id).get().await()
-                        if (snapshot.exists()) {
-                            val name = snapshot.getString("name") ?: "Unknown"
-                            id to name
-                        } else {
-                            null
-                        }
-                    } catch (e: Exception) {
-                        Log.e("Firebase", "Error fetching community $id: ${e.message}")
-                        null
-                    }
-                }
-            }.awaitAll()
-
-            val namesMap = namesList.filterNotNull().toMap()
-            _communityNames.value = namesMap
-
-        } catch (e: Exception) {
-            Log.e("Firebase", "Error fetching community names: ${e.message}")
+    fun loadCommunityNames(ids: List<String>) {
+        viewModelScope.launch {
+            val names = fetchCommunityNamesUseCase(ids)
+            _communityNames.value = names
         }
     }
 
-    private suspend fun fetchUserDetails(userIds: List<String>) = coroutineScope {
-        try {
-            val detailsList = userIds.map { id ->
-                async {
-                    try {
-                        val snapshot = firestore.collection("User").document(id).get().await()
-                        if (snapshot.exists()) {
-                            val name = snapshot.getString("name") ?: "Unknown"
-                            val image = snapshot.getString("image") ?: ""
-                            id to (name to image)
-                        } else {
-                            null
-                        }
-                    } catch (e: Exception) {
-                        Log.e("Firebase", "Error fetching user $id: ${e.message}")
-                        null
-                    }
-                }
-            }.awaitAll()
-
-            val detailsMap = detailsList.filterNotNull().toMap()
-            _userDetails.value = detailsMap
-
-        } catch (e: Exception) {
-            Log.e("Firebase", "Error fetching user details: ${e.message}")
+    fun loadUserDetails(ids: List<String>) {
+        viewModelScope.launch {
+            val details = fetchUserDetailsUseCase(ids)
+            _userDetails.value = details
         }
     }
 
     fun likePost(post: Post) {
         viewModelScope.launch {
-            try {
-                val currentUserId = firebaseAuth.currentUser?.uid
-                if (currentUserId.isNullOrEmpty()) {
-                    Log.e("HomeViewModel", "User not logged in")
-                    return@launch
-                }
+            val docId = _postDocumentIds.value[post]
+            if (docId == null) {
+                Log.e("HomeViewModel", "Document ID not found for post")
+                return@launch
+            }
 
-                val docId = postDocumentIds.value[post]
-                if (docId == null) {
+            val (updatedPost, likedUserId) = likePostUseCase(post, docId)
+
+            updatedPost?.let {
+                _posts.value = _posts.value.map { existing ->
+                    if (existing == post) it else existing
+                }
+                _postDocumentIds.value = _postDocumentIds.value.toMutableMap().apply {
+                    remove(post)
+                    put(it, docId)
+                }
+            }
+
+            likedUserId?.let {
+                _postLikedEvent.emit(it)
+            }
+        }
+    }
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            try {
+                val docId = _postDocumentIds.value[post]
+                if (docId.isNullOrEmpty()) {
                     Log.e("HomeViewModel", "Document ID not found for post")
                     return@launch
                 }
 
-                val postRef = firestore
-                    .collection("Community")
-                    .document(post.communityId)
-                    .collection("posts")
-                    .document(docId)
+                deletePostUseCase(post, docId)
 
-                var postLikedUserId: String? = null
-                var updatedPost: Post? = null
-
-                firestore.runTransaction { transaction ->
-                    val snapshot = transaction.get(postRef)
-                    val likedBy = snapshot.get("likedBy") as? List<String> ?: emptyList()
-
-                    val isLiked = currentUserId in likedBy
-                    val newLikedBy =
-                        if (isLiked) likedBy - currentUserId else likedBy + currentUserId
-                    val newLikes = newLikedBy.size
-
-                    transaction.update(
-                        postRef, mapOf(
-                            "likes" to newLikes,
-                            "likedBy" to newLikedBy
-                        )
-                    )
-
-                    updatedPost = post.copy(
-                        likes = newLikes,
-                        likedBy = newLikedBy
-                    )
-
-                    // Prepare to emit after transaction finishes
-                    if (!isLiked && post.userId != currentUserId) {
-                        postLikedUserId = post.userId
-                    }
-                }.await()
-
-                // Update local state after transaction
-                updatedPost?.let {
-                    _posts.value = _posts.value.map { existing ->
-                        if (existing == post) it else existing
-                    }
-                    _postDocumentIds.value = _postDocumentIds.value.toMutableMap().apply {
-                        remove(post)
-                        put(it, docId)
-                    }
-                }
-
-                postLikedUserId?.let {
-                    _postLikedEvent.emit(it)
-                }
+                _posts.value = _posts.value.filter { it != post }
+                _postDocumentIds.value = _postDocumentIds.value - post
 
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "Failed to like post: ${e.message}")
+                Log.e("HomeViewModel", "Failed to delete post: ${e.message}")
             }
         }
     }
 
+    fun fetchJoinedEvents() {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val userId = firebaseAuth.currentUser?.uid ?: return@launch
+                val eventsList = fetchJoinedEventsUseCase(userId)
+                _joinedEvents.value = eventsList
+
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error fetching joined events: ${e.message}")
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
     fun fetchPostsByUser(userId: String) {
         viewModelScope.launch {
             _loading.value = true
             try {
-                val userCommunityIds = getUserCommunityIds(userId)
 
-                if (userCommunityIds.isEmpty()) {
-                    _posts.value = emptyList()
-                    return@launch
-                }
-
-                val postsList = mutableListOf<Post>()
-                val docIdMap = mutableMapOf<Post, String>()
-
-                userCommunityIds.forEach { communityId ->
-                    val postSnapshot = firestore
-                        .collection("Community")
-                        .document(communityId)
-                        .collection("posts")
-                        .whereEqualTo("userId", userId) // filter by the passed userId
-                        .get()
-                        .await()
-
-                    for (doc in postSnapshot.documents) {
-                        val post = doc.toObject(Post::class.java)
-                        if (post != null) {
-                            postsList.add(post)
-                            docIdMap[post] = doc.id
-                        }
-                    }
-                }
+                val (postsList, docIdMap) = fetchPostsByUserUseCase(userId)
 
                 _posts.value = postsList
                 _postDocumentIds.value = docIdMap
@@ -319,9 +181,8 @@ class HomeViewModel @Inject constructor(
                 val communityIds = postsList.map { it.communityId }.distinct()
                 val userIds = postsList.map { it.userId }.distinct()
 
-                fetchCommunityNames(communityIds)
-                fetchUserDetails(userIds)
-
+                loadCommunityNames(communityIds)
+                loadUserDetails(userIds)
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -334,33 +195,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _loading.value = true
             try {
-                val userCommunityIds = getUserCommunityIds(userId)
-
-                if (userCommunityIds.isEmpty()) {
-                    _posts.value = emptyList()
-                    return@launch
-                }
-
-                val postsList = mutableListOf<Post>()
-                val docIdMap = mutableMapOf<Post, String>()
-
-                userCommunityIds.forEach { communityId ->
-                    val postSnapshot = firestore
-                        .collection("Community")
-                        .document(communityId)
-                        .collection("posts")
-                        .whereArrayContains("likedBy" ,userId )
-                        .get()
-                        .await()
-
-                    for (doc in postSnapshot.documents) {
-                        val post = doc.toObject(Post::class.java)
-                        if (post != null) {
-                            postsList.add(post)
-                            docIdMap[post] = doc.id
-                        }
-                    }
-                }
+                val (postsList, docIdMap) = fetchLikedPostsByUserUseCase(userId)
 
                 _posts.value = postsList
                 _postDocumentIds.value = docIdMap
@@ -368,8 +203,8 @@ class HomeViewModel @Inject constructor(
                 val communityIds = postsList.map { it.communityId }.distinct()
                 val userIds = postsList.map { it.userId }.distinct()
 
-                fetchCommunityNames(communityIds)
-                fetchUserDetails(userIds)
+                loadCommunityNames(communityIds)
+                loadUserDetails(userIds)
 
             } catch (e: Exception) {
                 _error.value = e.message
@@ -378,70 +213,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
-    fun deletePost(post: Post) {
-        viewModelScope.launch {
-            try {
-                val docId = _postDocumentIds.value[post]
-                if (docId.isNullOrEmpty()) {
-                    Log.e("HomeViewModel", "Document ID not found for post")
-                    return@launch
-                }
-
-                val postRef = firestore
-                    .collection("Community")
-                    .document(post.communityId)
-                    .collection("posts")
-                    .document(docId)
-
-                postRef.delete().await()
-
-                // Remove the post from local state
-                _posts.value = _posts.value.filter { it != post }
-                _postDocumentIds.value = _postDocumentIds.value - post
-
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Failed to delete post: ${e.message}")
-            }
-        }
-    }
-
-    // fetch joined events
-    fun fetchJoinedEvents() {
-        viewModelScope.launch {
-            _loading.value = true
-            try {
-                val userId = firebaseAuth.currentUser?.uid ?: return@launch
-                val communityIds = getUserCommunityIds(userId)
-
-                val joinedEventsDeferred = communityIds.map { communityId ->
-                    async {
-                        val eventsSnapshot = firestore.collection("Community")
-                            .document(communityId)
-                            .collection("event")
-                            .get()
-                            .await()
-
-                        eventsSnapshot.documents.mapNotNull { doc ->
-                            val event = doc.toObject(Event::class.java)
-                            if (event != null && userId in event.joinedUsers) {
-                                event.copy(id = doc.id, communityId = communityId)
-                            } else null
-                        }
-                    }
-                }
-
-                val eventsList = joinedEventsDeferred.awaitAll().flatten()
-                _joinedEvents.value = eventsList
-
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error fetching joined events: ${e.message}")
-            } finally {
-                _loading.value = false
-            }
-        }
-    }
-
     fun resetCancelButton() {
         _hasCancelEvents.value = false
     }

@@ -18,6 +18,9 @@ import com.example.sawaapplication.screens.communities.domain.useCases.GetUserCr
 import com.example.sawaapplication.screens.event.data.dataSources.EventInCommunityRemote
 import com.example.sawaapplication.screens.event.data.repository.EventRepositoryImpl
 import com.example.sawaapplication.screens.event.domain.repository.EventRepository
+import com.example.sawaapplication.screens.home.data.dataSources.remote.HomeRemoteDataSource
+import com.example.sawaapplication.screens.home.data.dataSources.repository.HomeRepositoryImpl
+import com.example.sawaapplication.screens.home.domain.repository.HomeRepository
 import com.example.sawaapplication.screens.notification.data.dataSources.NotificationRemoteDataSource
 import com.example.sawaapplication.screens.notification.data.repository.NotificationRepositoryImpl
 import com.example.sawaapplication.screens.notification.domain.repository.NotificationRepository
@@ -214,5 +217,22 @@ object AppModule {
         profileRepository: ProfileRepository
     ): FetchAboutMeUseCase {
         return FetchAboutMeUseCase(profileRepository)
+    }
+    @Provides
+    fun provideHomeRemoteDataSource(
+        firestore: FirebaseFirestore,
+        firebaseAuth: FirebaseAuth
+    ): HomeRemoteDataSource {
+        return HomeRemoteDataSource(
+            firestore,
+            firebaseAuth
+        )
+    }
+    @Provides
+    fun provideHomeRepository(
+        homeRemoteDataSource: HomeRemoteDataSource
+    ): HomeRepository {
+        return HomeRepositoryImpl(homeRemoteDataSource
+        )
     }
 }
