@@ -52,16 +52,19 @@ fun UserAccount(
 ) {
     val selectedUser by profileViewModel.selectedUser.collectAsState()
     val viewModel: HomeViewModel = hiltViewModel()
-
-    LaunchedEffect(userId) {
-        profileViewModel.fetchUserById(userId)
-    }
+    val badgeDefs        by profileViewModel.viewedDefinitions.collectAsState()
+    val badgeAwarded     by profileViewModel.viewedAwarded.collectAsState()
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(
         stringResource(R.string.posts),
         stringResource(R.string.likes)
     )
+
+    LaunchedEffect(userId) {
+        profileViewModel.fetchUserById(userId)
+        profileViewModel.loadUserBadges(userId)
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Show user info if available
@@ -100,6 +103,13 @@ fun UserAccount(
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                CompactBadgeRow(
+                    definitions = badgeDefs,
+                    awarded     = badgeAwarded,
+                    modifier    = Modifier.padding(horizontal = 16.dp),
+                    iconSize    = 28.dp,
+                    spacing     = 4.dp
                 )
             }
         } ?: run {

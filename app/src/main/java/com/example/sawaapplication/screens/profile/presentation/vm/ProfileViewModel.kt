@@ -11,12 +11,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.net.Uri
 import com.example.sawaapplication.core.permissions.PermissionHandler
+import com.example.sawaapplication.screens.profile.domain.model.Badge
 import com.example.sawaapplication.screens.profile.domain.model.User
 import com.example.sawaapplication.screens.profile.domain.useCases.FetchAboutMeUseCase
 import com.example.sawaapplication.screens.profile.domain.useCases.FetchImageUseCase
 import com.example.sawaapplication.screens.profile.domain.useCases.FetchUserByIdUseCase
 import com.example.sawaapplication.screens.profile.domain.useCases.FetchUserNameUseCase
+import com.example.sawaapplication.screens.profile.domain.useCases.GetAttendedEventUseCase
+import com.example.sawaapplication.screens.profile.domain.useCases.GetAwardedBadges
+import com.example.sawaapplication.screens.profile.domain.useCases.GetBadgeDefinitionsUseCase
+import com.example.sawaapplication.screens.profile.domain.useCases.GrantBadgeUseCase
 import com.example.sawaapplication.screens.profile.domain.useCases.UploadProfileImageUseCase
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -27,8 +34,11 @@ class ProfileViewModel @Inject constructor(
     private val fetchUserNameUseCase: FetchUserNameUseCase,
     private val fetchImageUseCase: FetchImageUseCase,
     private val uploadProfileImageUseCase: UploadProfileImageUseCase,
-    private val fetchUserByIdUseCase: FetchUserByIdUseCase
-
+    private val fetchUserByIdUseCase: FetchUserByIdUseCase,
+    private val grantBadgeUseCase: GrantBadgeUseCase,
+    private val getAttendedEventUseCase: GetAttendedEventUseCase,
+    private val getBadgeDefinitionsUseCase: GetBadgeDefinitionsUseCase,
+    private val getAwardedBadges: GetAwardedBadges,
 ) : ViewModel() {
 
     private val _userName = MutableStateFlow<String?>(null)
@@ -53,12 +63,32 @@ class ProfileViewModel @Inject constructor(
 
     private val _uploadError = MutableStateFlow<String?>(null)
 
+    private val _attendedCount = MutableStateFlow(0)
+    val attendedCount: StateFlow<Int> = _attendedCount
+
+    // For Current User profile
+    private val _badgeDefinitions   = MutableStateFlow<List<Badge>>(emptyList())
+    val badgeDefinitions: StateFlow<List<Badge>> = _badgeDefinitions
+
+    private val _awardedBadges      = MutableStateFlow<List<Badge>>(emptyList())
+    val awardedBadges: StateFlow<List<Badge>> = _awardedBadges
+
+    //for viewed user profile
+    private val _viewedDefinitions  = MutableStateFlow<List<Badge>>(emptyList())
+    val viewedDefinitions: StateFlow<List<Badge>> = _viewedDefinitions
+
+    private val _viewedAwarded      = MutableStateFlow<List<Badge>>(emptyList())
+    val viewedAwarded: StateFlow<List<Badge>> = _viewedAwarded
+
+
+    init {
+        getUserData()
+        loadCurrentUserId()
+    }
+
     fun loadCurrentUserId() {
         val id = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         _currentUserId.value = id
-    }
-    init {
-        getUserData()
     }
 
     private fun getUserData() {
@@ -135,4 +165,27 @@ class ProfileViewModel @Inject constructor(
     }
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
+
+    //User Event Attendance Badges
+    fun loadBadges(userId: String) {
+        if (userId.isBlank()) return
+        viewModelScope.launch {
+            _badgeDefinitions.value = getBadgeDefinitionsUseCase()
+            // fetch count
+            val attended = getAttendedEventUseCase(userId)
+            _attendedCount.value = attended.size
+            // award badges
+            grantBadgeUseCase(userId)
+            // update UI
+            _awardedBadges.value = getAwardedBadges(userId)
+        }
+    }
+
+    fun loadUserBadges(userId: String) {
+        if (userId.isBlank()) return
+        viewModelScope.launch {
+            _viewedDefinitions.value = getBadgeDefinitionsUseCase()
+            _viewedAwarded.value     = getAwardedBadges(userId)
+        }
+    }
 }
