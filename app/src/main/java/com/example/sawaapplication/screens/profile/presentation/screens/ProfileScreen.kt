@@ -119,8 +119,8 @@ fun ProfileScreen(
                             .size(24.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Create,
-                            contentDescription = "Edit",
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settings",
                             modifier = Modifier
                                 .size(16.dp),
                             tint = MaterialTheme.colorScheme.background
