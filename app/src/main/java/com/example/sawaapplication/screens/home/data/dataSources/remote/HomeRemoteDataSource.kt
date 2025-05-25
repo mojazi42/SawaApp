@@ -45,7 +45,6 @@ class HomeRemoteDataSource @Inject constructor(
             val postsList = mutableListOf<Post>()
             val docIdMap = mutableMapOf<Post, String>()
 
-            // Fetch posts one by one for each community (sequentially)
             for (communityId in userCommunityIds) {
                 val postSnapshot = firestore
                     .collection("Community")

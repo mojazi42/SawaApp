@@ -15,8 +15,8 @@ import com.example.sawaapplication.screens.home.domain.useCases.FetchUserDetails
 import com.example.sawaapplication.screens.home.domain.useCases.LikePostUseCase
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,7 +52,6 @@ class HomeViewModel @Inject constructor(
     private val _userDetails = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
     val userDetails: StateFlow<Map<String, Pair<String, String>>> = _userDetails
 
-    // Map Post object to its FireStore document ID
     private val _postDocumentIds = MutableStateFlow<Map<Post, String>>(emptyMap())
     val postDocumentIds: StateFlow<Map<Post, String>> = _postDocumentIds
 
@@ -72,20 +71,41 @@ class HomeViewModel @Inject constructor(
         return _events.value.find { it.id == eventId }
     }
 
+    private fun loadCommunityNames(ids: List<String>) {
+        viewModelScope.launch {
+            val names = fetchCommunityNamesUseCase(ids)
+            _communityNames.value = names
+        }
+    }
+
+    private fun loadUserDetails(ids: List<String>) {
+        viewModelScope.launch {
+            val details = fetchUserDetailsUseCase(ids)
+            _userDetails.value = details
+        }
+    }
+
     fun loadAllPosts() {
         viewModelScope.launch {
             _loading.value = true
-
             try {
                 val (postsList, docIdMap) = fetchAllPostsUseCase()
-                _posts.value = postsList
-                _postDocumentIds.value = docIdMap
 
                 val communityIds = postsList.map { it.communityId }.distinct()
                 val userIds = postsList.map { it.userId }.distinct()
 
-                loadCommunityNames(communityIds)
-                loadUserDetails(userIds)
+                // Fetch names in parallel
+                val namesDeferred = async { fetchCommunityNamesUseCase(communityIds) }
+                val detailsDeferred = async { fetchUserDetailsUseCase(userIds) }
+
+                val names = namesDeferred.await()
+                val details = detailsDeferred.await()
+
+                _communityNames.value = names
+                _userDetails.value = details
+
+                _posts.value = postsList
+                _postDocumentIds.value = docIdMap
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -94,19 +114,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun loadCommunityNames(ids: List<String>) {
-        viewModelScope.launch {
-            val names = fetchCommunityNamesUseCase(ids)
-            _communityNames.value = names
-        }
-    }
-
-    fun loadUserDetails(ids: List<String>) {
-        viewModelScope.launch {
-            val details = fetchUserDetailsUseCase(ids)
-            _userDetails.value = details
-        }
-    }
 
     fun likePost(post: Post) {
         viewModelScope.launch {
@@ -133,6 +140,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     fun deletePost(post: Post) {
         viewModelScope.launch {
             try {
@@ -145,7 +153,7 @@ class HomeViewModel @Inject constructor(
                 deletePostUseCase(post, docId)
 
                 _posts.value = _posts.value.filter { it != post }
-                _postDocumentIds.value = _postDocumentIds.value - post
+                _postDocumentIds.value -= post
 
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Failed to delete post: ${e.message}")
@@ -168,6 +176,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     fun fetchPostsByUser(userId: String) {
         viewModelScope.launch {
             _loading.value = true
@@ -213,6 +222,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     fun resetCancelButton() {
         _hasCancelEvents.value = false
     }
