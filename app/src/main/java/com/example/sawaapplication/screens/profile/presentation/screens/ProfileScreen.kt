@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,10 +15,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,9 +72,19 @@ fun ProfileScreen(
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Posts", "Likes")
 
+    val badges by profileViewModel.awardedBadges.collectAsState()
+    val attended by profileViewModel.attendedCount.collectAsState()
+
+    // --- Progress to next badge ---
+    val BADGE_THRESHOLDS = listOf(3, 7, 14, 21, 30)
+    val nextThreshold =
+        BADGE_THRESHOLDS.firstOrNull { it > attended } ?: BADGE_THRESHOLDS.last()
+    val progress = (attended.toFloat() / nextThreshold).coerceIn(0f, 1f)
+
     LaunchedEffect(Unit) {
         profileViewModel.loadCurrentUserId()
     }
+
     LaunchedEffect(selectedTabIndex, userCurrentId) {
         if (userCurrentId.isNotEmpty()) {
             when (selectedTabIndex) {
@@ -79,6 +93,13 @@ fun ProfileScreen(
             }
         }
     }
+
+    LaunchedEffect(userCurrentId) {
+        if (userCurrentId.isNotBlank()) {
+            profileViewModel.loadBadges(userCurrentId)
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         IconButton(
             onClick = { showMenu = !showMenu },
@@ -183,20 +204,50 @@ fun ProfileScreen(
                 fontSize = integerResource(R.integer.textSize2).sp,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-                Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(12.dp))
 
-                // Tab Row for "Posts" and "Likes"
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    "Your Event Badges",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+                Text(
+                    text = "🔥 Events Attended: $attended / $nextThreshold events",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .padding(horizontal = 8.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                )
+                // Badges Gallery
+                BadgeRow(badges)
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // Tab Row for "Posts" and "Likes"
             CustomTabRow(
                 tabs = tabs,
                 selectedTabIndex = selectedTabIndex,
                 onTabSelected = { selectedTabIndex = it }
             )
-                // Posts and Liked Posts
-                when (selectedTabIndex) {
-                    0 -> MyPostsTab(homeViewModel, navController, userCurrentId)
-                    1 -> PostsTabLike(homeViewModel, navController, userCurrentId)
-                }
+            // Posts and Liked Posts
+            when (selectedTabIndex) {
+                0 -> MyPostsTab(homeViewModel, navController, userCurrentId)
+                1 -> PostsTabLike(homeViewModel, navController, userCurrentId)
             }
         }
     }
+}
 

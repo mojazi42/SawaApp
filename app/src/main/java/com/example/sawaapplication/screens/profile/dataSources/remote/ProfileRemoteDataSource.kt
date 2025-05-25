@@ -2,6 +2,7 @@ package com.example.sawaapplication.screens.profile.dataSources.remote
 
 import android.net.Uri
 import android.util.Log
+import com.example.sawaapplication.screens.profile.domain.model.Badge
 import com.example.sawaapplication.screens.profile.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,9 +12,7 @@ import javax.inject.Inject
 
 class ProfileRemoteDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
-
 ) {
-
     suspend fun fetchAboutMe(userId: String): String? {
         return try {
             val snapshot = FirebaseFirestore.getInstance()
@@ -28,6 +27,7 @@ class ProfileRemoteDataSource @Inject constructor(
             null
         }
     }
+
     suspend fun fetchUserName(userId: String): String? {
         return try {
             val snapshot = FirebaseFirestore.getInstance()
@@ -42,6 +42,7 @@ class ProfileRemoteDataSource @Inject constructor(
             null
         }
     }
+
     suspend fun fetchProfileImageUrl(userId: String): String? {
         return try {
             val document = FirebaseFirestore.getInstance()
@@ -60,6 +61,7 @@ class ProfileRemoteDataSource @Inject constructor(
             null
         }
     }
+
     suspend fun uploadProfileImage(uri: Uri): Boolean {
         return try {
             val user = FirebaseAuth.getInstance().currentUser ?: return false
@@ -85,6 +87,7 @@ class ProfileRemoteDataSource @Inject constructor(
             false
         }
     }
+
     suspend fun fetchUserById(userId: String): User? {
         return try {
             val snapshot = firestore.collection("User").document(userId).get().await()
@@ -95,6 +98,50 @@ class ProfileRemoteDataSource @Inject constructor(
             }
         } catch (e: Exception) {
             null
+        }
+    }
+
+    //User Event Attendance / and Badges
+    suspend fun getAttendedEvent(userId: String): List<String> {
+        val snapshot = firestore.collection("User").document(userId).get().await()
+        return snapshot.get("eventAttendance.eventIds") as? List<String> ?: emptyList()
+    }
+
+    suspend fun grantBadges(userId: String, badgeIds: List<String>) {
+        val definitions = getBadgeDefinitions().associateBy { it.id }
+        val batch = firestore.batch()
+        val badgeCol = firestore.collection("User").document(userId).collection("Badges")
+
+        for (id in badgeIds) {
+            val def = definitions[id] ?: continue
+            val data = mapOf(
+                "id" to def.id,
+                "name" to def.name,
+                "iconUrl" to def.iconUrl,
+                "description" to def.description,
+            )
+            batch.set(badgeCol.document(id), data)
+        }
+        batch.commit().await()
+    }
+
+    suspend fun getAwardedBadges(userId: String): List<Badge> {
+        val snapshot = firestore.collection("User")
+            .document(userId)
+            .collection("Badges")
+            .get()
+            .await()
+        return snapshot.documents.mapNotNull { it.toObject(Badge::class.java) }
+    }
+
+    suspend fun getBadgeDefinitions(): List<Badge> {
+        val snapshot = firestore
+            .collection("BadgeDefinitions")
+            .get()
+            .await()
+        return snapshot.documents.map { doc ->
+            doc.toObject(Badge::class.java)!!
+                .copy(id = doc.id)
         }
     }
 }

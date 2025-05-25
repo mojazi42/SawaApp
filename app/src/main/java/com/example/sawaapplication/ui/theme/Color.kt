@@ -27,7 +27,7 @@ val darkGray = Color(0xFF5E5E5E)
 val lightGray = Color(0xFFA4A4A4)
 val Red = Color(0xFFB22626)
 
-
+val Beige = Color(0xFFD2CCCC)
 
 
 
