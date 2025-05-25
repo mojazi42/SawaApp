@@ -5,6 +5,7 @@ import com.example.sawaapplication.screens.event.data.dataSources.EventInCommuni
 import com.example.sawaapplication.screens.event.domain.model.Event
 import com.example.sawaapplication.screens.event.domain.repository.EventRepository
 import javax.inject.Inject
+import java.util.Date
 
 class EventRepositoryImpl @Inject constructor(
     private val remoteDataSource: EventInCommunityRemote,
@@ -50,6 +51,12 @@ class EventRepositoryImpl @Inject constructor(
         return remoteDataSource.getEventById(communityId, eventId)
     }
 
-
-
+    override suspend fun recordEventJoin(
+        userId: String,
+        eventId: String,
+        eventTitle: String,
+        startTime: Date
+    ) {
+        remoteDataSource.recordEventJoin(userId, eventId, eventTitle, startTime)
+    }
 }

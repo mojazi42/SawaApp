@@ -172,8 +172,15 @@ fun CommunityScreen(
         onDismissDialog = { dialogType ->
             dialogState = when (dialogType) {
                 DialogType.LEAVE_COMMUNITY -> dialogState.copy(showLeaveCommunity = false)
-                DialogType.LEAVE_EVENT -> dialogState.copy(showLeaveEvent = false, selectedEventId = null)
-                DialogType.DELETE_EVENT -> dialogState.copy(showDeleteEvent = false, selectedEventId = null)
+                DialogType.LEAVE_EVENT -> dialogState.copy(
+                    showLeaveEvent = false,
+                    selectedEventId = null
+                )
+
+                DialogType.DELETE_EVENT -> dialogState.copy(
+                    showDeleteEvent = false,
+                    selectedEventId = null
+                )
             }
         }
     )
@@ -237,6 +244,7 @@ fun CommunityScreen(
                         )
                     }
                 }
+
                 1 -> {
                     // Events Tab
                     items(uiState.events) { event ->
@@ -246,7 +254,17 @@ fun CommunityScreen(
                             currentUserId = currentUserId,
                             navController = navController,
                             communityId = communityId,
-                            onJoinEvent = { eventHandlers.onJoinEvent(event.id) },
+                            onJoinEvent = {
+                                eventHandlers.onJoinEvent(event.id)
+                                event.time?.let { it1 ->
+                                eventViewModel.recordEventJoin(
+                                    currentUserId,
+                                    event.id,
+                                    event.title,
+                                    it1.toDate()
+                                )
+                            }
+                            },
                             onLeaveEvent = {
                                 dialogState = dialogState.copy(
                                     showLeaveEvent = true,
@@ -461,6 +479,7 @@ private fun CommunityActionButtons(
         isAdmin -> {
             AdminChatButton(navController, communityId)
         }
+
         isUserJoined -> {
             MemberActionButtons(
                 navController = navController,
@@ -468,6 +487,7 @@ private fun CommunityActionButtons(
                 onShowLeaveCommunityDialog = onShowLeaveCommunityDialog
             )
         }
+
         else -> {
             JoinCommunityButton(onJoinCommunity = onJoinCommunity)
         }
