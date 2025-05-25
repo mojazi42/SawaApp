@@ -59,6 +59,8 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
     val error by chatViewModel.error.collectAsState()
     val mediaList by chatViewModel.chatMedia.collectAsState()
 
+    val creatorId = communityDetails?.creatorId
+
     var previewImageUrl by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(communityId) {
@@ -159,6 +161,7 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(members) { member ->
+                            val isCreator = member.userId == creatorId
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
@@ -183,10 +186,34 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
                                     contentScale = ContentScale.Crop
                                 )
                                 Spacer(Modifier.width(12.dp))
+
                                 Text(
                                     text = member.name ?: "Unknown",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.End) {
+                                    if (isCreator) {
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                                                    shape = RoundedCornerShape(4.dp)
+                                                )
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = "Admin",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
