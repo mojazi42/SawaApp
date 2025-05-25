@@ -30,7 +30,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,27 +63,55 @@ fun CreatePostScreen(
     val context = LocalContext.current
     val communityPostsViewModel: CommunityPostsViewModel = hiltViewModel()
     val communityViewModel: CommunityViewModel = hiltViewModel()
-    val isLoading by communityPostsViewModel.loading.collectAsState()
+
+    // Collect states from ViewModels
+    val isLoading by communityPostsViewModel.creatingPost.collectAsState()
+    val error by communityPostsViewModel.error.collectAsState()
+    val success by communityPostsViewModel.success.collectAsState()
 
     val communityDetails by communityViewModel.communityDetail.collectAsState()
     val communityImage = communityDetails?.image.orEmpty()
     val communityName = communityDetails?.name.orEmpty()
 
-    val imageUri by remember { derivedStateOf { communityPostsViewModel.imageUri } }
+
+    val imageUri = communityPostsViewModel.currentImageUri
+    val content = communityPostsViewModel.currentContent
+
     val coroutineScope = rememberCoroutineScope()
 
     val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
     var showPhotoPermissionDialog by remember { mutableStateOf(false) }
     val askPhotoPermissionText = stringResource(R.string.askPhotoPermissionFromSettings)
 
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> communityPostsViewModel.imageUri = uri }
+    ) { uri: Uri? -> communityPostsViewModel.updateImageUri(uri) }
 
-    // Launch fetch
+    // Initialize ViewModel
     LaunchedEffect(communityId) {
-        communityPostsViewModel.communityId = communityId
+
+        communityPostsViewModel.updateCommunityId(communityId)
         communityViewModel.fetchCommunityDetail(communityId)
+    }
+
+    // Handle success state
+    LaunchedEffect(success) {
+        if (success) {
+            communityPostsViewModel.clearSuccess()
+            navController.navigate("community_screen/$communityId") {
+                popUpTo("create_post/$communityId") { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
+
+    // Handle error state
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            communityPostsViewModel.clearError()
+        }
     }
 
     // Show permission dialog
@@ -110,6 +137,7 @@ fun CreatePostScreen(
         )
     }
 
+    // Loading overlay
     if (isLoading) {
         Box(
             modifier = Modifier
@@ -138,19 +166,14 @@ fun CreatePostScreen(
             TextButton(onClick = { navController.popBackStack() }) {
                 Text(stringResource(R.string.cancel))
             }
-            Button(onClick = {
-                coroutineScope.launch {
-                    val success = communityPostsViewModel.createPost(communityId)
-                    if (success) {
-                        navController.navigate("community_screen/$communityId") {
-                            popUpTo("create_post/$communityId") { inclusive = true }
-                            launchSingleTop = true
-                        }
-                    } else {
-                        Toast.makeText(context, "Failed to create post", Toast.LENGTH_SHORT).show()
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        communityPostsViewModel.createPost(communityId)
                     }
-                }
-            }) {
+                },
+                enabled = !isLoading && (content.isNotBlank() || imageUri != null)
+            ) {
                 Text(stringResource(R.string.post))
             }
         }
@@ -180,8 +203,9 @@ fun CreatePostScreen(
 
         // Post Input
         OutlinedTextField(
-            value = communityPostsViewModel.content,
-            onValueChange = { communityPostsViewModel.content = it },
+            value = content,
+
+            onValueChange = { communityPostsViewModel.updateContent(it) },
             placeholder = {
                 Text(stringResource(R.string.postContentPlaceholder), color = Color.Gray)
             },
@@ -190,7 +214,8 @@ fun CreatePostScreen(
                 .height(160.dp),
             shape = RoundedCornerShape(16.dp),
             singleLine = false,
-            maxLines = 6
+            maxLines = 6,
+            enabled = !isLoading
         )
 
         // Add Image Option
@@ -205,7 +230,7 @@ fun CreatePostScreen(
                 contentDescription = "Add photo",
                 modifier = Modifier
                     .size(32.dp)
-                    .clickable {
+                    .clickable(enabled = !isLoading) {
                         if (photoPermissionState.status.isGranted) {
                             imagePickerLauncher.launch("image/*")
                         } else {
@@ -220,21 +245,31 @@ fun CreatePostScreen(
                             }
                         }
                     },
-                tint = Color.Gray
+                tint = if (isLoading) Color.Gray.copy(alpha = 0.5f) else Color.Gray
             )
         }
 
         // Image Preview
         imageUri?.let { uri ->
-            Image(
-                painter = rememberAsyncImagePainter(uri),
-                contentDescription = "Selected Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
-            )
+            Box {
+                Image(
+                    painter = rememberAsyncImagePainter(uri),
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                // Remove image button
+                TextButton(
+                    onClick = { communityPostsViewModel.updateImageUri(null) },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Text("✕", color = Color.White)
+                }
+            }
         }
     }
 }
