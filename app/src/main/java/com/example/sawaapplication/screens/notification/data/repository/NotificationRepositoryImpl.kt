@@ -45,6 +45,9 @@ class NotificationRepositoryImpl @Inject constructor(
     override fun remindUpcomingCommunityEvents() {
         remote.remindCommunityMembersAboutUpcomingEvent()
     }
+    override suspend fun getPendingReminders(userId: String) =
+        remote.getPendingReminders(userId)
 
-
+    override suspend fun respondToReminder(userId: String, notificationId: String, attended: Boolean) =
+        remote.respondToReminder(userId, notificationId, attended)
 }

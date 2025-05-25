@@ -12,4 +12,6 @@ interface NotificationRepository {
     fun sendLikeNotification(post: Post)
     fun observeUnreadNotifications(listener: (Boolean) -> Unit)
     fun remindUpcomingCommunityEvents()
+    suspend fun getPendingReminders(userId: String): List<Notification>
+    suspend fun respondToReminder(userId: String, notificationId: String, attended: Boolean)
 }

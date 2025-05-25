@@ -30,7 +30,7 @@ fun NotificationCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = integerResource(R.integer.mediumSpace).dp, vertical = 8.dp)
+            .padding(horizontal = integerResource(R.integer.extraSmallSpace).dp, vertical = integerResource(R.integer.smallerSpace).dp)
             .border(
                 width = integerResource(R.integer.boxBorderWidth).dp,
                 color = Color.LightGray,
@@ -84,7 +84,7 @@ fun NotificationCard(
                         text = time,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
-                        modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier.padding(start = integerResource(R.integer.smallerSpace).dp)
                     )
                 }
             }

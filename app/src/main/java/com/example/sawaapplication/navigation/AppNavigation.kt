@@ -136,7 +136,7 @@ fun AppNavigation(
                 ExploreScreen(navController)
             }
             composable(Screen.Notification.route) {
-                NotificationScreen(navController)
+                NotificationScreen()
             }
             composable(Screen.Community.route) {
                 MyCommunitiesScreen(navController)
