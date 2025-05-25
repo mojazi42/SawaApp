@@ -2,6 +2,8 @@ package com.example.sawaapplication.screens.profile.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Create
@@ -101,128 +105,121 @@ fun ProfileScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = integerResource(R.integer.profilePadding).dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Box(
+            modifier = Modifier.size(integerResource(R.integer.photoBoxSize).dp)
+        ) {
 
-            Column(
+            Image(
+                painter = if (imageUrl != null)
+                    rememberAsyncImagePainter(imageUrl)
+                else
+                    painterResource(id = R.drawable.ic_launcher_background),
+                contentDescription = "Profile image",
+                contentScale = ContentScale.Crop,
+
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(integerResource(R.integer.profilePadding).dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .clip(CircleShape)
+                    .size(integerResource(R.integer.photoBoxSize).dp)
+            )
+
+            IconButton(
+                onClick = { navController.navigate(Screen.EditProfile.route) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .background(
+                        color = Color(0xFFFF5722),
+                        shape = RoundedCornerShape(48.dp)
+                    )
+                    .size(24.dp)
             ) {
-                Spacer(Modifier.height(integerResource(R.integer.topSpacing).dp))
-
-                Box(
-                    modifier = Modifier.size(integerResource(R.integer.photoBoxSize).dp)
-                ) {
-
-                    Image(
-                        painter = if (imageUrl != null)
-                            rememberAsyncImagePainter(imageUrl)
-                        else
-                            painterResource(id = R.drawable.ic_launcher_background),
-                        contentDescription = "Profile image",
-                        contentScale = ContentScale.Crop,
-
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(integerResource(R.integer.photoBoxSize).dp)
-                    )
-
-                    IconButton(
-                        onClick = { navController.navigate(Screen.EditProfile.route) },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .background(
-                                color = Color(0xFFFF5722),
-                                shape = RoundedCornerShape(48.dp)
-                            )
-                            .size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = "Settings",
-                            modifier = Modifier
-                                .size(16.dp),
-                            tint = MaterialTheme.colorScheme.background
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                Text(
-                    text = userName ?: "Unknown",
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Settings",
+                    modifier = Modifier
+                        .size(16.dp),
+                    tint = MaterialTheme.colorScheme.background
                 )
-
-                Text(
-                    text = userEmail ?: "No email",
-                    textAlign = TextAlign.Center,
-                    fontSize = integerResource(R.integer.textSize1).sp
-                )
-                Spacer(Modifier.height(8.dp))
-
-                Text(
-                    text = stringResource(id = R.string.aboutMe),
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = integerResource(R.integer.textSize2).sp
-                )
-
-                Text(
-                    text = aboutMe ?: "",
-                    textAlign = TextAlign.Center,
-                    fontSize = integerResource(R.integer.textSize2).sp,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                Spacer(Modifier.height(12.dp))
-
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        "Your Event Badges",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(8.dp)
-                    )
-
-                    Text(
-                        text = "🔥 Events Attended: $attended / $nextThreshold events",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .padding(horizontal = 8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                    )
-                    // Badges Gallery
-                    BadgeRow(badges)
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                // Tab Row for "Posts" and "Likes"
-                CustomTabRow(
-                    tabs = tabs,
-                    selectedTabIndex = selectedTabIndex,
-                    onTabSelected = { selectedTabIndex = it }
-                )
-                // Posts and Liked Posts
-                when (selectedTabIndex) {
-                    0 -> MyPostsTab(homeViewModel, navController, userCurrentId)
-                    1 -> PostsTabLike(homeViewModel, navController, userCurrentId)
-                }
             }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = userName ?: "Unknown",
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+
+        Text(
+            text = userEmail ?: "No email",
+            textAlign = TextAlign.Center,
+            fontSize = integerResource(R.integer.textSize1).sp
+        )
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(id = R.string.aboutMe),
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            fontSize = integerResource(R.integer.textSize2).sp
+        )
+
+        Text(
+            text = aboutMe ?: "",
+            textAlign = TextAlign.Center,
+            fontSize = integerResource(R.integer.textSize2).sp,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        Spacer(Modifier.height(12.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                "Your Event Badges",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(8.dp)
+            )
+
+            Text(
+                text = "🔥 Events Attended: $attended / $nextThreshold events",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .padding(horizontal = 8.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+            )
+            // Badges Gallery
+            BadgeRow(badges)
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        // Tab Row for "Posts" and "Likes"
+        CustomTabRow(
+            tabs = tabs,
+            selectedTabIndex = selectedTabIndex,
+            onTabSelected = { selectedTabIndex = it }
+        )
+        // Posts and Liked Posts
+        when (selectedTabIndex) {
+            0 -> MyPostsTab(homeViewModel, navController, userCurrentId)
+            1 -> PostsTabLike(homeViewModel, navController, userCurrentId)
         }
     }
 }
-
