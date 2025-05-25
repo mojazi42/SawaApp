@@ -67,19 +67,17 @@ fun ProfileScreen(
     val imageUrl by profileViewModel.profileImageUrl.collectAsState()
     val userCurrentId by profileViewModel.currentUserId.collectAsState()
 
-    val logOutViewModel: LogOutViewModel = hiltViewModel()
-    var showMenu by remember { mutableStateOf(false) }
-
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     val tabs = listOf(
         stringResource(R.string.posts),
         stringResource(R.string.likes)
-            )
+    )
 
     val badges by profileViewModel.awardedBadges.collectAsState()
     val attended by profileViewModel.attendedCount.collectAsState()
 
-    // --- Progress to next badge ---
+    // Progress to next badge
     val BADGE_THRESHOLDS = listOf(3, 7, 14, 21, 30)
     val nextThreshold =
         BADGE_THRESHOLDS.firstOrNull { it > attended } ?: BADGE_THRESHOLDS.last()
@@ -174,57 +172,57 @@ fun ProfileScreen(
                     fontSize = integerResource(R.integer.textSize2).sp
                 )
 
-            Text(
-                text = aboutMe ?: "",
-                textAlign = TextAlign.Center,
-                fontSize = integerResource(R.integer.textSize2).sp,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(Modifier.height(12.dp))
-
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
                 Text(
-                    "Your Event Badges",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(8.dp)
+                    text = aboutMe ?: "",
+                    textAlign = TextAlign.Center,
+                    fontSize = integerResource(R.integer.textSize2).sp,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
+                Spacer(Modifier.height(12.dp))
 
-                Text(
-                    text = "🔥 Events Attended: $attended / $nextThreshold events",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "Your Event Badges",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(8.dp)
+                    )
+
+                    Text(
+                        text = "🔥 Events Attended: $attended / $nextThreshold events",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .padding(horizontal = 8.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                    )
+                    // Badges Gallery
+                    BadgeRow(badges)
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                // Tab Row for "Posts" and "Likes"
+                CustomTabRow(
+                    tabs = tabs,
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { selectedTabIndex = it }
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .padding(horizontal = 8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                )
-                // Badges Gallery
-                BadgeRow(badges)
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            // Tab Row for "Posts" and "Likes"
-            CustomTabRow(
-                tabs = tabs,
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { selectedTabIndex = it }
-            )
-            // Posts and Liked Posts
-            when (selectedTabIndex) {
-                0 -> MyPostsTab(homeViewModel, navController, userCurrentId)
-                1 -> PostsTabLike(homeViewModel, navController, userCurrentId)
+                // Posts and Liked Posts
+                when (selectedTabIndex) {
+                    0 -> MyPostsTab(homeViewModel, navController, userCurrentId)
+                    1 -> PostsTabLike(homeViewModel, navController, userCurrentId)
+                }
             }
         }
     }
-}
 }
 
