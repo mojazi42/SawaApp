@@ -181,9 +181,19 @@ fun getTopBar(
                 TopBar(
                     title = stringResource(R.string.notification),
                     imageUrl = imageUrl,
-                    onProfileClick = { navController.navigate(Screen.Profile.route) }
-                )
+                    navIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    })
+
             }
+
         }
 
         Screen.EditProfile.route -> {
@@ -194,7 +204,7 @@ fun getTopBar(
                     navIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowCircleLeft,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(28.dp)
