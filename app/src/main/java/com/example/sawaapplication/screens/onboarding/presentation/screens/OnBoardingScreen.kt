@@ -82,7 +82,6 @@ fun OnBoardingScreen(
             }
         }
     }
-
 }
 
 @Composable
