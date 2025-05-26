@@ -117,8 +117,6 @@
     <string name = "deleteCommunity">Delete Community</string>
     <string name="areYouSureDeleteCommunity">Are you sure you want to delete this community?</string>
 
-
-
     <!--CreateNewEventScreen-->
     <string name="locationPermission">Location Permission</string>
     <string name="askLocationPermission">We need your location to pick the event location. Would you like to allow access?</string>

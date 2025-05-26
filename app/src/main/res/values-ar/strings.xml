@@ -10,8 +10,8 @@
 
     <!-- وصف شاشة البدء -->
     <string name="onboarding_text_1">مكان يجتمع فيه الناس من خلال شغفهم المشترك، مهما كان نوعه</string>
-    <string name="onboarding_text_2">استكشف مجموعة متنوعة من المجتمعات المهتمة وتواصل مع من يشاركونك اهتماماتك</string>
-    <string name="onboarding_text_3">شارك في الحوارات، وتبادل التجارب، وانمُ مع مجتمعات تشعر فيها وكأنك في بيتك</string>
+    <string name="onboarding_text_2">استكشف مجموعة متنوعة من المجتمعات وتواصل مع من يشاركونك اهتماماتك</string>
+    <string name="onboarding_text_3">شارك في الحوارات، وتبادل التجارب، وانمُ مع مجتمعات تشعر فيها بالألفة</string>
 
     <!-- نص الزر -->
     <string name="get_started">ابدأ الآن</string>

@@ -19,12 +19,12 @@
     <integer name="cardHeaderSize">28</integer>
     <integer name="cardWidth">340</integer>
     <integer name="cardHeightSignUp">512</integer>
-    <integer name="cardHeightLogin">440</integer>
+    <integer name="cardHeightLogin">460</integer>
     <integer name="cardHeightMyCommunity">232</integer>
     <integer name="roundCardCornerShape">8</integer>
     <integer name="shadow">16</integer>
-    <integer name="cardHeightResetPass">250</integer>
-    <integer name="cardWidthResetPass">373</integer>
+    <integer name="cardHeightResetPass">280</integer>
+    <integer name="cardWidthResetPass">340</integer>
     <integer name="cardSpacerResetPass">48</integer>
 
     <!--Card Header-->
@@ -35,10 +35,10 @@
     <integer name="smallText">16</integer>
 
     <!--Button-->
-    <integer name="buttonHeight">72</integer>
+    <integer name="buttonHeight">48</integer>
     <integer name="buttonRoundCornerShape">40</integer>
     <integer name="roundedCornerShape">22</integer>
-    <integer name="buttonWidth">244</integer>
+    <integer name="buttonWidth">200</integer>
     <integer name="floatingButton">36</integer>
 
     <!--Custom Card Dimensions-->
@@ -54,6 +54,7 @@
     <integer name="photoBoxSize">96</integer>
     <integer name="textSize1">14</integer>
     <integer name="textSize2">18</integer>
+
     <!--onBoarding Dimensions-->
     <integer name="getStartedButtonHeight">48</integer>
     <integer name="getStartedButtonWidth">200</integer>
@@ -72,12 +73,6 @@
     <!--Logo-->
     <integer name="logoHeight">80</integer>
     <integer name="logoWidth">100</integer>
-
-    <!--Tablet size-->
-    <integer name="tabletFontSize">28</integer>
-    <integer name="largeFontSize">18</integer>
-    <integer name="tabletOnboardingImage">350</integer>
-    <integer name="tabletPadding">32</integer>
 
     <!--Create Post-->
     <integer name="padding">16</integer>
@@ -209,6 +204,5 @@
     <!--Bottom bar-->
     <integer name="IconSize">44</integer>
     <integer name="IconShadowElevation">16</integer>
-
 
 </resources>
