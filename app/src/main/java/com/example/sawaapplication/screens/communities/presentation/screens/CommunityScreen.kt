@@ -231,15 +231,23 @@ fun CommunityScreen(
             when (selectedTab) {
                 0 -> {
                     // Posts Tab
+                    // In your CommunityScreen, update the PostCard call:
+
+// Posts Tab
                     items(uiState.posts) { post ->
                         PostCard(
                             post = post,
                             currentUserId = currentUserId,
+                            canLike = uiState.isUserJoined, // ✅ NEW: Only allow likes if user joined community
                             onImageClick = { imageUrl ->
                                 val encoded = URLEncoder.encode(imageUrl, "utf-8")
                                 onClick(encoded)
                             },
-                            onLikeClick = { communityPostsViewModel.likePost(it.id) },
+                            onLikeClick = {
+                                if (uiState.isUserJoined) { // ✅ Additional safety check
+                                    communityPostsViewModel.likePost(it.id)
+                                }
+                            },
                             navController = navController
                         )
                     }
