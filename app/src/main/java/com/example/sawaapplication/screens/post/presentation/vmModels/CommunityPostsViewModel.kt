@@ -109,7 +109,7 @@ class CommunityPostsViewModel @Inject constructor(
             createPostUseCase(communityId, post, _imageUri)
 
             resetForm()
-            fetchPostsForCommunity(communityId) // ✅ CORRECT: Use repository method
+            fetchPostsForCommunity(communityId)
             _success.value = true
             Log.d(TAG, "Post created successfully")
             true
@@ -194,8 +194,8 @@ class CommunityPostsViewModel @Inject constructor(
                         .map { post ->
                             PostUiModel(
                                 id = post.id,
-                                username = post.username, // ✅ Repository already provides this
-                                userAvatarUrl = post.userAvatarUrl, // ✅ Repository already provides this
+                                username = post.username,
+                                userAvatarUrl = post.userAvatarUrl,
                                 postImageUrl = post.postImageUrl,
                                 content = post.content,
                                 likes = post.likes,
@@ -248,7 +248,7 @@ class CommunityPostsViewModel @Inject constructor(
             id = documentId,
             username = data["username"] as? String ?: "Unknown User", // Will be enriched later
             userAvatarUrl = data["userAvatarUrl"] as? String ?: "", // Will be enriched later
-            postImageUrl = data["imageUri"] as? String ?: "", // ✅ Fixed: Use correct field name
+            postImageUrl = data["imageUri"] as? String ?: "",
             content = data["content"] as? String ?: "",
             likes = (data["likes"] as? Long)?.toInt() ?: 0,
             likedBy = data["likedBy"] as? List<String> ?: emptyList(),
@@ -258,7 +258,7 @@ class CommunityPostsViewModel @Inject constructor(
         )
     }
 
-    // ✅ NEW: Method to enrich posts with user information
+
     private suspend fun enrichPostsWithUserInfo(posts: List<PostUiModel>): List<PostUiModel> {
         return posts.map { post ->
             if (post.username != "Unknown User" && post.username.isNotEmpty()) {
@@ -267,7 +267,7 @@ class CommunityPostsViewModel @Inject constructor(
             } else {
                 // Fetch user info from User collection (same as PostsInCommunityRemote)
                 try {
-                    val userDoc = firestore.collection("User") // ✅ FIXED: Use "User" not "users"
+                    val userDoc = firestore.collection("User")
                         .document(post.userId)
                         .get()
                         .await()
@@ -275,11 +275,11 @@ class CommunityPostsViewModel @Inject constructor(
                     if (userDoc.exists()) {
                         val userData = userDoc.data
                         post.copy(
-                            username = userData?.get("name") as? String // ✅ FIXED: Use "name" like PostsInCommunityRemote
+                            username = userData?.get("name") as? String
                                 ?: userData?.get("username") as? String
                                 ?: userData?.get("displayName") as? String
                                 ?: "User ${post.userId.take(6)}",
-                            userAvatarUrl = userData?.get("image") as? String // ✅ FIXED: Use "image" like PostsInCommunityRemote
+                            userAvatarUrl = userData?.get("image") as? String
                                 ?: userData?.get("avatarUrl") as? String
                                 ?: userData?.get("profileImageUrl") as? String
                                 ?: ""
@@ -505,7 +505,7 @@ class CommunityPostsViewModel @Inject constructor(
 
     // Refresh Method
     fun refresh(communityId: String) {
-        fetchPostsForCommunity(communityId) // ✅ FIXED: Use repository method that fetches user info!
+        fetchPostsForCommunity(communityId)
     }
 
     fun refreshWithRepository(communityId: String) {
@@ -527,7 +527,7 @@ class CommunityPostsViewModel @Inject constructor(
                 }
 
                 snapshot?.let { _ ->
-                    // ✅ FIXED: Use repository method that fetches user info!
+
                     fetchPostsForCommunity(communityId)
                     Log.d(TAG, "Real-time update triggered refresh via repository")
                 }
