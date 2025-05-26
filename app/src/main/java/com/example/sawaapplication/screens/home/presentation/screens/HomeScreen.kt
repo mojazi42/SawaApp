@@ -40,7 +40,7 @@ import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
+import com.example.sawaapplication.screens.event.presentation.vmModels.EventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.CustomTabRow
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
@@ -175,7 +175,7 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
 @Composable
 fun MyEventsTab(
     viewModel: HomeViewModel = hiltViewModel(),
-    eventViewModel: FetchEventViewModel = hiltViewModel(),
+    eventViewModel: EventViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val events by viewModel.joinedEvents.collectAsState()
