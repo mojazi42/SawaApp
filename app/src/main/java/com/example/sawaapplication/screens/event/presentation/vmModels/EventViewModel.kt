@@ -39,6 +39,9 @@ class EventViewModel @Inject constructor(
     private val _joinResult = MutableStateFlow<Result<Unit>?>(null)
     val joinResult: StateFlow<Result<Unit>?> = _joinResult
 
+    private val _deleteResult = MutableStateFlow<Result<Unit>?>(null)
+    val deleteResult: StateFlow<Result<Unit>?> = _deleteResult
+
     private val _event = MutableStateFlow<Event?>(null)
     val event: StateFlow<Event?> = _event
 
@@ -97,7 +100,9 @@ class EventViewModel @Inject constructor(
 
     fun deleteEvent(communityId: String, eventId: String) {
         viewModelScope.launch {
+            _deleteResult.value = null
             val result = deleteEventUseCase(communityId, eventId)
+            _deleteResult.value = result
             if (result.isSuccess) {
                 _events.value = _events.value.filterNot { it.id == eventId }
             } else {
@@ -105,6 +110,22 @@ class EventViewModel @Inject constructor(
             }
         }
     }
+
+    fun clearDeleteResult() {
+        _deleteResult.value = null
+    }
+
+    /*fun updateEvent(communityId: String, eventId: String, updatedData: Map<String, Any>) {
+        viewModelScope.launch {
+            val result = eventRepository.updateEvent(communityId, eventId, updatedData)
+            if (result.isSuccess) {
+                loadEvents(communityId)
+            } else {
+                Log.e("UpdateEvent", "Error: ${result.exceptionOrNull()?.message}")
+            }
+        }
+
+    }*/
     suspend fun fetchEventById(communityId: String, eventId: String): Event? {
         return try {
            getEventByIdUseCase(communityId, eventId)

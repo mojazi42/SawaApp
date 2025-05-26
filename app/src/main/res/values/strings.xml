@@ -44,6 +44,8 @@
     <string name="leave">Leave</string>
     <string name="joined">Joined</string>
     <string name="logout">Logout</string>
+    <string name ="logoutSuccess">Logged out successfully</string>
+    <string name ="logoutFailed">An error occurred during logout</string>
     <string name="name">Name</string>
     <string name="darkMode">Dark Mode</string>
     <string name="language">Language</string>
@@ -52,6 +54,9 @@
     <string name="description">Description</string>
 
     <string name="notification">Notification</string>
+
+    <string name = "saved">Saved Successfully!</string>
+    <string name ="unsavedImage">Failed to upload image, try again</string>
 
     <string name="exploreCommunity">Explore</string>
     <string name="newCommunity">New Community</string>
@@ -90,6 +95,8 @@
     <string name="joinCommunity">Join Community</string>
     <string name="areYouSureEvent">Are you sure you want to leave this event?</string>
     <string name="areYouSureCommunity">Are you sure you want to leave this community?</string>
+    <string name="deleteEventSuccess">Event deleted successfully!</string>
+    <string name="deleteEventFailed">Failed to delete event, try again</string>
 
     <!-- Chats Screen-->
     <string name="chats">Chats</string>
@@ -111,10 +118,14 @@
     <!--EditCommunity-->
     <string name = "photoPermissionTitle">Photo Permission</string>
     <string name = "photoPermissionTextC">We need access to your photos so you can add an image for the community.</string>
+    <string name = "photoPermissionTextP">We need access to your photos so you can add an image for your profile image.</string>
     <string name = "photoPermissionToast">Please allow photo access in settings</string>
     <string name = "edit">Edit</string>
     <string name = "update">Update</string>
+    <string name = "updateCommunityToast">Community updated successfully</string>
+    <string name = "errorToast">Something went wrong, please try again</string>
     <string name = "deleteCommunity">Delete Community</string>
+    <string name = "deleteCommunityToast">Community deleted successfully</string>
     <string name="areYouSureDeleteCommunity">Are you sure you want to delete this community?</string>
 
     <!--CreateNewEventScreen-->
@@ -128,6 +139,7 @@
     <string name="askPhotoPermissionFromSettings">Please allow photo access in settings</string>
     <string name="askLocationPermissionFromSettings">Please allow location access in settings</string>
     <string name="locationIsNeeded">Location permission is needed to pick your event location.</string>
+
 
     <!--PostCard-->
     <string name="postedOn">Posted on</string>
@@ -145,6 +157,7 @@
 
     <!--CreatePostScreen-->
     <string name="postContentPlaceholder">Share your Idea</string>
+    <string name="createPostSuccess">Post created successfully!</string>
 
     <!--CustomConfirmationDialog-->
     <string name="yesImSure">Yes, I\'m sure</string>

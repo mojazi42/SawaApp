@@ -80,12 +80,6 @@ fun EventDetailScreen(
     val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
 
     if (event == null) {
-        Text(
-            "Event not found",
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center)
-        )
         return
     }
 

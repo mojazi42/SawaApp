@@ -199,6 +199,10 @@ class CreateEventViewModel @Inject constructor(
         _success.value = false
     }
 
+    fun resetError() {
+        _error.value = null
+    }
+
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()
     fun markLocationPermissionRequested() = permissionHandler.markLocationPermissionRequested()
 

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.AuthState
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LoginViewModel
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.ValidationInputViewModel
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.handleAuthStateLogin
@@ -239,4 +241,16 @@ fun LoginScreen(
             }
         }
     }
+
+    if (authState is AuthState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
 }

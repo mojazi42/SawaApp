@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
@@ -44,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.AuthState
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.SignUpViewModel
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.handleAuthStateSignUp
 import com.example.sawaapplication.ui.screenComponent.CustomCard
@@ -56,7 +59,7 @@ import kotlinx.coroutines.delay
 fun SignUpScreen(
     navController: NavController,
 ) {
-
+    val context = LocalContext.current
     val signUpViewModel: SignUpViewModel = hiltViewModel()
     var showPassword by remember { mutableStateOf(false) }
     var showConfirmPassword by remember { mutableStateOf(false) }
@@ -64,7 +67,7 @@ fun SignUpScreen(
     // Entry animations
     var bannerVisible by remember { mutableStateOf(false) }
     var cardVisible by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
 
     val authState = signUpViewModel.authState.collectAsState().value
 
@@ -231,6 +234,17 @@ fun SignUpScreen(
                     }
                 }
             }
+        }
+    }
+
+    if (authState is AuthState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }

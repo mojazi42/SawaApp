@@ -92,28 +92,28 @@ fun CreateNewEventScreen(
     onUpdateClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+
     val success by viewModel.success.collectAsState()
-    val communityID = viewModel.communityId
+    val error by viewModel.error.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
-
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
-
     var pickedLocation by remember { mutableStateOf<LatLng?>(null) }
-    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
-    var showPermissionDialog by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showLocationPermissionDialog by remember { mutableStateOf(false) }
+    val formattedDate = viewModel.eventDate?.let {
+        DateFormat.getDateInstance().format(Date(it))
+    } ?: ""
 
+    val photoPermissionState = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+    var showPhotoPermissionDialog by remember { mutableStateOf(false) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         viewModel.imageUri = uri
     }
-    val formattedDate = viewModel.eventDate?.let {
-        DateFormat.getDateInstance().format(Date(it))
-    } ?: ""
+
 
     LaunchedEffect(Unit) {
         viewModel.communityId = communityId
@@ -126,46 +126,24 @@ fun CreateNewEventScreen(
         }
     }
 
-    // Photo Permission Dialog
-    if (showPhotoPermissionDialog) {
-        AlertDialog(
-            onDismissRequest = { showPhotoPermissionDialog = false },
-            title = { Text(stringResource(R.string.photoPermission)) },
-            text = { Text(stringResource(R.string.askPhotoPermission)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.markPhotoPermissionRequested()
-                    photoPermissionState.launchPermissionRequest()
-                    showPhotoPermissionDialog = false
-                }) { Text(stringResource(R.string.allow)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPhotoPermissionDialog = false }) {
-                    Text(stringResource(R.string.deny))
-                }
-            }
-        )
+    LaunchedEffect(success) {
+        if (success) {
+            notificationViewModel.notifyEventCreated(viewModel.name)
+            notificationViewModel.notifyCommunityMembers(communityId, viewModel.name)
+            Toast.makeText(context, context.getString(R.string.eventCreated), Toast.LENGTH_SHORT)
+                .show()
+            navController.popBackStack()
+            viewModel.resetSuccess()
+        }
     }
 
-    // Location Permission Dialog
-    if (showPermissionDialog) {
-        AlertDialog(
-            onDismissRequest = { showPermissionDialog = false },
-            title = { Text(stringResource(R.string.locationPermission)) },
-            text = { Text(stringResource(R.string.askLocationPermission)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.markLocationPermissionRequested()
-                    locationPermissionState.launchPermissionRequest()
-                    showPermissionDialog = false
-                }) { Text(stringResource(R.string.allow)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPermissionDialog = false }) {
-                    Text(stringResource(R.string.deny))
-                }
-            })
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            viewModel.resetError()
+        }
     }
+
     // Photo Permission Dialog
     if (showPhotoPermissionDialog) {
         AlertDialog(
@@ -182,39 +160,31 @@ fun CreateNewEventScreen(
                 }
             },
             dismissButton = {
+                TextButton(onClick = { showPhotoPermissionDialog = false }) {
+                    Text(stringResource(R.string.deny))
+                }
+            }
+        )
+    }
+
+    // Location Permission Dialog
+    if (showLocationPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocationPermissionDialog = false },
+            title = { Text(stringResource(R.string.locationPermission)) },
+            text = { Text(stringResource(R.string.askLocationPermission)) },
+            confirmButton = {
                 TextButton(onClick = {
-                    showPhotoPermissionDialog = false
-                }) {
+                    viewModel.markLocationPermissionRequested()
+                    locationPermissionState.launchPermissionRequest()
+                    showLocationPermissionDialog = false
+                }) { Text(stringResource(R.string.allow)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationPermissionDialog = false }) {
                     Text(stringResource(R.string.deny))
                 }
             })
-    }
-
-    val eventCreated = stringResource(R.string.eventCreated)
-    LaunchedEffect(communityId, success) {
-        viewModel.communityId = communityId
-        if (success) {
-            // Notify creator about the event creation
-            notificationViewModel.notifyEventCreated(viewModel.name)
-
-            // Notify community members about the new event
-            notificationViewModel.notifyCommunityMembers(
-                communityId = communityId,
-                eventName = viewModel.name
-            )
-
-            // Show success toast message
-            Toast.makeText(context, eventCreated, Toast.LENGTH_SHORT).show()
-
-            // Navigate back to previous screen
-            navController.popBackStack()
-
-            viewModel.resetSuccess()
-        } else {
-            Toast.makeText(context, "Event creation failed", Toast.LENGTH_SHORT).show()
-        }
-
-
     }
 
     Column(
@@ -334,7 +304,8 @@ fun CreateNewEventScreen(
                         modifier = Modifier.clickable {
                             if (locationPermissionState.status.isGranted) viewModel.isMapVisible =
                                 true
-                            else if (viewModel.shouldRequestLocation()) showPermissionDialog = true
+                            else if (viewModel.shouldRequestLocation()) showLocationPermissionDialog =
+                                true
                             else Toast.makeText(
                                 context,
                                 askLocationPermissionFromSettings,
