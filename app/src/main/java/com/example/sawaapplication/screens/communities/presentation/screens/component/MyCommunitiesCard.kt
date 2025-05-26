@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.communities.presentation.screens.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,9 +87,22 @@ fun MyCommunitiesCard(
                 fontSize = integerResource(id = R.integer.smallerTextFontSize).sp,
             )
 
+            // Category display with background styling
+            Text(
+                text = community.category,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(horizontal = integerResource(R.integer.communityDetailHorizontalPadding).dp)
+                    .clip(RoundedCornerShape(integerResource(R.integer.roundValue).dp))
+                    .background(MaterialTheme.colorScheme.tertiaryContainer)
+                    .padding(horizontal = integerResource(R.integer.extraSmallSpace).dp)
+            )
+
             Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
 
-            community.description?.takeIf { it.isNotBlank() }?.let { description ->
+            community.description.takeIf { it.isNotBlank() }?.let { description ->
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
