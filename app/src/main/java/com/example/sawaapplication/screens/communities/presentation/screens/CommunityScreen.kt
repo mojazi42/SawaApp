@@ -70,13 +70,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.sawaapplication.R
+import com.example.sawaapplication.screens.communities.domain.model.Community
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.screens.communities.presentation.vmModels.ExploreCommunityViewModel
+import com.example.sawaapplication.screens.event.domain.model.Event
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.example.sawaapplication.screens.event.presentation.vmModels.EventViewModel
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
+import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.screens.post.presentation.vmModels.CommunityPostsViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.ui.theme.PrimaryOrange
@@ -109,6 +112,7 @@ fun CommunityScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     var dialogState by remember { mutableStateOf(DialogState()) }
 
+    
     // Collect States - Fixed: Use proper StateFlow collection
     val posts by communityPostsViewModel.communityPosts.collectAsState()
     val events by eventViewModel.events.collectAsState()
@@ -231,18 +235,23 @@ fun CommunityScreen(
             when (selectedTab) {
                 0 -> {
                     // Posts Tab
-                    items(uiState.posts) { post ->
+                    items(uiState.posts) { singlePost ->   // rename `post` to `singlePost`
                         PostCard(
-                            post = post,
+                            post = singlePost,
                             currentUserId = currentUserId,
                             onImageClick = { imageUrl ->
                                 val encoded = URLEncoder.encode(imageUrl, "utf-8")
                                 onClick(encoded)
                             },
                             onLikeClick = { communityPostsViewModel.likePost(it.id) },
+                            onDeleteClick = { communityPostsViewModel.deletePost(
+                                singlePost.id,
+                                communityId = communityId
+                            ) }, // use singlePost.id here
                             navController = navController
                         )
                     }
+
                 }
 
                 1 -> {
@@ -290,9 +299,9 @@ fun CommunityScreen(
 
 // Data classes for better state management
 private data class CommunityScreenState(
-    val posts: List<com.example.sawaapplication.screens.post.domain.model.PostUiModel>,
-    val events: List<com.example.sawaapplication.screens.event.domain.model.Event>,
-    val communityDetail: com.example.sawaapplication.screens.communities.domain.model.Community?,
+    val posts: List<PostUiModel>,
+    val events: List<Event>,
+    val communityDetail: Community?,
     val isAdmin: Boolean,
     val hasJoinedOrLeft: Boolean,
     val isUserJoined: Boolean
@@ -350,7 +359,7 @@ private fun CommunityTopBar(onBackPressed: () -> Unit) {
 
 @Composable
 private fun CommunityHeader(
-    communityDetail: com.example.sawaapplication.screens.communities.domain.model.Community?,
+    communityDetail: Community?,
     isAdmin: Boolean,
     isUserJoined: Boolean,
     navController: NavHostController,
@@ -388,7 +397,7 @@ private fun CommunityHeader(
 
 @Composable
 private fun CommunityImageSection(
-    communityDetail: com.example.sawaapplication.screens.communities.domain.model.Community?,
+    communityDetail: Community?,
     isAdmin: Boolean,
     navController: NavHostController,
     communityId: String
@@ -426,7 +435,7 @@ private fun CommunityImageSection(
 
 @Composable
 private fun CommunityInfoSection(
-    communityDetail: com.example.sawaapplication.screens.communities.domain.model.Community?
+    communityDetail: Community?
 ) {
     communityDetail?.let { community ->
         Text(
@@ -687,7 +696,7 @@ private fun CommunityFAB(
 
 @Composable
 private fun CommunityEventCard(
-    event: com.example.sawaapplication.screens.event.domain.model.Event,
+    event: Event,
     communityName: String,
     currentUserId: String,
     navController: NavHostController,
