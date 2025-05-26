@@ -57,15 +57,6 @@ class CreateEventViewModel @Inject constructor(
     private val _events = MutableStateFlow<List<Event>>(emptyList())
     val events: StateFlow<List<Event>> = _events
 
-
-    init {
-        val dateString = "2024-05-23" // your input
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-
-        val date = formatter.parse(dateString)
-        eventDate = date?.time
-    }
-
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 

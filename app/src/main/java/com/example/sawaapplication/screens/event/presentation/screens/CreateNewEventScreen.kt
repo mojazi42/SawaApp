@@ -111,7 +111,6 @@ fun CreateNewEventScreen(
     ) { uri: Uri? ->
         viewModel.imageUri = uri
     }
-
     val formattedDate = viewModel.eventDate?.let {
         DateFormat.getDateInstance().format(Date(it))
     } ?: ""
@@ -357,16 +356,31 @@ fun CreateNewEventScreen(
                 }
             )
 
+//            CustomTextField(
+//                formattedDate, {}, stringResource(R.string.eventDate), readOnly = true,
+//                trailingIcon = {
+//                    Icon(
+//                        Icons.Default.DateRange,
+//                        contentDescription = null,
+//                        tint = MaterialTheme.colorScheme.primary,
+//                        modifier = Modifier.clickable { showDatePicker = true })
+//                }
+//            )
             CustomTextField(
-                formattedDate, {}, stringResource(R.string.eventDate), readOnly = true,
+                value = formattedDate,
+                onValueChange = {}, // readOnly
+                label = stringResource(R.string.eventDate),
+                readOnly = true,
                 trailingIcon = {
                     Icon(
                         Icons.Default.DateRange,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { showDatePicker = true })
+                        modifier = Modifier.clickable { showDatePicker = true }
+                    )
                 }
             )
+
 
             CustomTextField(
                 viewModel.eventTime,
@@ -434,8 +448,8 @@ fun CreateNewEventScreen(
                         ) {
                             val cameraPositionState = rememberCameraPositionState {
                                 position = CameraPosition.fromLatLngZoom(
-                                    pickedLocation ?: LatLng(24.7136, 46.6753),
-                                    5f
+                                    pickedLocation ?: LatLng(24.4403644, 39.6411140),
+                                    10f
                                 )
                             }
 
