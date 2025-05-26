@@ -47,7 +47,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 @Composable
 fun EditProfileScreen(
     navController: NavController,
-    isDarkTheme: Boolean,
     changeAppTheme: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel(),
