@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
@@ -22,7 +23,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,19 +41,24 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import com.example.sawaapplication.ui.theme.black
+import com.example.sawaapplication.ui.theme.white
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 @Composable
 fun PostCard(
     post: PostUiModel,
     currentUserId: String,
     onImageClick: (String) -> Unit,
     onLikeClick: (PostUiModel) -> Unit,
+    onDeleteClick: (() -> Unit)? = null,  // Optional delete callback
     navController: NavController
 ) {
     val isLiked = currentUserId in post.likedBy
+    val isOwnedByCurrentUser = currentUserId == post.userId
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     val formattedDate = remember(post.createdAt) {
         try {
@@ -61,8 +70,10 @@ fun PostCard(
             "Unknown date"
         }
     }
+
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .border(
                 width = 1.dp,
                 color = Color.White,
@@ -87,14 +98,13 @@ fun PostCard(
                             .size(integerResource(R.integer.asyncImageSize).dp)
                             .clip(CircleShape)
                             .clickable {
-                                if(post.userId == currentUserId){
+                                if (post.userId == currentUserId) {
                                     navController.navigate(Screen.Profile.route)
-                                }else{
+                                } else {
                                     navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
                                 }
                             },
-
-                        )
+                    )
                 }
                 Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
 
@@ -146,19 +156,46 @@ fun PostCard(
             // Likes section
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { onLikeClick(post) }) {
-                    Icon(
-                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = if (isLiked) "Unlike" else "Like",
-                        tint = if (isLiked) Color.Red else Color.Gray
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { onLikeClick(post) }) {
+                        Icon(
+                            imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = if (isLiked) "Unlike" else "Like",
+                            tint = if (isLiked) Color.Red else Color.Gray
+                        )
+                    }
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
-                    style = MaterialTheme.typography.bodySmall
+
+                if (isOwnedByCurrentUser && onDeleteClick != null) {
+                    IconButton(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Post",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+            }
+
+            if (showDeleteDialog) {
+                CustomConfirmationDialog(
+                    message = stringResource(R.string.areYouSurePost),
+                    onDismiss = { showDeleteDialog = false },
+                    onConfirm = {
+                        showDeleteDialog = false
+                        onDeleteClick?.invoke()  // call delete lambda without arguments
+                    }
                 )
             }
         }
