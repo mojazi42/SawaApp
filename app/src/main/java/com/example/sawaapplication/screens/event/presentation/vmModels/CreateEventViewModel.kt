@@ -195,23 +195,6 @@ class CreateEventViewModel @Inject constructor(
         }
     }
 
-
-
-    suspend fun fetchEventById(eventId: String, communityId: String): Event? {
-        return try {
-            val event = eventRepository.getEventById(communityId, eventId)
-            editingEvent = event
-            event
-        } catch (e: Exception) {
-            Log.e("EditEvent", "Error fetching event: ${e.message}")
-            null
-        }
-    }
-
-
-
-
-
     fun resetSuccess() {
         _success.value = false
     }
