@@ -98,6 +98,7 @@ fun CreatePostScreen(
     // Handle success state
     LaunchedEffect(success) {
         if (success) {
+            Toast.makeText(context, R.string.createPostSuccess, Toast.LENGTH_SHORT).show()
             communityPostsViewModel.clearSuccess()
             navController.navigate("community_screen/$communityId") {
                 popUpTo("create_post/$communityId") { inclusive = true }

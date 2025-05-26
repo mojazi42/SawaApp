@@ -47,12 +47,17 @@
     <string name="leave">مغادرة</string>
     <string name="joined">انضم</string>
     <string name="logout">تسجيل الخروج</string>
+    <string name ="logoutSuccess">تم تسجيل الخروج بنجاح</string>
+    <string name ="logoutFailed">حدث خطأ في تسجيل الخروج، حاول مجددًا</string>
     <string name="name">الاسم</string>
     <string name="language">اللغة</string>
     <string name="darkMode">الوضع الليلي</string>
     <string name="post">نشر</string>
 
     <string name="notification">الإشعارات</string>
+
+    <string name = "saved">تم الحفظ بنجاح!</string>
+    <string name ="unsavedImage">فشل تحميل الصورة، حاول مجددًا</string>
 
     <string name="exploreCommunity">استكشف المجتمعات</string>
     <string name="newCommunity">مجتمع جديد</string>
@@ -76,6 +81,8 @@
     <string name="joinCommunity">إنضم للمجتمع</string>
     <string name="areYouSureEvent">هل أنت متأكد من رغبتك في مغادرة الحدث؟</string>
     <string name="areYouSureCommunity">هل أنت متأكد من رغبتك في مغادرة المجتمع؟</string>
+    <string name="deleteEventSuccess">تم حذف الحدث نهائيًا بنجاح</string>
+    <string name="deleteEventFailed">فشل حذف الحدث، حاول مجددًا</string>
 
     <!-- Chats Screen-->
     <string name="chats">المحادثات</string>
@@ -94,10 +101,14 @@
     <!--EditCommunity-->
     <string name = "photoPermissionTitle">الوصول لألبوم الصور</string>
     <string name = "photoPermissionTextC">نحتاج الوصول لألبوم الصور حتى يمكنك إضافة صورة للمجتمع</string>
+    <string name = "photoPermissionTextP">نحتاج الوصول لألبوم الصور حتى يمكنك إضافة صورة لحسابك </string>
     <string name = "photoPermissionToast">الرجاء السماح للوصول لألبوم الصور من اعدادات هاتفك</string>
     <string name = "edit">تعديل</string>
     <string name = "update">حفظ التغييرات</string>
+    <string name = "updateCommunityToast">تم تحديث بيانات المجتمع بنجاح</string>
     <string name = "deleteCommunity">حذف المجتمع</string>
+    <string name = "deleteCommunityToast">تم حذف المجتمع نهائيًا بنجاح</string>
+    <string name = "errorToast">حدث خطأ ما، حاول مجددًا</string>
     <string name="areYouSureDeleteCommunity">هل أنت متأكد من رغبتك في حذف المجتمع؟ سيتم حذفه نهائيًا</string>
 
     <!--Community Types-->
@@ -146,6 +157,7 @@
 
     <!--CreatePostScreen-->
     <string name="postContentPlaceholder">شارك أفكارك</string>
+    <string name="createPostSuccess">تم نشر المنشور بنجاح!</string>
 
     <!--CustomConfirmationDialog-->
     <string name="yesImSure">نعم، متأكد</string>

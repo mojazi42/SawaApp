@@ -40,6 +40,9 @@ class HomeViewModel @Inject constructor(
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     val posts: StateFlow<List<Post>> = _posts
 
+    private val _deletePostResult = MutableStateFlow<Result<Unit>?>(null)
+    val deletePostResult: StateFlow<Result<Unit>?> = _deletePostResult
+
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
@@ -143,22 +146,24 @@ class HomeViewModel @Inject constructor(
 
     fun deletePost(post: Post) {
         viewModelScope.launch {
-            try {
+            _deletePostResult.value = null
+
+            val result = runCatching {
                 val docId = _postDocumentIds.value[post]
                 if (docId.isNullOrEmpty()) {
                     Log.e("HomeViewModel", "Document ID not found for post")
-                    return@launch
+                    throw Exception("Document ID not found for post")
                 }
-
                 deletePostUseCase(post, docId)
-
                 _posts.value = _posts.value.filter { it != post }
-                _postDocumentIds.value -= post
-
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Failed to delete post: ${e.message}")
+                _postDocumentIds.value = _postDocumentIds.value - post
             }
+            _deletePostResult.value = result
         }
+    }
+
+    fun clearDeletePostResult() {
+        _deletePostResult.value = null
     }
 
     fun fetchJoinedEvents() {

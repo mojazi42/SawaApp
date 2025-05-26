@@ -10,8 +10,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.DarkMode
@@ -32,7 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
+import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogOutViewModel
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogoutUiState
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.LogoutUiState.*
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.screens.profile.presentation.vm.ProfileViewModel
 import com.example.sawaapplication.screens.profile.presentation.vm.ThemeViewModel
@@ -75,22 +80,22 @@ fun EditProfileScreen(
     if (showPhotoPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPhotoPermissionDialog = false },
-            title = { Text("Photo Permission") },
-            text = { Text("We need access to your photos so you can add an image for the event.") },
+            title = { Text(stringResource(R.string.photoPermissionTitle)) },
+            text = { Text(stringResource(R.string.photoPermissionTextP)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markPhotoPermissionRequested()
                     photoPermissionState.launchPermissionRequest()
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Allow")
+                    Text(stringResource(R.string.allow))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showPhotoPermissionDialog = false
                 }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.deny))
                 }
             }
         )
@@ -110,10 +115,30 @@ fun EditProfileScreen(
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
     val isArabic by themeViewModel.isArabic.collectAsState()
     val logOutViewModel: LogOutViewModel = hiltViewModel()
+    val logoutState by logOutViewModel.logoutState.collectAsState()
+
+    LaunchedEffect(logoutState) {
+        when (logoutState) {
+            is Success -> {
+                Toast.makeText(context, R.string.logoutSuccess, Toast.LENGTH_SHORT).show()
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+            is Error -> {
+                Toast.makeText(context,  R.string.logoutFailed, Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Loading
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .verticalScroll(state = rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Clickable Image to Upload
@@ -128,7 +153,7 @@ fun EditProfileScreen(
                         if (viewModel.shouldRequestPhoto()) {
                             showPhotoPermissionDialog = true
                         } else {
-                            Toast.makeText(context, "Please allow photo access in settings", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, R.string.photoPermissionToast, Toast.LENGTH_LONG).show()
                         }
                     }
                 },
@@ -155,7 +180,7 @@ fun EditProfileScreen(
 
                 else -> {
                     Text(
-                        text = "Tap to upload\nimage",
+                        text = stringResource(R.string.tapToUploadImage),
                         textAlign = TextAlign.Center,
                         color = Color.Gray,
                         fontSize = 12.sp
@@ -169,7 +194,7 @@ fun EditProfileScreen(
         CustomTextField(
             value = name,
             onValueChange = { name = it },
-            label = "Name",
+            label = stringResource(R.string.name),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -178,7 +203,7 @@ fun EditProfileScreen(
         CustomTextField(
             value = about,
             onValueChange = { about = it },
-            label = "About me",
+            label = stringResource(R.string.aboutMe),
             maxLines = 5,
             modifier = Modifier
                 .fillMaxWidth()
@@ -218,11 +243,6 @@ fun EditProfileScreen(
                     iconOff = Icons.Default.LightMode,
                     modifier = Modifier.size(width = 50.dp, height = 30.dp)
                 )
-//                SettingsThemeSwitches(
-//                    isDark = isDarkTheme,
-//                    onCheckedChange = { changeAppTheme()
-//                        themeViewModel.toggleTheme()}
-//                )
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -300,7 +320,7 @@ fun EditProfileScreen(
                                 notificationViewModel.notifyProfileUpdate() // Store notification
                                 Toast.makeText(
                                     context,
-                                    "Saved Successfully!",
+                                    R.string.saved,
                                     Toast.LENGTH_SHORT
                                 )
                                     .show()
@@ -309,7 +329,7 @@ fun EditProfileScreen(
                             onFailure = {
                                 Toast.makeText(
                                     context,
-                                    "Failed to upload image",
+                                    R.string.unsavedImage,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -318,7 +338,7 @@ fun EditProfileScreen(
                         viewModel.updateName(name)
                         viewModel.updateAboutMe(about)
                         notificationViewModel.notifyProfileUpdate() // Store notification
-                        Toast.makeText(context, "Saved Successfully!", Toast.LENGTH_SHORT)
+                        Toast.makeText(context, R.string.saved, Toast.LENGTH_SHORT)
                             .show()
                         navController.popBackStack()
                     }

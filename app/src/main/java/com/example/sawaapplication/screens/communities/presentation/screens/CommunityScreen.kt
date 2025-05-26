@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -107,19 +108,24 @@ fun CommunityScreen(
     onClick: (String) -> Unit,
     navController: NavHostController
 ) {
+
+    val context = LocalContext.current
+
     // State Management
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var selectedTab by remember { mutableIntStateOf(0) }
     var dialogState by remember { mutableStateOf(DialogState()) }
 
-    
+
     // Collect States - Fixed: Use proper StateFlow collection
+    // Collect States
     val posts by communityPostsViewModel.communityPosts.collectAsState()
     val events by eventViewModel.events.collectAsState()
     val communityDetail by viewModel.communityDetail.collectAsState()
     val isAdmin by viewModel.isAdmin.collectAsState()
     val hasJoinedOrLeft by joinCommunityViewModel.hasJoinedOrLeft.collectAsState()
     val isUserJoined = communityDetail?.members?.contains(currentUserId) == true
+    val deleteResult by eventViewModel.deleteResult.collectAsState()
 
     // Create UI State
     val uiState = CommunityScreenState(
@@ -142,6 +148,17 @@ fun CommunityScreen(
         if (uiState.hasJoinedOrLeft) {
             viewModel.fetchCommunityDetail(communityId)
             joinCommunityViewModel.resetJoinLeaveState()
+        }
+    }
+
+    LaunchedEffect(deleteResult) {
+        deleteResult?.let { result ->
+            if (result.isSuccess) {
+                Toast.makeText(context, R.string.deleteEventSuccess, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, R.string.deleteEventFailed, Toast.LENGTH_SHORT).show()
+            }
+            eventViewModel.clearDeleteResult()
         }
     }
 

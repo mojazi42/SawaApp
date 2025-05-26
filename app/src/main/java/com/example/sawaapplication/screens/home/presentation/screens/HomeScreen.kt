@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.home.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -90,14 +91,21 @@ fun HomeScreen(
 
 @Composable
 fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
+    val context = LocalContext.current
+
     val posts by viewModel.posts.collectAsState()
+    val postLikedUserId = viewModel.postLikedEvent.collectAsState().value
+
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
+
     val communityNames by viewModel.communityNames.collectAsState()
     val userDetails by viewModel.userDetails.collectAsState()
+
     val notificationViewModel: NotificationViewModel = hiltViewModel()
 
-    val postLikedUserId = viewModel.postLikedEvent.collectAsState().value
+    val deleteResult by viewModel.deletePostResult.collectAsState()
+
 
     // Trigger a notification whenever a post is liked by a user
     LaunchedEffect(postLikedUserId) {
@@ -112,6 +120,18 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
     LaunchedEffect(Unit) {
         viewModel.loadAllPosts()
     }
+
+    LaunchedEffect(deleteResult) {
+        deleteResult?.let { result ->
+            if (result.isSuccess) {
+                Toast.makeText(context, "Post deleted successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show()
+            }
+            viewModel.clearDeletePostResult()
+        }
+    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -183,11 +203,14 @@ fun MyEventsTab(
     eventViewModel: EventViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val context = LocalContext.current
+
     val events by viewModel.joinedEvents.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val joinResult by eventViewModel.joinResult.collectAsState()
+    val deleteResult by eventViewModel.deleteResult.collectAsState()
 
     // Fetch community names
 
@@ -211,6 +234,19 @@ fun MyEventsTab(
     LaunchedEffect(joinResult) {
         if (joinResult?.isSuccess == true) {
             viewModel.fetchJoinedEvents()
+        }
+    }
+
+    // Show a toast when delete event
+    LaunchedEffect(deleteResult) {
+        deleteResult?.let { result ->
+            if (result.isSuccess) {
+                Toast.makeText(context, "Event deleted successfully", Toast.LENGTH_SHORT).show()
+                viewModel.fetchJoinedEvents()
+            } else {
+                Toast.makeText(context, "Failed to delete event", Toast.LENGTH_SHORT).show()
+            }
+            eventViewModel.clearDeleteResult()
         }
     }
 

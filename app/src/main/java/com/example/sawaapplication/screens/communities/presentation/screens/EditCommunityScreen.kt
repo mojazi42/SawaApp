@@ -107,10 +107,30 @@ fun EditCommunityScreen(
 
     val loading by viewModel.loading.collectAsState()
     val success by viewModel.success.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val actionType by viewModel.actionType.collectAsState()
 
     LaunchedEffect(success) {
         if (success) {
-            navController.navigate(Screen.Community.route)
+            when (actionType) {
+                "update" -> Toast.makeText(context, R.string.updateCommunityToast, Toast.LENGTH_SHORT).show()
+                "delete" -> Toast.makeText(context, R.string.deleteCommunityToast, Toast.LENGTH_SHORT).show()
+            }
+
+            if (actionType == "delete") {
+                navController.navigate("community") {
+                    popUpTo("edit_community/$communityId") { inclusive = true }
+                }
+            } else {
+                navController.popBackStack()
+            }
+        }
+    }
+
+    LaunchedEffect(error) {
+        error?.let { message ->
+            Toast.makeText(context, R.string.errorToast, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
         }
     }
 
@@ -257,15 +277,6 @@ fun EditCommunityScreen(
             }
 
             Spacer(Modifier.height(16.dp))
-
-//            Button(
-//                onClick = { navController.popBackStack() },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(56.dp)
-//            ) {
-//                Text(stringResource(R.string.cancel),)
-//            }
 
             TextButton(
                 onClick = { navController.popBackStack() },
