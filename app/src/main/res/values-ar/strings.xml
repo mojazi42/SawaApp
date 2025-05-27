@@ -124,6 +124,7 @@
     <string name="healthWellness">الصحة</string>
     <string name="artCreativity">الإبداع والفن</string>
     <string name="funny">المرح</string>
+    <string name="education">تعليم</string>
     <string name="other">غير ذلك</string>
 
     <!-- Event Card Screen-->
@@ -188,5 +189,7 @@
     <string name="addEvent">أضف حدث</string>
     <string name="add">أضف</string>
     <string name="noTimeSet">لم يتم تحديد الوقت</string>
-
+    <string name="Default">الافتراضي</string>
+    <string name="mostPopular">الأشهر</string>
+    <string name="mostRecent">الأحدث</string>
 </resources>
