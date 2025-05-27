@@ -104,7 +104,6 @@ fun CommunityScreen(
     eventViewModel: EventViewModel = hiltViewModel(),
     communityPostsViewModel: CommunityPostsViewModel = hiltViewModel(),
     joinCommunityViewModel: ExploreCommunityViewModel = hiltViewModel(),
-    onBackPressed: () -> Unit,
     onClick: (String) -> Unit,
     navController: NavHostController
 ) {
@@ -239,9 +238,6 @@ fun CommunityScreen(
     )
 
     Scaffold(
-        topBar = {
-            CommunityTopBar(onBackPressed = { navController.popBackStack() })
-        },
         floatingActionButton = {
             CommunityFAB(
                 selectedTab = selectedTab,
@@ -252,11 +248,10 @@ fun CommunityScreen(
         },
         floatingActionButtonPosition = FabPosition.End,
         contentWindowInsets = WindowInsets(0)
-    ) { innerPadding ->
-
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding,
+
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

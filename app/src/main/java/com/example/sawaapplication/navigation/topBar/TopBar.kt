@@ -41,6 +41,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
+import com.example.sawaapplication.screens.profile.presentation.vm.ProfileViewModel
 
 @Composable
 fun TopBar(
@@ -53,6 +54,12 @@ fun TopBar(
     onNotificationClick: () -> Unit = {},
     navIcon: @Composable (() -> Unit)? = null,
 ) {
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+
+    LaunchedEffect(Unit) {
+        profileViewModel.refreshUserData()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,50 +233,6 @@ fun getTopBar(
                 )
             }
         }
-        Screen.Profile.route -> {
-            {
-                TopBar(
-                    title = "",
-                    navIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .graphicsLayer {
-                                        scaleX = if (isRtl) -1f else 1f
-                                    }
-                            )
-                        }
-                    },
-                )
-            }
-        }
-
-        Screen.UserAccount.route -> {
-            {
-                TopBar(
-                    title = "",
-                    navIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .graphicsLayer {
-                                        scaleX = if (isRtl) -1f else 1f
-                                    }
-                            )
-                        }
-                    },
-                )
-            }
-        }
-
         Screen.Chats.route -> {
             {
                 TopBar(
@@ -290,6 +253,27 @@ fun getTopBar(
             {
                 TopBar(
                     title = stringResource(R.string.groupMembers),
+                    navIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .graphicsLayer {
+                                        scaleX = if (isRtl) -1f else 1f
+                                    }
+                            )
+                        }
+                    }
+                )
+            }
+        }
+        "community_screen/{communityId}" -> {
+            {
+                TopBar(
+                    title ="",
                     navIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
