@@ -48,6 +48,7 @@ import com.example.sawaapplication.ui.theme.white
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 @Composable
 fun PostCard(
     post: PostUiModel,
@@ -170,7 +171,7 @@ fun PostCard(
                     }
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
+                        text = if (post.likes == 1) "1 ${stringResource(R.string.like)}" else "${post.likes} ${stringResource(R.string.likes)}",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
