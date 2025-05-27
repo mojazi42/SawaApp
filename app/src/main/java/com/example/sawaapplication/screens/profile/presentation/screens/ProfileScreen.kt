@@ -240,13 +240,6 @@ fun ProfileScreen(
                     onLikeClick = { homeViewModel.likePost(post) },
                     onDeleteClick = { homeViewModel.deletePost(post) },
                     navController = navController,
-                    onUserImageClick = { homeViewModel.likePost(post) }
-                )
-
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
         }

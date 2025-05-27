@@ -33,6 +33,6 @@ val Red = Color(0xFFB22626)
 
 val Beige = Color(0xFFD2CCCC)
 
-
+val errorColor = Color(0xFFB22626)
 
 

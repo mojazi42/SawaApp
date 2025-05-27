@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -96,6 +97,7 @@ private data class DialogState(
     val selectedEventId: String? = null
 )
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
@@ -799,9 +801,11 @@ private fun EnhancedCommunityEventCard(
                         Toast.LENGTH_LONG
                     ).show()
                 }
+
                 isUserJoinedEvent -> {
                     onLeaveEvent()
                 }
+
                 else -> {
                     onJoinEvent()
                 }
@@ -810,7 +814,11 @@ private fun EnhancedCommunityEventCard(
         showCancelButton = true,
         modifier = Modifier.padding(4.dp),
         eventTimestamp = event.time,
-        onClick = { navController.navigate("event_detail/$communityId/${event.id}") }
+        onClick = { navController.navigate("event_detail/$communityId/${event.id}") },
+        onCommunityClick = { communityId ->
+            navController.navigate("community_screen/$communityId")
+        },
+        communityId = communityId
     )
 }
 

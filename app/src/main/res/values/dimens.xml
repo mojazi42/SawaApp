@@ -210,5 +210,5 @@
     <integer name="eventInfoPillIcon">16</integer>
     <integer name="eventButtonHeight">28</integer>
     <integer name ="smallRoundCorner">8</integer>
-
+    <integer name="homeEventTopPadding">52</integer>>
 </resources>
