@@ -51,8 +51,10 @@ object AppModule {
 
     @Provides
     fun provideFirebaseAuthDataSource(
-        firebaseAuth: FirebaseAuth
-    ): FirebaseAuthDataSource = FirebaseAuthDataSource(firebaseAuth)
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): FirebaseAuthDataSource = FirebaseAuthDataSource(firebaseAuth,firestore)
+
 
     @Provides
     fun provideCommunityRemoteDataSource(

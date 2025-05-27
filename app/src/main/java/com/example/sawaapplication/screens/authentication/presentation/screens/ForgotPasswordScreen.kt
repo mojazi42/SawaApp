@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
@@ -42,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.AuthState
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.ForgotPasswordViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomCard
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
@@ -50,7 +53,7 @@ import kotlinx.coroutines.delay
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
-fun ResetPasswordScreen(
+fun ForgotPasswordScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -60,6 +63,25 @@ fun ResetPasswordScreen(
     // Entry animations
     var bannerVisible by remember { mutableStateOf(false) }
     var cardVisible by remember { mutableStateOf(false) }
+
+    val authState by forgotPasswordViewModel.authState.collectAsState()
+
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.Authenticated -> {
+                Toast.makeText(context, "Reset link sent to email", Toast.LENGTH_SHORT).show()
+                delay(300)
+                navController.navigate(Screen.Login.route)
+            }
+            is AuthState.Error -> {
+                val msg = (authState as AuthState.Error).message
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            }
+            else -> Unit
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         bannerVisible = true
@@ -155,13 +177,7 @@ fun ResetPasswordScreen(
                         onClick = {
                             val email = emailState.trim()
                             if (email.isNotEmpty()) {
-                                forgotPasswordViewModel.forgotPassword()  // Handles Firebase email sending
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.SentPassword),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                navController.navigate(Screen.Login.route)
+                                forgotPasswordViewModel.forgotPassword()
                             } else {
                                 Toast.makeText(
                                     context,
@@ -174,6 +190,16 @@ fun ResetPasswordScreen(
                     )
                 }
             }
+        }
+    }
+    if (authState is AuthState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }

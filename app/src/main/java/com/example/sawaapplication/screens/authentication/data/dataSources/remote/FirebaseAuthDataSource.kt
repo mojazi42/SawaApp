@@ -9,7 +9,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirebaseAuthDataSource @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val  firestore: FirebaseFirestore
 ) {
 
     suspend fun signUp(name: String, email: String, password: String) {
@@ -60,9 +61,23 @@ class FirebaseAuthDataSource @Inject constructor(
         }
     }
 
-    suspend fun sendPasswordResetEmail(email: String) {
-        firebaseAuth.sendPasswordResetEmail(email).await()
+    suspend fun sendPasswordResetEmail(email: String):Result<Unit> {
+        return try {
+            val querySnapshot = firestore.collection("User")
+                .whereEqualTo("email", email)
+                .get()
+                .await()
+            if (!querySnapshot.isEmpty) {
+                firebaseAuth.sendPasswordResetEmail(email).await()
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Email not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
+
 
     fun logOut() {
         firebaseAuth.signOut()
