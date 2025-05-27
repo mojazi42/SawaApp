@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -105,6 +106,7 @@ fun CommunityScreen(
     navController: NavHostController
 ) {
     // State Management
+    val context = LocalContext.current
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var selectedTab by remember { mutableIntStateOf(0) }
     var dialogState by remember { mutableStateOf(DialogState()) }
@@ -141,7 +143,7 @@ fun CommunityScreen(
         }
     }
 
-    // Event Handlers
+    // Enhanced Event Handlers with membership validation
     val eventHandlers = CommunityEventHandlers(
         onLeaveCommunity = {
             joinCommunityViewModel.leaveCommunity(communityId, currentUserId)
@@ -149,8 +151,18 @@ fun CommunityScreen(
             dialogState = dialogState.copy(showLeaveCommunity = false)
         },
         onLeaveEvent = { eventId ->
-            eventViewModel.leaveEvent(communityId, eventId, currentUserId)
-            dialogState = dialogState.copy(showLeaveEvent = false, selectedEventId = null)
+            viewModel.leaveEvent(
+                communityId = communityId,
+                eventId = eventId,
+                onSuccess = {
+                    eventViewModel.loadEvents(communityId) // Refresh events list
+                    dialogState = dialogState.copy(showLeaveEvent = false, selectedEventId = null)
+                },
+                onFailure = { error ->
+                    Log.e("CommunityScreen", "Failed to leave event: $error")
+                    Toast.makeText(context, "Failed to leave event: $error", Toast.LENGTH_LONG).show()
+                }
+            )
         },
         onDeleteEvent = { eventId ->
             eventViewModel.deleteEvent(communityId, eventId)
@@ -161,7 +173,30 @@ fun CommunityScreen(
             joinCommunityViewModel.joinCommunity(communityId, currentUserId)
         },
         onJoinEvent = { eventId ->
-            eventViewModel.joinEvent(communityId, eventId, currentUserId)
+            // Enhanced validation: Check if user is a community member before joining event
+            if (uiState.isUserJoined) {
+                viewModel.joinEventWithMembershipCheck(
+                    communityId = communityId,
+                    eventId = eventId,
+                    onSuccess = {
+                        // Event joined successfully
+                        eventViewModel.loadEvents(communityId) // Refresh events list
+                        Toast.makeText(context, "Successfully joined the event!", Toast.LENGTH_SHORT).show()
+                    },
+                    onFailure = { error ->
+                        // Show error message to user
+                        Log.e("CommunityScreen", "Failed to join event: $error")
+                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                    }
+                )
+            } else {
+                // Show message that user must join community first
+                Toast.makeText(
+                    context,
+                    "You must join the community first to participate in events",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     )
 
@@ -193,7 +228,8 @@ fun CommunityScreen(
             CommunityFAB(
                 selectedTab = selectedTab,
                 communityId = communityId,
-                navController = navController
+                navController = navController,
+                isUserJoined = uiState.isUserJoined
             )
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -231,14 +267,11 @@ fun CommunityScreen(
             when (selectedTab) {
                 0 -> {
                     // Posts Tab
-                    // In your CommunityScreen, update the PostCard call:
-
-// Posts Tab
                     items(uiState.posts) { post ->
                         PostCard(
                             post = post,
                             currentUserId = currentUserId,
-                            canLike = uiState.isUserJoined, // ✅ NEW: Only allow likes if user joined community
+                            canLike = uiState.isUserJoined, // ✅ Only allow likes if user joined community
                             onImageClick = { imageUrl ->
                                 val encoded = URLEncoder.encode(imageUrl, "utf-8")
                                 onClick(encoded)
@@ -254,24 +287,28 @@ fun CommunityScreen(
                 }
 
                 1 -> {
-                    // Events Tab
+                    // Events Tab - Enhanced with membership validation
                     items(uiState.events) { event ->
-                        CommunityEventCard(
+                        EnhancedCommunityEventCard(
                             event = event,
                             communityName = uiState.communityDetail?.name ?: "",
                             currentUserId = currentUserId,
                             navController = navController,
                             communityId = communityId,
+                            isUserJoined = uiState.isUserJoined, // ✅ Pass membership status
                             onJoinEvent = {
                                 eventHandlers.onJoinEvent(event.id)
-                                event.time?.let { it1 ->
-                                eventViewModel.recordEventJoin(
-                                    currentUserId,
-                                    event.id,
-                                    event.title,
-                                    it1.toDate()
-                                )
-                            }
+                                // Record event join only if successful
+                                event.time?.let { timestamp ->
+                                    if (uiState.isUserJoined) {
+                                        eventViewModel.recordEventJoin(
+                                            currentUserId,
+                                            event.id,
+                                            event.title,
+                                            timestamp.toDate()
+                                        )
+                                    }
+                                }
                             },
                             onLeaveEvent = {
                                 dialogState = dialogState.copy(
@@ -661,45 +698,51 @@ private fun CommunityTabs(
 private fun CommunityFAB(
     selectedTab: Int,
     communityId: String,
-    navController: NavHostController
+    navController: NavHostController,
+    isUserJoined: Boolean
 ) {
-    FloatingActionButton(
-        onClick = {
-            val route = when (selectedTab) {
-                0 -> "create_post/$communityId"
-                1 -> "create_event/$communityId"
-                else -> return@FloatingActionButton
-            }
-            navController.navigate(route)
-        },
-        modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
-        shape = CircleShape,
-        containerColor = PrimaryOrange,
-        contentColor = white,
-        elevation = FloatingActionButtonDefaults.elevation(integerResource(R.integer.floatingActionButtonElevation).dp)
-    ) {
-        Icon(
-            imageVector = when (selectedTab) {
-                0 -> Icons.Default.Edit
-                1 -> Icons.Default.Event
-                else -> Icons.Default.Edit
+    // Only show FAB if user has joined the community
+    if (isUserJoined) {
+        FloatingActionButton(
+            onClick = {
+                val route = when (selectedTab) {
+                    0 -> "create_post/$communityId"
+                    1 -> "create_event/$communityId"
+                    else -> return@FloatingActionButton
+                }
+                navController.navigate(route)
             },
-            contentDescription = when (selectedTab) {
-                0 -> "Add Post"
-                1 -> "Add Event"
-                else -> "Add"
-            }
-        )
+            modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
+            shape = CircleShape,
+            containerColor = PrimaryOrange,
+            contentColor = white,
+            elevation = FloatingActionButtonDefaults.elevation(integerResource(R.integer.floatingActionButtonElevation).dp)
+        ) {
+            Icon(
+                imageVector = when (selectedTab) {
+                    0 -> Icons.Default.Edit
+                    1 -> Icons.Default.Event
+                    else -> Icons.Default.Edit
+                },
+                contentDescription = when (selectedTab) {
+                    0 -> "Add Post"
+                    1 -> "Add Event"
+                    else -> "Add"
+                }
+            )
+        }
     }
 }
 
+// Enhanced EventCard with membership validation
 @Composable
-private fun CommunityEventCard(
+private fun EnhancedCommunityEventCard(
     event: com.example.sawaapplication.screens.event.domain.model.Event,
     communityName: String,
     currentUserId: String,
     navController: NavHostController,
     communityId: String,
+    isUserJoined: Boolean,
     onJoinEvent: () -> Unit,
     onLeaveEvent: () -> Unit,
     onEditEvent: () -> Unit,
@@ -708,6 +751,9 @@ private fun CommunityEventCard(
     val context = LocalContext.current
     val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
     val formattedDate = formatDateString(event.date)
+
+    // Check if user is already joined to this event
+    val isUserJoinedEvent = event.joinedUsers.contains(currentUserId)
 
     EventCard(
         image = event.imageUri,
@@ -719,15 +765,27 @@ private fun CommunityEventCard(
         community = communityName,
         time = timeFormatted,
         date = formattedDate,
-        joined = event.joinedUsers.contains(currentUserId),
+        joined = isUserJoinedEvent,
         isEditable = event.createdBy == currentUserId,
+        canJoinEvents = isUserJoined, // NEW: Pass membership status to control button state
         onEditClick = onEditEvent,
         onDeleteClick = onDeleteEvent,
         onJoinClick = {
-            if (event.joinedUsers.contains(currentUserId)) {
-                onLeaveEvent()
-            } else {
-                onJoinEvent()
+            when {
+                !isUserJoined -> {
+                    // Show message that user must join community first
+                    Toast.makeText(
+                        context,
+                        "You must join the community first to participate in events",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                isUserJoinedEvent -> {
+                    onLeaveEvent()
+                }
+                else -> {
+                    onJoinEvent()
+                }
             }
         },
         showCancelButton = true,
