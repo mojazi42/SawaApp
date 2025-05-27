@@ -57,7 +57,6 @@ fun PostCard(
     userImage: String,
     onClick: () -> Unit,
     onLikeClick: (Post) -> Unit,
-    onUserImageClick: () -> Unit,
     onDeleteClick: (Post) -> Unit,
     navController: NavController,
     modifier: Modifier = Modifier,

@@ -3,6 +3,7 @@ package com.example.sawaapplication.screens.home.presentation.screens.component
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Group
@@ -24,13 +26,13 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,19 +43,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.google.firebase.Timestamp
-import com.example.sawaapplication.screens.event.domain.model.Event
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Badge
+import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import com.example.sawaapplication.ui.theme.errorColor
+import com.example.sawaapplication.ui.theme.thirdOrange
+
 
 @Composable
 fun EventCard(
@@ -76,8 +85,12 @@ fun EventCard(
     onDeleteClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     canJoinEvents: Boolean = true,
-) {
+    onCommunityClick: ((String) -> Unit)? = null,
+    communityId: String,
+
+    ) {
     val context = LocalContext.current
+    val joinedCount = joinedUsers.size
 
     fun isEventExpired(eventTime: Timestamp): Boolean {
         val eventMillis = eventTime.toDate().time
@@ -95,12 +108,15 @@ fun EventCard(
     val isExpired = remember(eventTimestamp) {
         eventTimestamp?.let { isEventExpired(it) } ?: false
     }
-    var expanded by remember { mutableStateOf(false) }
+    var menuExpanded by remember { mutableStateOf(false) }
 
-    OutlinedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(integerResource(id = R.integer.smallerSpace).dp)
+            .padding(
+                vertical = integerResource(id = R.integer.smallerSpace).dp,
+                horizontal = integerResource(id = R.integer.smallerSpace).dp
+            )
             .clickable {
                 if (canJoinEvents) {
                     onClick()
@@ -112,184 +128,232 @@ fun EventCard(
                     ).show()
                 }
             },
+
+        shape = RoundedCornerShape(integerResource(id = R.integer.cardRoundedCornerShape).dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
-        shape = RoundedCornerShape(integerResource(id = R.integer.homeScreenRoundedCornerShape).dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = integerResource(id = R.integer.homeScreenCardElevation).dp
-        ),
-        border = BorderStroke(
-            integerResource(R.integer.stroke).dp,
-            MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
     ) {
         Column {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                // Image
-                Image(
-                    painter = if (image.isNotEmpty())
-                        rememberAsyncImagePainter(image)
-                    else
-                        painterResource(id = R.drawable.ic_launcher_background),
+            //Top image
+            Box {
+                AsyncImage(
+                    model = image,
                     contentDescription = "Event image",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .clip(RectangleShape)
+                        .fillMaxWidth()
+                        .height(integerResource(id = R.integer.eventImageHeight).dp)
                         .clip(
                             RoundedCornerShape(
-                                topStart = integerResource(id = R.integer.homeScreenRoundedCornerShape).dp
+                                topStart = integerResource(id = R.integer.cardRoundedCornerShape).dp,
+                                topEnd = integerResource(id = R.integer.cardRoundedCornerShape).dp
                             )
                         )
-                        .size(integerResource(id = R.integer.homeScreenEventImageSize).dp)
+                )
+                if (isExpired) {
+                    Badge(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(integerResource(id = R.integer.smallerSpace).dp),
+                        containerColor = errorColor,
+                    ) {
+                        Text(
+                            stringResource(id = R.string.expired),
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                } else if (isFull) {
+                    Badge(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(integerResource(id = R.integer.smallerSpace).dp),
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Text(
+                            stringResource(id = R.string.full),
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
+
+            Column(Modifier.padding(horizontal = integerResource(id = R.integer.mediumSpace).dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    //Community tag
+                    AssistChip(
+                        onClick = { onCommunityClick?.invoke(communityId) },
+                        label = { Text(community) },
+                        leadingIcon = { Icon(Icons.Outlined.Group, contentDescription = null) },
+                        shape = RoundedCornerShape(integerResource(id = R.integer.RoundedCornerShape).dp),
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.1f),
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                    )
+                    if (isEditable) {
+                        Box {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(Icons.Filled.MoreVert, contentDescription = "Options")
+                            }
+                            DropdownMenu(
+                                expanded = menuExpanded,
+                                onDismissRequest = { menuExpanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(id = R.string.edit)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onEditClick()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            stringResource(id = R.string.delete),
+                                            color = Color.Red
+                                        )
+                                    },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onDeleteClick()
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
+
+                // Title & description
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(integerResource(id = R.integer.extraSmallSpace).dp))
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Spacer(modifier = Modifier.width(integerResource(id = R.integer.smallSpace).dp))
+                Spacer(Modifier.height(integerResource(id = R.integer.smallSpace).dp))
 
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(top = integerResource(id = R.integer.smallSpace).dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = community,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray
-                    )
+                    // location & time
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.mediumSpace).dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        InfoPill(
+                            icon = Icons.Outlined.LocationOn,
+                            text = location,
+                            maxTextWidth = integerResource(id = R.integer.eventInfoPillWidth).dp
+                        )
+                        InfoPill(
+                            icon = Icons.Outlined.Timer,
+                            text = "$date • $time",
+                        )
+                    }
+                }
 
-                    Spacer(modifier = Modifier.height(integerResource(R.integer.spacer).dp))
+                Spacer(Modifier.height(integerResource(id = R.integer.smallSpace).dp))
 
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-
-                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
-
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontSize = integerResource(R.integer.titleSize).sp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
+                //join/leave button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     JoinButton(
                         joined = joined,
                         onJoinClick = onJoinClick,
                         showCancel = showCancelButton,
                         isExpired = isExpired,
                         isFull = isFull,
-                        canJoinEvents = canJoinEvents,
+                        canJoinEvents = canJoinEvents
                     )
-                }
 
-                // Overflow menu
-                if (isEditable) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Top)
-                            .padding(top = 4.dp, end = 4.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(
-                                imageVector = Icons.Filled.MoreVert,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                        }
+                        // Participants count
+                        Icon(
+                            imageVector = Icons.Default.Group,
+                            contentDescription = "Participants",
+                            tint = if (joinedUsers.size >= participants) thirdOrange else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
+                        )
+                        Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
 
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Edit") },
-                                onClick = {
-                                    expanded = false
-                                    onEditClick()
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Delete", color = Color.Red) },
-                                onClick = {
-                                    expanded = false
-                                    onDeleteClick()
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Bottom info row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = integerResource(id = R.integer.smallSpace).dp,
-                        vertical = integerResource(id = R.integer.smallerSpace).dp
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Outlined.LocationOn,
-                        contentDescription = "Location",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
-                    )
-                    Text(
-                        text = location,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Outlined.Timer,
-                        contentDescription = "Time",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
-                    )
-                    Text(
-                        text = "$date•$time",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Group,
-                        contentDescription = "Participants",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(integerResource(id = R.integer.homeScreenIconSize).dp)
-                    )
-                    Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
-
-                    Text(
-                        text = "${joinedUsers.size}/$participants",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-
-                    if (joinedUsers.size >= participants) {
-                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Full",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            text = "$participants/${joinedUsers.size}",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = if (joinedUsers.size >= participants) thirdOrange else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
+
+                Spacer(Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
             }
         }
+    }
+}
+
+@Composable
+private fun InfoPill(
+    icon: ImageVector,
+    text: String,
+    maxTextWidth: Dp = Dp.Unspecified,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .background(
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(integerResource(id = R.integer.cardRoundedCornerShape).dp)
+            )
+            .padding(
+                horizontal = integerResource(id = R.integer.smallerSpace).dp,
+                vertical = integerResource(id = R.integer.extraSmallSpace).dp
+            )
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.size(integerResource(id = R.integer.eventInfoPillIcon).dp)
+        )
+        Spacer(Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
+        Text(
+            text,
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = if (maxTextWidth != Dp.Unspecified)
+                Modifier.widthIn(max = maxTextWidth)
+            else
+                Modifier
+        )
     }
 }
 
@@ -321,16 +385,11 @@ fun JoinButton(
         shape = RoundedCornerShape(30),
         colors = ButtonDefaults.buttonColors(
             containerColor = when {
-                isCancelVisible -> Color(0xFFEAEAEA)
-                joined -> Color(0xFFEAEAEA)
-                isLocked -> Color(0xFFEAEAEA)
+                isCancelVisible || joined || isLocked -> Color(0xFFEAEAEA)
                 else -> MaterialTheme.colorScheme.primary
             },
             contentColor = when {
-                isCancelVisible -> Color.Gray
-                joined -> Color.Gray
-                isEventFull -> Color.Gray
-                isLocked -> Color.Gray
+                isCancelVisible || joined || isEventFull || isLocked -> Color.Gray
                 else -> Color.White
             }
         ),
@@ -341,12 +400,12 @@ fun JoinButton(
     ) {
         Text(
             text = when {
-                isLocked -> "🔒 Locked"
-                isEventFull -> "Join"
-                isExpired -> "Finished"
+                isLocked   -> "🔒 Locked"
+                isExpired  -> "Finished"
+                isEventFull-> "Full"
                 isCancelVisible -> "Leave"
-                joined -> "Joined"
-                else -> "Join"
+                joined     -> "Joined"
+                else       -> "Join"
             },
             style = MaterialTheme.typography.labelSmall
         )

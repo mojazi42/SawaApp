@@ -198,7 +198,7 @@ class EventInCommunityRemote @Inject constructor(
             "eventId"   to eventId,
             "startTime" to startTime,
             "responded" to false,
-            "message"   to "Did you attend \"$eventTitle\"?",
+            "message"   to "\"$eventTitle\"",
             "timestamp" to FieldValue.serverTimestamp()
         )
         firestore

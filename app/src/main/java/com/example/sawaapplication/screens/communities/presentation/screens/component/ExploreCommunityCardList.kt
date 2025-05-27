@@ -48,7 +48,7 @@ fun ExploreCommunityCardList(
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = 4.dp),
                 thickness = 1.dp,
                 color = Color.LightGray
             )
