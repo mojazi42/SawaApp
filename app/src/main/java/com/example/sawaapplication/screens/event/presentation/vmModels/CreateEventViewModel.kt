@@ -46,10 +46,6 @@ class CreateEventViewModel @Inject constructor(
     var location by mutableStateOf(GeoPoint(0.0, 0.0))
     var locationText by mutableStateOf("Location not set")
     private var job: Job? = null
-
-    // val loading = mutableStateOf(false)
-    // val success = mutableStateOf(false)
-    // val error = mutableStateOf<String?>(null)
     var isMapVisible by mutableStateOf(false)
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
@@ -197,6 +193,10 @@ class CreateEventViewModel @Inject constructor(
 
     fun resetSuccess() {
         _success.value = false
+    }
+
+    fun resetError() {
+        _error.value = null
     }
 
     fun shouldRequestLocation() = permissionHandler.shouldRequestLocationPermission()

@@ -2,16 +2,33 @@ package com.example.sawaapplication.screens.communities.presentation.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,8 +43,7 @@ import coil.compose.AsyncImage
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
-import com.example.sawaapplication.ui.theme.black
-import com.example.sawaapplication.ui.theme.white
+import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -39,16 +55,20 @@ fun PostCard(
     onImageClick: (String) -> Unit,
     onLikeClick: (PostUiModel) -> Unit,
     canLike: Boolean = true,
+    onDeleteClick: (() -> Unit)? = null,  // Optional delete callback
     navController: NavController
 ) {
     val isLiked = currentUserId in post.likedBy
+    val isOwnedByCurrentUser = currentUserId == post.userId
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     val formattedDate = remember(post.createdAt) {
         formatPostDate(post.createdAt)
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .border(
                 width = 1.dp,
                 color = Color.White,
@@ -105,9 +125,9 @@ private fun UserHeaderSection(
                     .size(integerResource(R.integer.asyncImageSize).dp)
                     .clip(CircleShape)
                     .clickable {
-                        if(post.userId == currentUserId){
+                        if (post.userId == currentUserId) {
                             navController.navigate(Screen.Profile.route)
-                        }else{
+                        } else {
                             navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
                         }
                     },

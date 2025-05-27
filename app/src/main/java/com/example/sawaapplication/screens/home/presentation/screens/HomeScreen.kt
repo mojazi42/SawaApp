@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.home.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,11 +42,11 @@ import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
-import com.example.sawaapplication.screens.event.presentation.vmModels.FetchEventViewModel
+import com.example.sawaapplication.screens.event.presentation.vmModels.EventViewModel
+import com.example.sawaapplication.screens.home.domain.model.EventFilterType
 import com.example.sawaapplication.screens.home.presentation.screens.component.CustomTabRow
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
-import com.example.sawaapplication.screens.home.presentation.vmModels.EventFilterType
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
@@ -90,14 +91,21 @@ fun HomeScreen(
 
 @Composable
 fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
+    val context = LocalContext.current
+
     val posts by viewModel.posts.collectAsState()
+    val postLikedUserId = viewModel.postLikedEvent.collectAsState().value
+
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
+
     val communityNames by viewModel.communityNames.collectAsState()
     val userDetails by viewModel.userDetails.collectAsState()
+
     val notificationViewModel: NotificationViewModel = hiltViewModel()
 
-    val postLikedUserId = viewModel.postLikedEvent.collectAsState().value
+    val deleteResult by viewModel.deletePostResult.collectAsState()
+
 
     // Trigger a notification whenever a post is liked by a user
     LaunchedEffect(postLikedUserId) {
@@ -112,6 +120,18 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
     LaunchedEffect(Unit) {
         viewModel.loadAllPosts()
     }
+
+    LaunchedEffect(deleteResult) {
+        deleteResult?.let { result ->
+            if (result.isSuccess) {
+                Toast.makeText(context, "Post deleted successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show()
+            }
+            viewModel.clearDeletePostResult()
+        }
+    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -180,14 +200,17 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
 @Composable
 fun MyEventsTab(
     viewModel: HomeViewModel = hiltViewModel(),
-    eventViewModel: FetchEventViewModel = hiltViewModel(),
+    eventViewModel: EventViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val context = LocalContext.current
+
     val events by viewModel.joinedEvents.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val joinResult by eventViewModel.joinResult.collectAsState()
+    val deleteResult by eventViewModel.deleteResult.collectAsState()
 
     // Fetch community names
 
@@ -211,6 +234,19 @@ fun MyEventsTab(
     LaunchedEffect(joinResult) {
         if (joinResult?.isSuccess == true) {
             viewModel.fetchJoinedEvents()
+        }
+    }
+
+    // Show a toast when delete event
+    LaunchedEffect(deleteResult) {
+        deleteResult?.let { result ->
+            if (result.isSuccess) {
+                Toast.makeText(context, "Event deleted successfully", Toast.LENGTH_SHORT).show()
+                viewModel.fetchJoinedEvents()
+            } else {
+                Toast.makeText(context, "Failed to delete event", Toast.LENGTH_SHORT).show()
+            }
+            eventViewModel.clearDeleteResult()
         }
     }
 
@@ -247,7 +283,7 @@ fun MyEventsTab(
                 DropdownMenuItem(
                     text = { Text("Finished Events") },
                     onClick = {
-                        viewModel.setFilter(EventFilterType.Fineshed)
+                        viewModel.setFilter(EventFilterType.Finished)
                         isFilterMenuExpanded = false
                     }
                 )

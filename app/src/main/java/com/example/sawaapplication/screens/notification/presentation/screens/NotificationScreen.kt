@@ -53,7 +53,6 @@ fun NotificationScreen(
     LaunchedEffect(userId) {
         if (userId.isNotBlank()) {
             notificationViewModel.fetchNotifications()
-            notificationViewModel.loadReminders(userId)
         }
     }
     LaunchedEffect(Unit) {

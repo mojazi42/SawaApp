@@ -4,8 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.event.domain.model.Event
-import com.example.sawaapplication.screens.event.domain.repository.EventRepository
+import com.example.sawaapplication.screens.event.domain.useCases.DeleteEventUseCase
 import com.example.sawaapplication.screens.event.domain.useCases.GetAllEventInCommunity
+import com.example.sawaapplication.screens.event.domain.useCases.GetEventByIdUseCase
 import com.example.sawaapplication.screens.event.domain.useCases.JoinEventUseCase
 import com.example.sawaapplication.screens.event.domain.useCases.LeaveEventUseCase
 import com.example.sawaapplication.screens.event.domain.useCases.RecordEventJoinUseCase
@@ -17,11 +18,12 @@ import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class FetchEventViewModel @Inject constructor(
+class EventViewModel @Inject constructor(
     private val getAllEventInCommunity: GetAllEventInCommunity,
     private val joinEventUseCase: JoinEventUseCase,
     private val leaveEventUseCase: LeaveEventUseCase,
-    private val eventRepository: EventRepository,
+    private val deleteEventUseCase: DeleteEventUseCase,
+    private val getEventByIdUseCase: GetEventByIdUseCase,
     private val recordEventJoinUseCase: RecordEventJoinUseCase,
 ) : ViewModel() {
 
@@ -36,6 +38,9 @@ class FetchEventViewModel @Inject constructor(
 
     private val _joinResult = MutableStateFlow<Result<Unit>?>(null)
     val joinResult: StateFlow<Result<Unit>?> = _joinResult
+
+    private val _deleteResult = MutableStateFlow<Result<Unit>?>(null)
+    val deleteResult: StateFlow<Result<Unit>?> = _deleteResult
 
     private val _event = MutableStateFlow<Event?>(null)
     val event: StateFlow<Event?> = _event
@@ -95,7 +100,9 @@ class FetchEventViewModel @Inject constructor(
 
     fun deleteEvent(communityId: String, eventId: String) {
         viewModelScope.launch {
-            val result = eventRepository.deleteEvent(communityId, eventId)
+            _deleteResult.value = null
+            val result = deleteEventUseCase(communityId, eventId)
+            _deleteResult.value = result
             if (result.isSuccess) {
                 _events.value = _events.value.filterNot { it.id == eventId }
             } else {
@@ -104,33 +111,16 @@ class FetchEventViewModel @Inject constructor(
         }
     }
 
-    fun updateEvent(communityId: String, eventId: String, updatedData: Map<String, Any>) {
-        viewModelScope.launch {
-            val result = eventRepository.updateEvent(communityId, eventId, updatedData)
-            if (result.isSuccess) {
-                loadEvents(communityId)
-            } else {
-                Log.e("UpdateEvent", "Error: ${result.exceptionOrNull()?.message}")
-            }
-        }
-
+    fun clearDeleteResult() {
+        _deleteResult.value = null
     }
+
     suspend fun fetchEventById(communityId: String, eventId: String): Event? {
         return try {
-            eventRepository.getEventById(communityId, eventId)
+           getEventByIdUseCase(communityId, eventId)
         } catch (e: Exception) {
             Log.e("FetchEvent", "Failed to fetch event: ${e.message}")
             null
-        }
-    }
-
-    fun fetchEventByIdAsync(communityId: String, eventId: String) {
-        viewModelScope.launch {
-            try {
-                _event.value = eventRepository.getEventById(communityId, eventId)
-            } catch (e: Exception) {
-                Log.e("FetchEvent", "Failed to fetch event: ${e.message}")
-            }
         }
     }
 

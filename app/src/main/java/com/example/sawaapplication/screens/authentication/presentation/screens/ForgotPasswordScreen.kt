@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.authentication.presentation.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -8,16 +9,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -47,8 +45,7 @@ import androidx.navigation.NavController
 import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.authentication.presentation.vmModels.AuthState
-import com.example.sawaapplication.screens.authentication.presentation.vmModels.SignUpViewModel
-import com.example.sawaapplication.screens.authentication.presentation.vmModels.handleAuthStateSignUp
+import com.example.sawaapplication.screens.authentication.presentation.vmModels.ForgotPasswordViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomCard
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 import com.example.sawaapplication.ui.screenComponent.GradientButton
@@ -56,29 +53,36 @@ import kotlinx.coroutines.delay
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
-fun SignUpScreen(
-    navController: NavController,
+fun ForgotPasswordScreen(
+    navController: NavController
 ) {
     val context = LocalContext.current
-    val signUpViewModel: SignUpViewModel = hiltViewModel()
-    var showPassword by remember { mutableStateOf(false) }
-    var showConfirmPassword by remember { mutableStateOf(false) }
+    val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel()
+    val emailState by forgotPasswordViewModel.email.collectAsState()
 
     // Entry animations
     var bannerVisible by remember { mutableStateOf(false) }
     var cardVisible by remember { mutableStateOf(false) }
 
+    val authState by forgotPasswordViewModel.authState.collectAsState()
 
-    val authState = signUpViewModel.authState.collectAsState().value
 
     LaunchedEffect(authState) {
-        handleAuthStateSignUp(
-            authState,
-            context,
-            navController
-        )
-
+        when (authState) {
+            is AuthState.Authenticated -> {
+                Toast.makeText(context, "Reset link sent to email", Toast.LENGTH_SHORT).show()
+                delay(300)
+                navController.navigate(Screen.Login.route)
+            }
+            is AuthState.Error -> {
+                val msg = (authState as AuthState.Error).message
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            }
+            else -> Unit
+        }
     }
+
+
     LaunchedEffect(Unit) {
         bannerVisible = true
         delay(300)
@@ -87,7 +91,6 @@ fun SignUpScreen(
 
     val bannerHeight = 250.dp
     val logoSize = 90.dp
-    val cardOffsetY = bannerHeight * 0.6f + 16.dp
 
     Box(
         modifier = Modifier
@@ -103,6 +106,8 @@ fun SignUpScreen(
             .padding(top = integerResource(id = R.integer.mediumSpace).dp)
 
     ) {
+        Spacer(modifier = Modifier.height(integerResource(id = R.integer.mediumSpace).dp))
+
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -114,6 +119,7 @@ fun SignUpScreen(
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
             )
+
             // Logo centered on the banner
             Image(
                 painter = painterResource(id = R.drawable.applogo),
@@ -122,16 +128,16 @@ fun SignUpScreen(
                     .size(logoSize)
                     .align(Alignment.Center)
                     .padding(bottom = integerResource(id = R.integer.mediumSpace).dp),
+
             )
         }
 
         AnimatedVisibility(
             visible = cardVisible,
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = cardOffsetY)
+                .align(Alignment.Center)
                 .width(integerResource(id = R.integer.cardWidth).dp)
-                .height(integerResource(id = R.integer.cardHeightSignUp).dp),
+                .height(integerResource(id = R.integer.cardHeightResetPass).dp),
             enter = fadeIn(tween(300)) + slideInVertically(
                 initialOffsetY = { it / 2 },
                 animationSpec = tween(300)
@@ -142,13 +148,13 @@ fun SignUpScreen(
 
             CustomCard(modifier = Modifier.fillMaxSize()) {
                 Column(
-                    modifier = Modifier
+                    Modifier
                         .fillMaxSize()
                         .padding(integerResource(id = R.integer.smallSpace).dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = CenterHorizontally
                 ) {
                     Text(
-                        text = stringResource(id = R.string.Signup),
+                        text = stringResource(id = R.string.resetPassword),
                         fontSize = integerResource(id = R.integer.cardHeaderSize).sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -157,86 +163,35 @@ fun SignUpScreen(
                             bottom = integerResource(id = R.integer.cardHeaderBottomPadding).dp
                         )
                     )
-                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.extraSmallSpace).dp))
+                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallSpace).dp))
 
                     CustomTextField(
-                        value = signUpViewModel.name,
-                        onValueChange = { signUpViewModel.name = it },
-                        label = stringResource(id = R.string.username)
+                        value = emailState,
+                        onValueChange = { forgotPasswordViewModel.email.value = it },
+                        label = stringResource(id = R.string.email),
                     )
-                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
 
-                    CustomTextField(
-                        value = signUpViewModel.email,
-                        onValueChange = { signUpViewModel.email = it },
-                        label = stringResource(id = R.string.email)
-                    )
-                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
-
-                    CustomTextField(
-                        value = signUpViewModel.password,
-                        onValueChange = { signUpViewModel.password = it },
-                        label = stringResource(id = R.string.password),
-                        isPassword = true,
-                        showPassword = showPassword,
-                        onTogglePasswordVisibility = { showPassword = !showPassword }
-                    )
-                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.smallerSpace).dp))
-
-                    CustomTextField(
-                        value = signUpViewModel.confirmPassword,
-                        onValueChange = { signUpViewModel.confirmPassword = it },
-                        label = stringResource(id = R.string.confirmPassword),
-                        isPassword = true,
-                        showPassword = showConfirmPassword,
-                        onTogglePasswordVisibility = { showConfirmPassword = !showConfirmPassword }
-                    )
-                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.mediumSpace).dp))
+                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.largerSpace).dp))
 
                     GradientButton(
                         onClick = {
-                            signUpViewModel.signUp(
-                                name = signUpViewModel.name,
-                                email = signUpViewModel.email,
-                                password = signUpViewModel.password,
-                                confirmPassword = signUpViewModel.confirmPassword
-                            )
-                        },
-                        text = stringResource(id = R.string.Signup),
-                        modifier = Modifier
-                            .width(integerResource(id = R.integer.buttonWidth).dp)
-                            .height(integerResource(id = R.integer.buttonHeight).dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(integerResource(id = R.integer.largeSpace).dp))
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = integerResource(id = R.integer.extraSmallSpace).dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.already_have_account),
-                            fontSize = integerResource(id = R.integer.smallText).sp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = stringResource(id = R.string.Login),
-                            fontSize = integerResource(id = R.integer.smallText).sp,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.clickable {
-                                navController.navigate(Screen.Login.route)
+                            val email = emailState.trim()
+                            if (email.isNotEmpty()) {
+                                forgotPasswordViewModel.forgotPassword()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.failedSend),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                        )
-                    }
+                        },
+                        text = stringResource(id = R.string.resetPassword)
+                    )
                 }
             }
         }
     }
-
     if (authState is AuthState.Loading) {
         Box(
             modifier = Modifier

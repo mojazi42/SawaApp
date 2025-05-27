@@ -16,6 +16,7 @@ import com.example.sawaapplication.screens.notification.domain.useCases.SendLike
 import com.example.sawaapplication.screens.notification.domain.useCases.SendProfileUpdateNotificationUseCase
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.example.sawaapplication.screens.profile.domain.useCases.GrantBadgeUseCase
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,7 @@ class NotificationViewModel @Inject constructor(
     private val grantBadgeUseCase: GrantBadgeUseCase,
     private val getPendingRemindersUseCase: GetPendingRemindersUseCase,
     private val respondToReminderUseCase: RespondToReminderUseCase,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
@@ -51,6 +53,11 @@ class NotificationViewModel @Inject constructor(
         fetchNotifications()
         observeUnread()
         remindUpcomingEvents()
+
+        val userId = auth.currentUser?.uid
+        if (!userId.isNullOrBlank()) {
+            loadReminders(userId)
+        }
     }
 
     fun fetchNotifications() {

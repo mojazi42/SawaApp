@@ -67,6 +67,9 @@ class CommunityViewModel @Inject constructor(
     private val _success = MutableStateFlow(false)
     val success: StateFlow<Boolean> = _success
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     // Stores the list of communities created by the current user
     private val _createdCommunities = MutableStateFlow<List<Community>>(emptyList())
     val createdCommunities: StateFlow<List<Community>> = _createdCommunities
@@ -75,8 +78,6 @@ class CommunityViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
 
     //Fetching the posts in side community
     private val _communityPosts = MutableStateFlow<List<PostUiModel>>(emptyList())
@@ -87,6 +88,9 @@ class CommunityViewModel @Inject constructor(
     val searchText: StateFlow<String> = _searchText
 
     var selectedFilter by mutableStateOf<CommunityFilterType>(CommunityFilterType.DEFAULT)
+
+    private val _actionType = MutableStateFlow<String?>(null)
+    val actionType: StateFlow<String?> = _actionType
 
     fun onSearchTextChange(newText: String) {
         _searchText.value = newText
@@ -619,6 +623,7 @@ class CommunityViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             _loading.value = true
+            _actionType.value = "update"
             try {
                 val result = updateCommunityUseCase(communityId, name, description,category, imageUri)
                 result.onSuccess {
@@ -638,6 +643,7 @@ class CommunityViewModel @Inject constructor(
     fun deleteCommunity(communityId: String, imageUrl: String?) {
         viewModelScope.launch {
             _loading.value = true
+            _actionType.value = "delete"
             try {
                 val result = deleteCommunityUseCase(communityId, imageUrl)
                 result.onSuccess {
@@ -656,5 +662,9 @@ class CommunityViewModel @Inject constructor(
     override fun onCleared() {
         job?.cancel()
         super.onCleared()
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 }

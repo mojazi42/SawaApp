@@ -26,7 +26,7 @@ import com.example.sawaapplication.core.sharedPreferences.AuthPreferences
 import com.example.sawaapplication.navigation.bottomBar.CustomBottomBar
 import com.example.sawaapplication.navigation.topBar.getTopBar
 import com.example.sawaapplication.screens.authentication.presentation.screens.LoginScreen
-import com.example.sawaapplication.screens.authentication.presentation.screens.ResetPasswordScreen
+import com.example.sawaapplication.screens.authentication.presentation.screens.ForgotPasswordScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SignUpScreen
 import com.example.sawaapplication.screens.authentication.presentation.screens.SplashScreen
 import com.example.sawaapplication.screens.chat.presentation.screens.ChatScreen
@@ -112,7 +112,9 @@ fun AppNavigation(
                 SplashScreen(navController)
             }
             composable(Screen.Onboarding.route) {
-                OnBoardingScreen(navController)
+                OnBoardingScreen(
+                    navController, changeAppTheme = changeAppTheme
+                )
             }
             composable(Screen.Login.route) {
                 LoginScreen(navController)
@@ -121,7 +123,7 @@ fun AppNavigation(
                 SignUpScreen(navController)
             }
             composable(Screen.ForgotPass.route) {
-                ResetPasswordScreen(navController)
+                ForgotPasswordScreen(navController)
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
@@ -145,7 +147,6 @@ fun AppNavigation(
             composable(Screen.EditProfile.route) {
                 EditProfileScreen(
                     navController = navController,
-                    isDarkTheme = isDarkTheme,
                     changeAppTheme = changeAppTheme
                 )
             }
@@ -180,13 +181,13 @@ fun AppNavigation(
             ) {
                 val communityId = it.arguments!!.getString("communityId")!!
                 CommunityScreen(
-                    communityId    = communityId,
-                    onBackPressed  = { navController.popBackStack() },
-                    onClick   = { imageUrl  ->
+                    communityId = communityId,
+                    onBackPressed = { navController.popBackStack() },
+                    onClick = { imageUrl ->
 
                         navController.navigate(Screen.FullscreenImage.createRoute(imageUrl))
                     },
-                    navController  = navController
+                    navController = navController
                 )
             }
 
@@ -266,7 +267,8 @@ fun AppNavigation(
                     navArgument("eventId") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
-                val communityId = backStackEntry.arguments?.getString("communityId") ?: return@composable
+                val communityId =
+                    backStackEntry.arguments?.getString("communityId") ?: return@composable
                 val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
 
                 EditEventScreen(
@@ -275,7 +277,6 @@ fun AppNavigation(
                     communityId = communityId
                 )
             }
-
 
 
         }

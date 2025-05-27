@@ -77,7 +77,7 @@ class ProfileViewModel @Inject constructor(
     private val _viewedDefinitions  = MutableStateFlow<List<Badge>>(emptyList())
     val viewedDefinitions: StateFlow<List<Badge>> = _viewedDefinitions
 
-    private val _viewedAwarded      = MutableStateFlow<List<Badge>>(emptyList())
+    private val _viewedAwarded = MutableStateFlow<List<Badge>>(emptyList())
     val viewedAwarded: StateFlow<List<Badge>> = _viewedAwarded
 
 

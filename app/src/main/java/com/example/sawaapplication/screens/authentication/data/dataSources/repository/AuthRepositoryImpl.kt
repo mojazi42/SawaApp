@@ -1,4 +1,4 @@
-package com.example.sawaapplication.screens.authentication.data.repository
+package com.example.sawaapplication.screens.authentication.data.dataSources.repository
 
 
 import com.example.sawaapplication.screens.authentication.data.dataSources.remote.FirebaseAuthDataSource
@@ -26,9 +26,14 @@ class AuthRepositoryImpl @Inject constructor(private val firebaseAuthDataSource:
         }
     }
 
-    override suspend fun sendPasswordResetEmail(email: String) {
-        firebaseAuthDataSource.sendPasswordResetEmail(email)
+    override suspend fun sendPasswordResetEmail(email: String):Result<Unit> {
+        return try {
+            firebaseAuthDataSource.sendPasswordResetEmail(email)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
+
 
     override fun logOut() {
         firebaseAuthDataSource.logOut()
