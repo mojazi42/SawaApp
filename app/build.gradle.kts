@@ -1,3 +1,6 @@
+val onesignalkey: String by project
+val onesignalauthtoken: String by project
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -23,6 +26,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "ONESIGNAL_KEY", "\"$onesignalkey\"")
+        buildConfigField("String", "ONESIGNAL_AUTH_TOKEN", "\"$onesignalauthtoken\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -44,6 +50,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
