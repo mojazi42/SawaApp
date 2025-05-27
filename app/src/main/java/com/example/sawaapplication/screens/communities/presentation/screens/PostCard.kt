@@ -44,8 +44,6 @@ import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import com.example.sawaapplication.ui.theme.black
-import com.example.sawaapplication.ui.theme.white
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
