@@ -502,7 +502,7 @@ private fun CommunityInfoSection(
         )
 
         Text(
-            text = "${community.members.size} Members",
+            text = "${community.members.size} ${stringResource(R.string.members)}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -746,9 +746,9 @@ private fun CommunityFAB(
                     else -> Icons.Default.Edit
                 },
                 contentDescription = when (selectedTab) {
-                    0 -> "Add Post"
-                    1 -> "Add Event"
-                    else -> "Add"
+                    0 -> stringResource(R.string.addPost)
+                    1 -> stringResource(R.string.addEvent)
+                    else -> stringResource(R.string.add)
                 }
             )
         }
@@ -770,7 +770,7 @@ private fun EnhancedCommunityEventCard(
     onDeleteEvent: () -> Unit
 ) {
     val context = LocalContext.current
-    val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+    val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: stringResource(R.string.noTimeSet)
     val formattedDate = formatDateString(event.date)
 
     // Check if user is already joined to this event

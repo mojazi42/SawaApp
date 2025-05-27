@@ -177,6 +177,21 @@
     <string name="no_joined_communities">لم تنضم إلى أي مجتمعات.</string>
     <string name="no_posts_available">لا توجد منشورات متاحة.</string>
 
+    <!--Chat Bubble-->
+    <string name="readByAll">قرأها الجميع</string>
+    <string name="notReadBy">لم تُقرأ</string>
+    <string name="typeYourMessage">أكتب رسالتك</string>
+
+    <!--Chat Screen-->
+    <string name="noMessagesYet">لا يوجد رسائل</string>
+
+    <!--Group Members Screen-->
+    <string name="community">مجتمع</string>
+    <string name="members">أعضاء</string>
+    <string name="addPost">أضف منشور</string>
+    <string name="addEvent">أضف حدث</string>
+    <string name="add">أضف</string>
+    <string name="noTimeSet">لم يتم تحديد الوقت</string>
 
     <string name="shareMedia">الوسائط المشتركة</string>
     <string name="noSharedMedia">لم تتم مشاركة أي وسائط في هذه الدردشة</string>

@@ -99,7 +99,7 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
                     ) {
                         AsyncImage(
                             model = communityImage,
-                            contentDescription = "Community",
+                            contentDescription = stringResource(R.string.community),
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(CircleShape),
