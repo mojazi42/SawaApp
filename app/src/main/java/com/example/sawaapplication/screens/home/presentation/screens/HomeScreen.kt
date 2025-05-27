@@ -43,10 +43,10 @@ import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.event.presentation.screens.formatDateString
 import com.example.sawaapplication.screens.event.presentation.screens.formatTimestampToTimeString
 import com.example.sawaapplication.screens.event.presentation.vmModels.EventViewModel
+import com.example.sawaapplication.screens.home.domain.model.EventFilterType
 import com.example.sawaapplication.screens.home.presentation.screens.component.CustomTabRow
 import com.example.sawaapplication.screens.home.presentation.screens.component.EventCard
 import com.example.sawaapplication.screens.home.presentation.screens.component.PostCard
-import com.example.sawaapplication.screens.home.presentation.vmModels.EventFilterType
 import com.example.sawaapplication.screens.home.presentation.vmModels.HomeViewModel
 import com.example.sawaapplication.screens.notification.presentation.viewmodels.NotificationViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
@@ -283,7 +283,7 @@ fun MyEventsTab(
                 DropdownMenuItem(
                     text = { Text("Finished Events") },
                     onClick = {
-                        viewModel.setFilter(EventFilterType.Fineshed)
+                        viewModel.setFilter(EventFilterType.Finished)
                         isFilterMenuExpanded = false
                     }
                 )

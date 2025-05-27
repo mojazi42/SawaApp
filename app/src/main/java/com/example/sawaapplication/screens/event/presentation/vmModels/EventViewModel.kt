@@ -115,17 +115,6 @@ class EventViewModel @Inject constructor(
         _deleteResult.value = null
     }
 
-    /*fun updateEvent(communityId: String, eventId: String, updatedData: Map<String, Any>) {
-        viewModelScope.launch {
-            val result = eventRepository.updateEvent(communityId, eventId, updatedData)
-            if (result.isSuccess) {
-                loadEvents(communityId)
-            } else {
-                Log.e("UpdateEvent", "Error: ${result.exceptionOrNull()?.message}")
-            }
-        }
-
-    }*/
     suspend fun fetchEventById(communityId: String, eventId: String): Event? {
         return try {
            getEventByIdUseCase(communityId, eventId)
