@@ -286,7 +286,7 @@ class NotificationRemoteDataSource @Inject constructor(
 
             val startTs = doc.getTimestamp("startTime")?.toDate()?.time
                 ?: return@mapNotNull null
-            if (startTs + 15 * 60 * 1000 > now) return@mapNotNull null
+            if (startTs + 60 * 60 * 1000 > now) return@mapNotNull null
 
             val message = doc.getString("message") ?: return@mapNotNull null
 

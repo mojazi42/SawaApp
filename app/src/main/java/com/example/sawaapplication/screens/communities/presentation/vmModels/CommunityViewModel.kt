@@ -219,7 +219,7 @@ class CommunityViewModel @Inject constructor(
                 // If user is a member, proceed with event joining
                 val eventRef = firestore.collection("Community")
                     .document(communityId)
-                    .collection("events")
+                    .collection("event")
                     .document(eventId)
 
                 firestore.runTransaction { transaction ->
@@ -302,7 +302,7 @@ class CommunityViewModel @Inject constructor(
                 val currentUserId = firebaseAuth.currentUser?.uid ?: return@launch
                 val eventRef = firestore.collection("Community")
                     .document(communityId)
-                    .collection("events")
+                    .collection("event")
                     .document(eventId)
 
                 firestore.runTransaction { transaction ->
