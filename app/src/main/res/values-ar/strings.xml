@@ -210,4 +210,9 @@
     <string name="badgeLegend">أسطورة</string>
     <string name="delete">حذف</string>
 
+    <string name="photo_permission_title">إذن الوصول للصور</string>
+    <string name="photo_permission_desc">نحتاج إلى إذن للوصول إلى صورك حتى تتمكن من رفع صورة للمجتمع.</string>
+
+    <string name="open_settings_permission">يرجى السماح بالوصول إلى الصور من الإعدادات</string>
+
 </resources>

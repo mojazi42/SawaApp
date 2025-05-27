@@ -37,7 +37,7 @@ import com.example.sawaapplication.screens.communities.presentation.screens.Edit
 import com.example.sawaapplication.screens.communities.presentation.screens.ExploreScreen
 import com.example.sawaapplication.screens.home.presentation.screens.HomeScreen
 import com.example.sawaapplication.screens.notification.presentation.screens.NotificationScreen
-import com.example.sawaapplication.screens.communities.presentation.screens.NewCommunity
+import com.example.sawaapplication.screens.communities.presentation.screens.CreateCommunityScreen
 import com.example.sawaapplication.screens.communities.presentation.screens.MyCommunitiesScreen
 import com.example.sawaapplication.screens.event.presentation.screens.CreateNewEventScreen
 import com.example.sawaapplication.screens.event.presentation.screens.EditEventScreen
@@ -128,8 +128,8 @@ fun AppNavigation(
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
             }
-            composable(Screen.NewCommunity.route) {
-                NewCommunity(navController)
+            composable(Screen.CreateCommunityScreen.route) {
+                CreateCommunityScreen(navController)
             }
             composable(Screen.Home.route) {
                 HomeScreen(navController)

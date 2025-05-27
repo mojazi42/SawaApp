@@ -71,6 +71,7 @@ fun PostCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = integerResource(R.integer.cardHorizontalPadding).dp)
             .border(
                 width = 1.dp,
                 color = Color.White,
