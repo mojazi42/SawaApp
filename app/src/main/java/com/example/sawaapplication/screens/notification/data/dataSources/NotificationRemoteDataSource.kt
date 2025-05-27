@@ -1,6 +1,7 @@
 package com.example.sawaapplication.screens.notification.data.dataSources
 
 import android.util.Log
+import com.example.sawaapplication.BuildConfig
 import com.example.sawaapplication.screens.notification.domain.model.Notification
 import com.example.sawaapplication.screens.post.domain.model.Post
 import com.google.firebase.auth.FirebaseAuth
@@ -24,12 +25,13 @@ class NotificationRemoteDataSource @Inject constructor(
     private val auth: FirebaseAuth
 ) {
 
+    // Fetches all user notifications
     fun fetchNotifications(listener: (List<Notification>) -> Unit) {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = auth.currentUser?.uid ?: return  // Get current user ID or exit if null
 
-        firestore.collection("Notification")
+        firestore.collection("Notification")  // Access 'Notification' collection
             .whereEqualTo("userId", userId)
-            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .orderBy("timestamp", Query.Direction.DESCENDING) // Order by newest first
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.e("RemoteDataSource", "Error: ${error.message}")
@@ -43,18 +45,19 @@ class NotificationRemoteDataSource @Inject constructor(
                         doc.getString("type") != "event_reminder"
                     }
                     ?.mapNotNull { doc ->
-                    val message = doc.getString("message") ?: return@mapNotNull null
-                    val timestamp =
-                        doc.getTimestamp("timestamp")?.toDate() ?: return@mapNotNull null
-                    val userId = doc.getString("userId") ?: return@mapNotNull null
-                    val isRead = doc.getBoolean("isRead") ?: false
-                    Notification(doc.id, message, timestamp, userId, isRead)
-                } ?: emptyList()
+                        val message = doc.getString("message") ?: return@mapNotNull null
+                        val timestamp =
+                            doc.getTimestamp("timestamp")?.toDate() ?: return@mapNotNull null
+                        val userId = doc.getString("userId") ?: return@mapNotNull null
+                        val isRead = doc.getBoolean("isRead") ?: false
+                        Notification(doc.id, message, timestamp, userId, isRead)
+                    } ?: emptyList()
 
                 listener(notifications)
             }
     }
 
+    // Marks all unread notifications for the current user as read
     fun markAllAsRead() {
         val userId = auth.currentUser?.uid ?: return
         firestore.collection("Notification")
@@ -62,15 +65,16 @@ class NotificationRemoteDataSource @Inject constructor(
             .whereEqualTo("isRead", false)
             .get()
             .addOnSuccessListener { snapshot ->
+                // Update all unread notifications to isRead = true
                 snapshot.documents.forEach { it.reference.update("isRead", true) }
             }
     }
 
     // Sends reminders to community members about upcoming events
     fun remindCommunityMembersAboutUpcomingEvent() {
-        val currentUser = auth.currentUser ?: return // Ensure user is logged in
         val currentTime = System.currentTimeMillis()
 
+        // Get all communities
         firestore.collection("Community")
             .get()
             .addOnSuccessListener { communitySnapshot ->
@@ -79,7 +83,7 @@ class NotificationRemoteDataSource @Inject constructor(
                     val communityName = communityDoc.getString("name") ?: "Unknown"
                     val members = communityDoc.get("members") as? List<String> ?: emptyList()
 
-                    // Fetch all events for this community
+                    // Get all events in this community
                     firestore.collection("Community").document(communityId)
                         .collection("event")
                         .get()
@@ -104,6 +108,7 @@ class NotificationRemoteDataSource @Inject constructor(
                                     val message =
                                         "Reminder: The event '$eventTitle' in '$communityName' has one day left to start!"
 
+                                    // Run transaction to ensure it only send once
                                     firestore.runTransaction { transaction ->
                                         val snapshot = transaction.get(eventDoc.reference)
                                         val reminderSent =
@@ -122,13 +127,13 @@ class NotificationRemoteDataSource @Inject constructor(
                                             "Sending notifications for event '$eventTitle'"
                                         )
 
-                                        // Send notifications to all members except the creator and the current user
+                                        // Send notifications to all members except the creator
                                         members.filter { it != creatorId }.forEach { memberId ->
                                             sendNotificationToUser(memberId, message)
                                             sendPushNotificationToUser(memberId, message)
                                         }
 
-                                        // Mark reminder as sent in transaction
+                                        // Mark reminder as sent
                                         transaction.update(eventDoc.reference, "reminderSent", true)
                                         null
                                     }.addOnFailureListener { e ->
@@ -153,7 +158,7 @@ class NotificationRemoteDataSource @Inject constructor(
             }
     }
 
-    // Stores in-app notification in FireStore under the "Notification" collection
+    // Saves an in-app notification to FireStore
     fun sendNotificationToUser(userId: String, message: String) {
         val data = mapOf(
             "message" to message,
@@ -164,13 +169,11 @@ class NotificationRemoteDataSource @Inject constructor(
         firestore.collection("Notification").add(data)
     }
 
-    // Sends a real-time push notification via OneSignal to a user
+    // Sends a OneSignal push notification using player ID from user document
     fun sendPushNotificationToUser(userId: String, message: String) {
-        Log.d("NotifDebug", "Preparing to send push notification to $userId with message: $message")
-
         firestore.collection("User").document(userId).get()
             .addOnSuccessListener { doc ->
-                val playerId = doc.getString("oneSignalPlayerId") // OneSignal device ID
+                val playerId = doc.getString("oneSignalPlayerId")
 
                 if (playerId.isNullOrEmpty()) {
                     Log.e("NotifDebug", "No playerId found for user $userId")
@@ -182,7 +185,7 @@ class NotificationRemoteDataSource @Inject constructor(
                 // Build OneSignal push notification payload
                 val url = "https://onesignal.com/api/v1/notifications"
                 val json = JSONObject().apply {
-                    put("app_id", "cf902765-3bc6-4eab-84cb-307d5db55cd1")
+                    put("app_id", BuildConfig.ONESIGNAL_KEY)
                     put("include_player_ids", JSONArray().put(playerId))
                     put("contents", JSONObject().put("en", message))
                 }
@@ -195,11 +198,10 @@ class NotificationRemoteDataSource @Inject constructor(
                     .post(requestBody)
                     .addHeader(
                         "Authorization",
-                        "Bearer os_v2_app_z6icozj3yzhkxbglgb6v3nk42fcgx4eiuzxubcvzkrblrsvt2ahoweclqf3dghxpkzejgpr6ytv2hev5uzqufeabyejj4ubfntqztzi"
+                        "Bearer ${BuildConfig.ONESIGNAL_AUTH_TOKEN}"
                     )
                     .build()
 
-                // Send the request asynchronously
                 OkHttpClient().newCall(request).enqueue(object : Callback {
                     override fun onFailure(call: okhttp3.Call, e: IOException) {
                         Log.e("NotifDebug", "Failed to send push: ${e.message}")
@@ -217,6 +219,7 @@ class NotificationRemoteDataSource @Inject constructor(
             }
     }
 
+    // Sends a notification to all community members about a newly created event
     fun sendCommunityEventNotification(communityId: String, eventName: String) {
         val currentUser = auth.currentUser ?: return
         val db = firestore
@@ -230,19 +233,23 @@ class NotificationRemoteDataSource @Inject constructor(
                         ?: return@addOnSuccessListener
 
                 val msg = "A new event \"$eventName\" was created in \"$name\" community."
+                // Notify all members except the current user
                 members.filter { it != currentUser.uid }.forEach { memberId ->
                     sendNotificationToUser(memberId, msg)
                 }
             }
     }
 
+    // Sends a notification when a post is liked
     fun sendLikeNotification(post: Post) {
         val likerId = post.likedBy.lastOrNull() ?: return
         val recipientId = post.userId
 
+        // Get name of liker
         firestore.collection("User").document(likerId).get().addOnSuccessListener { userDoc ->
             val likerName = userDoc.getString("name") ?: "Someone"
 
+            // Get community name and send notification
             firestore.collection("Community").document(post.communityId).get()
                 .addOnSuccessListener { communityDoc ->
                     val communityName = communityDoc.getString("name") ?: "Unknown"
@@ -252,6 +259,7 @@ class NotificationRemoteDataSource @Inject constructor(
         }
     }
 
+    // Observes if there are any unread notifications for the current user
     fun observeUnreadNotifications(listener: (Boolean) -> Unit) {
         val userId = auth.currentUser?.uid ?: return
 
@@ -259,13 +267,13 @@ class NotificationRemoteDataSource @Inject constructor(
             .whereEqualTo("userId", userId)
             .whereEqualTo("isRead", false)
             .addSnapshotListener { snapshot, _ ->
-                listener(snapshot?.isEmpty == false)
+                listener(snapshot?.isEmpty == false) // Notify if any unread
             }
     }
-    //Event Reminder
-    // Fetch reminders (start+1h passed, not yet responded)
+
+    // Event Reminder, Fetch reminders (start + 1 hour passed, not yet responded)
     suspend fun getPendingReminders(userId: String): List<Notification> {
-        val snapshot = firestore.collection("Notification")      // <-- singular
+        val snapshot = firestore.collection("Notification")
             .whereEqualTo("userId", userId)
             .whereEqualTo("type", "event_reminder")
             .get()
@@ -278,11 +286,11 @@ class NotificationRemoteDataSource @Inject constructor(
 
             val startTs = doc.getTimestamp("startTime")?.toDate()?.time
                 ?: return@mapNotNull null
-            if (startTs + 60 * 60 * 1000 > now) return@mapNotNull null
+            if (startTs + 15 * 60 * 1000 > now) return@mapNotNull null
 
             val message = doc.getString("message") ?: return@mapNotNull null
 
-            // Send OneSignal push notification to the user
+            // Send OneSignal push notification reminder to the user
             sendPushNotificationToUser(userId, message)
 
             Notification(
@@ -305,7 +313,7 @@ class NotificationRemoteDataSource @Inject constructor(
         notificationId: String,
         attended: Boolean
     ) {
-        //eventId from the reminder doc
+        // eventId from the reminder doc
         val docSnap = firestore.collection("Notification")
             .document(notificationId)
             .get()
@@ -313,7 +321,7 @@ class NotificationRemoteDataSource @Inject constructor(
         val eventId = docSnap.getString("eventId")
             ?: throw IllegalStateException("Reminder $notificationId has no eventId")
 
-        //responded=true, and if Yes, add eventId to attendance
+        // responded = true, and if Yes, add eventId to attendance
         val batch = firestore.batch()
         val notifRef = firestore.collection("Notification").document(notificationId)
         batch.update(notifRef, "responded", true)
