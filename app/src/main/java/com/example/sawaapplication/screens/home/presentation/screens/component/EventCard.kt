@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.home.presentation.screens.component
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -32,18 +33,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +54,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.google.firebase.Timestamp
 import com.example.sawaapplication.screens.event.domain.model.Event
-
 
 @Composable
 fun EventCard(
@@ -76,7 +75,10 @@ fun EventCard(
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    canJoinEvents: Boolean = true,
 ) {
+    val context = LocalContext.current
+
     fun isEventExpired(eventTime: Timestamp): Boolean {
         val eventMillis = eventTime.toDate().time
         val expiryMillis = eventMillis + 60 * 60 * 1000 // Add 1 hour
@@ -88,8 +90,8 @@ fun EventCard(
     fun isEventFull(participantsLimit: Int, currentJoined: Int): Boolean {
         return currentJoined >= participantsLimit
     }
-    val isFull = isEventFull(participants, joinedUsers.size)
 
+    val isFull = isEventFull(participants, joinedUsers.size)
     val isExpired = remember(eventTimestamp) {
         eventTimestamp?.let { isEventExpired(it) } ?: false
     }
@@ -99,7 +101,17 @@ fun EventCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(integerResource(id = R.integer.smallerSpace).dp)
-            .clickable { onClick() },
+            .clickable {
+                if (canJoinEvents) {
+                    onClick()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "You need to join the community until you can join the event",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
@@ -171,6 +183,7 @@ fun EventCard(
                         showCancel = showCancelButton,
                         isExpired = isExpired,
                         isFull = isFull,
+                        canJoinEvents = canJoinEvents,
                     )
                 }
 
@@ -182,11 +195,10 @@ fun EventCard(
                             .padding(top = 4.dp, end = 4.dp)
                     ) {
                         IconButton(onClick = { expanded = true }) {
-                            Icon( // Replace with Icons.Default.MoreVert if needed
+                            Icon(
                                 imageVector = Icons.Filled.MoreVert,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-
                             )
                         }
 
@@ -262,7 +274,7 @@ fun EventCard(
                     Spacer(modifier = Modifier.width(integerResource(id = R.integer.extraSmallSpace).dp))
 
                     Text(
-                        text = "$participants/${joinedUsers.size}",
+                        text = "${joinedUsers.size}/$participants",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -272,7 +284,7 @@ fun EventCard(
                         Text(
                             text = "Full",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary// Orange
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -281,25 +293,28 @@ fun EventCard(
     }
 }
 
-
-
 @Composable
 fun JoinButton(
     joined: Boolean,
     onJoinClick: () -> Unit,
     showCancel: Boolean = false,
     isExpired: Boolean,
-    isFull: Boolean
+    isFull: Boolean,
+    canJoinEvents: Boolean = true,
 ) {
     val isCancelVisible = showCancel && joined
-    val isFull = isFull && !joined
+    val isEventFull = isFull && !joined
+    val isLocked = !canJoinEvents && !joined
+
     val isButtonEnabled = when {
         isExpired -> false
-        isFull -> false
+        isEventFull -> false
+        isLocked -> false
         isCancelVisible -> true
         joined -> false
         else -> true
-    }    // disabled : !joined && (limit full)
+    }
+
     Button(
         onClick = onJoinClick,
         enabled = isButtonEnabled,
@@ -308,12 +323,14 @@ fun JoinButton(
             containerColor = when {
                 isCancelVisible -> Color(0xFFEAEAEA)
                 joined -> Color(0xFFEAEAEA)
+                isLocked -> Color(0xFFEAEAEA)
                 else -> MaterialTheme.colorScheme.primary
             },
             contentColor = when {
                 isCancelVisible -> Color.Gray
                 joined -> Color.Gray
-                isFull -> Color.Gray
+                isEventFull -> Color.Gray
+                isLocked -> Color.Gray
                 else -> Color.White
             }
         ),
@@ -324,7 +341,8 @@ fun JoinButton(
     ) {
         Text(
             text = when {
-                isFull -> "Join"
+                isLocked -> "🔒 Locked"
+                isEventFull -> "Join"
                 isExpired -> "Finished"
                 isCancelVisible -> "Leave"
                 joined -> "Joined"

@@ -165,8 +165,8 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                             communityId = post.communityId,
                             userName,
                             userImage,
-                            onClick = {  // ✅ FIXED: No parameters, get image from post object
-                                val imageUrl = post.imageUri // or post.postImageUrl - check your Post model
+                            onClick = {
+                                val imageUrl = post.imageUri
                                 if (!imageUrl.isNullOrEmpty()) {
                                     val encoded = URLEncoder.encode(imageUrl, "utf-8")
                                     navController.navigate(Screen.FullscreenImage.createRoute(encoded))

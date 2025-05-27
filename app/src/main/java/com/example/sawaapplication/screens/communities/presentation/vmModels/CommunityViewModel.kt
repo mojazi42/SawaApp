@@ -15,12 +15,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -57,6 +51,18 @@ class CommunityViewModel @Inject constructor(
     val isAdmin: StateFlow<Boolean> = communityDetail.map { it?.creatorId == currentUserId }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    // Track current user's membership status
+    private val _isMember = MutableStateFlow(false)
+    val isMember: StateFlow<Boolean> = _isMember
+
+    // Track if user can join events (must be a member)
+    val canJoinEvents: StateFlow<Boolean> = _isMember
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // Track if user can interact with posts (must be a member)
+    val canInteractWithPosts: StateFlow<Boolean> = _isMember
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     // Tracks whether the community creation was successful
     private val _success = MutableStateFlow(false)
     val success: StateFlow<Boolean> = _success
@@ -90,11 +96,398 @@ class CommunityViewModel @Inject constructor(
         _searchText.value = newText
     }
 
-
     fun shouldRequestPhoto() = permissionHandler.shouldRequestPhotoPermission()
     fun markPhotoPermissionRequested() = permissionHandler.markPhotoPermissionRequested()
 
+    /**
+     * Check if current user is a member of the community
+     */
+    fun checkMembershipStatus(communityId: String) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: return@launch
+                val communityRef = firestore.collection("Community").document(communityId)
+                val snapshot = communityRef.get().await()
 
+                val members = snapshot.get("members") as? List<String> ?: emptyList()
+                _isMember.value = currentUserId in members
+
+            } catch (e: Exception) {
+                Log.e("CommunityViewModel", "Failed to check membership: ${e.message}")
+                _isMember.value = false
+            }
+        }
+    }
+
+    /**
+     * Join a community
+     */
+    fun joinCommunity(communityId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: return@launch
+                val communityRef = firestore.collection("Community").document(communityId)
+
+                firestore.runTransaction { transaction ->
+                    val snapshot = transaction.get(communityRef)
+                    val members = snapshot.get("members") as? MutableList<String> ?: mutableListOf()
+
+                    if (currentUserId !in members) {
+                        members.add(currentUserId)
+                        transaction.update(communityRef, "members", members)
+                    }
+                }.await()
+
+                _isMember.value = true
+                // Refresh community detail to show updated member count
+                fetchCommunityDetail(communityId)
+
+            } catch (e: Exception) {
+                _error.value = "Failed to join community: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    /**
+     * Leave a community
+     */
+    fun leaveCommunity(communityId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: return@launch
+                val communityRef = firestore.collection("Community").document(communityId)
+
+                firestore.runTransaction { transaction ->
+                    val snapshot = transaction.get(communityRef)
+                    val members = snapshot.get("members") as? MutableList<String> ?: mutableListOf()
+
+                    if (currentUserId in members) {
+                        members.remove(currentUserId)
+                        transaction.update(communityRef, "members", members)
+                    }
+                }.await()
+
+                _isMember.value = false
+                // Refresh community detail to show updated member count
+                fetchCommunityDetail(communityId)
+
+            } catch (e: Exception) {
+                _error.value = "Failed to leave community: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    /**
+     * Check if user can join an event (must be community member)
+     */
+    fun canUserJoinEvent(communityId: String): Boolean {
+        return _isMember.value
+    }
+
+    /**
+     * Enhanced event joining with strict community membership validation
+     */
+    fun joinEventWithMembershipCheck(
+        communityId: String,
+        eventId: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: run {
+                    onFailure("User not authenticated")
+                    return@launch
+                }
+
+                // First, verify community membership from Firestore (server-side validation)
+                val communityRef = firestore.collection("Community").document(communityId)
+                val communitySnapshot = communityRef.get().await()
+                val members = communitySnapshot.get("members") as? List<String> ?: emptyList()
+
+                if (currentUserId !in members) {
+                    onFailure("You must join the community first to participate in events")
+                    return@launch
+                }
+
+                // If user is a member, proceed with event joining
+                val eventRef = firestore.collection("Community")
+                    .document(communityId)
+                    .collection("events")
+                    .document(eventId)
+
+                firestore.runTransaction { transaction ->
+                    val eventSnapshot = transaction.get(eventRef)
+                    val joinedUsers = eventSnapshot.get("joinedUsers") as? MutableList<String> ?: mutableListOf()
+                    val memberLimit = eventSnapshot.getLong("memberLimit")?.toInt() ?: Int.MAX_VALUE
+
+                    // Check if event is full
+                    if (joinedUsers.size >= memberLimit) {
+                        throw Exception("Event is full")
+                    }
+
+                    // Check if user is already joined
+                    if (currentUserId in joinedUsers) {
+                        throw Exception("You are already registered for this event")
+                    }
+
+                    joinedUsers.add(currentUserId)
+                    transaction.update(eventRef, "joinedUsers", joinedUsers)
+                }.await()
+
+                onSuccess()
+
+            } catch (e: Exception) {
+                onFailure("Failed to join event: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Check if user can join a specific event with server-side validation
+     */
+    fun canUserJoinEventAsync(communityId: String, callback: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: run {
+                    callback(false, "User not authenticated")
+                    return@launch
+                }
+
+                val communityRef = firestore.collection("Community").document(communityId)
+                val snapshot = communityRef.get().await()
+                val members = snapshot.get("members") as? List<String> ?: emptyList()
+
+                if (currentUserId in members) {
+                    callback(true, null)
+                } else {
+                    callback(false, "You must join the community first")
+                }
+            } catch (e: Exception) {
+                callback(false, "Error checking membership: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Attempt to join an event with membership validation (keeping original method for backward compatibility)
+     */
+    fun joinEvent(
+        communityId: String,
+        eventId: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        // Use the enhanced method
+        joinEventWithMembershipCheck(communityId, eventId, onSuccess, onFailure)
+    }
+
+    /**
+     * Leave an event
+     */
+    fun leaveEvent(
+        communityId: String,
+        eventId: String,
+        onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: return@launch
+                val eventRef = firestore.collection("Community")
+                    .document(communityId)
+                    .collection("events")
+                    .document(eventId)
+
+                firestore.runTransaction { transaction ->
+                    val snapshot = transaction.get(eventRef)
+                    val joinedUsers = snapshot.get("joinedUsers") as? MutableList<String> ?: mutableListOf()
+
+                    if (currentUserId in joinedUsers) {
+                        joinedUsers.remove(currentUserId)
+                        transaction.update(eventRef, "joinedUsers", joinedUsers)
+                    }
+                }.await()
+
+                onSuccess()
+
+            } catch (e: Exception) {
+                Log.e("CommunityViewModel", "Failed to leave event: ${e.message}")
+                onFailure(e.message ?: "Failed to leave event")
+            }
+        }
+    }
+
+    // ========== ENHANCED POST INTERACTION METHODS ==========
+
+    /**
+     * Enhanced like post with strict community membership validation
+     */
+    fun likePostWithMembershipCheck(
+        post: PostUiModel,
+        onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: run {
+                    onFailure("User not authenticated")
+                    return@launch
+                }
+
+                // First, verify community membership from Firestore (server-side validation)
+                val communityRef = firestore.collection("Community").document(post.communityId)
+                val communitySnapshot = communityRef.get().await()
+                val members = communitySnapshot.get("members") as? List<String> ?: emptyList()
+
+                if (currentUserId !in members) {
+                    onFailure("You must join the community first to like posts")
+                    return@launch
+                }
+
+                // If user is a member, proceed with liking the post
+                val postRef = firestore.collection("Community")
+                    .document(post.communityId)
+                    .collection("posts")
+                    .document(post.id)
+
+                firestore.runTransaction { transaction ->
+                    val snapshot = transaction.get(postRef)
+                    val likedBy = snapshot.get("likedBy") as? List<String> ?: emptyList()
+                    val isLiked = currentUserId in likedBy
+                    val newLikedBy = if (isLiked) likedBy - currentUserId else likedBy + currentUserId
+                    val newLikes = newLikedBy.size
+
+                    transaction.update(postRef, mapOf(
+                        "likes" to newLikes,
+                        "likedBy" to newLikedBy
+                    ))
+                }.await()
+
+                // Locally update the UI
+                _communityPosts.update { posts ->
+                    posts.map {
+                        if (it.id == post.id) {
+                            val isCurrentlyLiked = currentUserId in it.likedBy
+                            it.copy(
+                                likes = if (isCurrentlyLiked) it.likes - 1 else it.likes + 1,
+                                likedBy = if (isCurrentlyLiked)
+                                    it.likedBy - currentUserId
+                                else
+                                    it.likedBy + currentUserId
+                            )
+                        } else it
+                    }
+                }
+
+                onSuccess()
+
+            } catch (e: Exception) {
+                Log.e("CommunityViewModel", "Failed to like post: ${e.message}")
+                onFailure("Failed to like post: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Enhanced method to check if user can interact with posts
+     */
+    fun canUserInteractWithPosts(communityId: String, callback: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: run {
+                    callback(false, "User not authenticated")
+                    return@launch
+                }
+
+                val communityRef = firestore.collection("Community").document(communityId)
+                val snapshot = communityRef.get().await()
+                val members = snapshot.get("members") as? List<String> ?: emptyList()
+
+                if (currentUserId in members) {
+                    callback(true, null)
+                } else {
+                    callback(false, "You must join the community first")
+                }
+            } catch (e: Exception) {
+                callback(false, "Error checking membership: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Enhanced comment on post with membership validation
+     */
+    fun commentOnPostWithMembershipCheck(
+        postId: String,
+        communityId: String,
+        comment: String,
+        onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = firebaseAuth.currentUser?.uid ?: run {
+                    onFailure("User not authenticated")
+                    return@launch
+                }
+
+                // Check community membership
+                val communityRef = firestore.collection("Community").document(communityId)
+                val communitySnapshot = communityRef.get().await()
+                val members = communitySnapshot.get("members") as? List<String> ?: emptyList()
+
+                if (currentUserId !in members) {
+                    onFailure("You must be a community member to comment on posts")
+                    return@launch
+                }
+
+                // Add comment logic here
+                val commentData = mapOf(
+                    "userId" to currentUserId,
+                    "comment" to comment,
+                    "timestamp" to System.currentTimeMillis()
+                )
+
+                firestore.collection("Community")
+                    .document(communityId)
+                    .collection("posts")
+                    .document(postId)
+                    .collection("comments")
+                    .add(commentData)
+                    .await()
+
+                onSuccess()
+
+            } catch (e: Exception) {
+                Log.e("CommunityViewModel", "Failed to comment: ${e.message}")
+                onFailure(e.message ?: "Failed to comment")
+            }
+        }
+    }
+
+    /**
+     * Original like post method (keeping for backward compatibility)
+     * Now uses enhanced validation
+     */
+    fun likePost(post: PostUiModel) {
+        likePostWithMembershipCheck(
+            post = post,
+            onSuccess = {
+                // Post liked successfully
+            },
+            onFailure = { error ->
+                Log.e("CommunityViewModel", "Failed to like post: $error")
+                _error.value = error
+            }
+        )
+    }
 
     // Creates a new community, uploads its image, and updates state
     fun createCommunity(
@@ -159,8 +552,6 @@ class CommunityViewModel @Inject constructor(
             filtered
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-
-
     // Fetches communities where the current user is a member
     fun fetchCreatedCommunities(userId: String) {
         viewModelScope.launch {
@@ -181,7 +572,7 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    // Fetches the full detail of a single community by its ID
+    // Fetches the full detail of a single community by its ID and checks membership
     fun fetchCommunityDetail(communityId: String) {
         viewModelScope.launch {
             _loading.value = true
@@ -189,6 +580,8 @@ class CommunityViewModel @Inject constructor(
             val result = getCommunityByIdUseCase(communityId)
             result.onSuccess {
                 _communityDetail.value = it
+                // Check membership status when community details are loaded
+                checkMembershipStatus(communityId)
             }.onFailure {
                 _error.value = "Failed to load community detail: ${it.message}"
             }
@@ -203,64 +596,20 @@ class CommunityViewModel @Inject constructor(
                 _communityPosts.value = posts
                     .sortedBy { it.createdAt }
                     .map {
-                    PostUiModel(
-                        id = it.id,
-                        username = it.username,
-                        userAvatarUrl = it.userAvatarUrl,
-                        postImageUrl = it.postImageUrl,
-                        content = it.content,
-                        likes = it.likes,
-                        likedBy = it.likedBy,
-                        userId = it.userId,
-                        communityId = it.communityId
-                    )
-                }
+                        PostUiModel(
+                            id = it.id,
+                            username = it.username,
+                            userAvatarUrl = it.userAvatarUrl,
+                            postImageUrl = it.postImageUrl,
+                            content = it.content,
+                            likes = it.likes,
+                            likedBy = it.likedBy,
+                            userId = it.userId,
+                            communityId = it.communityId
+                        )
+                    }
             }.onFailure {
                 Log.e("CommunityViewModel", "Failed to fetch posts: ${it.message}")
-            }
-        }
-    }
-
-    fun likePost(post: PostUiModel) {
-        viewModelScope.launch {
-            try {
-                val currentUserId = firebaseAuth.currentUser?.uid ?: return@launch
-                val postRef = firestore.collection("Community")
-                    .document(post.communityId)
-                    .collection("posts")
-                    .document(post.id)
-
-                firestore.runTransaction { transaction ->
-                    val snapshot = transaction.get(postRef)
-                    val likedBy = snapshot.get("likedBy") as? List<String> ?: emptyList()
-                    val isLiked = currentUserId in likedBy
-                    val newLikedBy = if (isLiked) likedBy - currentUserId else likedBy + currentUserId
-                    val newLikes = newLikedBy.size
-
-                    transaction.update(postRef, mapOf(
-                        "likes" to newLikes,
-                        "likedBy" to newLikedBy
-                    ))
-                }.await()
-
-                //  Locally update the UI
-                _communityPosts.update { posts ->
-                    posts.map {
-                        if (it.id == post.id) {
-                            val isCurrentlyLiked = currentUserId in it.likedBy
-                            it.copy(
-                                likes = if (isCurrentlyLiked) it.likes - 1 else it.likes + 1,
-                                likedBy = if (isCurrentlyLiked)
-                                    it.likedBy - currentUserId
-                                else
-                                    it.likedBy + currentUserId
-                            )
-                        } else it
-                    }
-                }
-
-            } catch (e: Exception) {
-                Log.e("CommunityViewModel", "Failed to like post: ${e.message}")
             }
         }
     }
@@ -310,12 +659,12 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
+    fun clearError() {
+        _error.value = null
+    }
+
     override fun onCleared() {
         job?.cancel()
         super.onCleared()
-    }
-
-    fun clearError() {
-        _error.value = null
     }
 }

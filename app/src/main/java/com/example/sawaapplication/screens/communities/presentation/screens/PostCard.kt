@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -48,12 +49,14 @@ import com.example.sawaapplication.ui.theme.white
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 @Composable
 fun PostCard(
     post: PostUiModel,
     currentUserId: String,
     onImageClick: (String) -> Unit,
     onLikeClick: (PostUiModel) -> Unit,
+    canLike: Boolean = true,
     onDeleteClick: (() -> Unit)? = null,  // Optional delete callback
     navController: NavController
 ) {
@@ -62,14 +65,7 @@ fun PostCard(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     val formattedDate = remember(post.createdAt) {
-        try {
-            val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
-            val date = parser.parse(post.createdAt)
-            val formatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-            formatter.format(date ?: Date())
-        } catch (e: Exception) {
-            "Unknown date"
-        }
+        formatPostDate(post.createdAt)
     }
 
     Card(
@@ -86,119 +82,210 @@ fun PostCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             // User row
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (post.userAvatarUrl.isNotBlank()) {
-                    AsyncImage(
-                        model = post.userAvatarUrl,
-                        contentDescription = "User Profile Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(integerResource(R.integer.asyncImageSize).dp)
-                            .clip(CircleShape)
-                            .clickable {
-                                if (post.userId == currentUserId) {
-                                    navController.navigate(Screen.Profile.route)
-                                } else {
-                                    navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
-                                }
-                            },
-                    )
-                }
-                Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
+            UserHeaderSection(
+                post = post,
+                currentUserId = currentUserId,
+                formattedDate = formattedDate,
+                navController = navController
+            )
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = post.username,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clickable {
+            Spacer(Modifier.height(8.dp))
+
+            // Post content
+            PostContentSection(
+                post = post,
+                onImageClick = onImageClick
+            )
+
+            // Likes and actions section
+            LikesAndActionsSection(
+                post = post,
+                isLiked = isLiked,
+                canLike = canLike,
+                isOwnedByCurrentUser = isOwnedByCurrentUser,
+                onLikeClick = onLikeClick,
+                onDeleteClick = onDeleteClick,
+                showDeleteDialog = showDeleteDialog,
+                onShowDeleteDialog = { showDeleteDialog = it }
+            )
+        }
+    }
+}
+
+@Composable
+private fun UserHeaderSection(
+    post: PostUiModel,
+    currentUserId: String,
+    formattedDate: String,
+    navController: NavController
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (post.userAvatarUrl.isNotBlank()) {
+            AsyncImage(
+                model = post.userAvatarUrl,
+                contentDescription = "User Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(integerResource(R.integer.asyncImageSize).dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        if (post.userId == currentUserId) {
+                            navController.navigate(Screen.Profile.route)
+                        } else {
                             navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
                         }
+                    },
+            )
+        }
+        Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = post.username,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clickable {
+                    navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                }
+            )
+            Text(
+                text = "${stringResource(R.string.postedOn)} $formattedDate",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray
+            )
+        }
+    }
+}
+
+@Composable
+private fun PostContentSection(
+    post: PostUiModel,
+    onImageClick: (String) -> Unit
+) {
+    // Post text content
+    if (post.content.isNotBlank()) {
+        Text(
+            text = post.content,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
+    }
+
+    // Post image
+    if (post.postImageUrl.isNotBlank()) {
+        AsyncImage(
+            model = post.postImageUrl,
+            contentDescription = "Post image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onImageClick(post.postImageUrl) },
+            contentScale = ContentScale.Crop
+        )
+        Spacer(Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun LikesAndActionsSection(
+    post: PostUiModel,
+    isLiked: Boolean,
+    canLike: Boolean,
+    isOwnedByCurrentUser: Boolean,
+    onLikeClick: (PostUiModel) -> Unit,
+    onDeleteClick: (() -> Unit)?,
+    showDeleteDialog: Boolean,
+    onShowDeleteDialog: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Left side: Like functionality
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (canLike) {
+                // Show like button for community members
+                IconButton(onClick = { onLikeClick(post) }) {
+                    Icon(
+                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = if (isLiked) "Unlike" else "Like",
+                        tint = if (isLiked) Color.Red else Color.Gray
                     )
+                }
+            } else {
+                // Show locked icon for non-members
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Join community to like",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${stringResource(R.string.postedOn)} $formattedDate",
-                        style = MaterialTheme.typography.labelSmall,
+                        text = "Join to like",
+                        style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.width(4.dp))
 
-            // Post content
-            if (post.content.isNotBlank()) {
-                Text(
-                    text = post.content,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-            }
+            // Always show like count
+            Text(
+                text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
 
-            // Post image
-            if (post.postImageUrl.isNotBlank()) {
-                AsyncImage(
-                    model = post.postImageUrl,
-                    contentDescription = "Post image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { onImageClick(post.postImageUrl) },
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.height(8.dp))
-            }
-
-            // Likes section
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+        // Right side: Delete button (if user owns the post)
+        if (isOwnedByCurrentUser && onDeleteClick != null) {
+            IconButton(
+                onClick = { onShowDeleteDialog(true) },
+                modifier = Modifier.size(32.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { onLikeClick(post) }) {
-                        Icon(
-                            imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = if (isLiked) "Unlike" else "Like",
-                            tint = if (isLiked) Color.Red else Color.Gray
-                        )
-                    }
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-                if (isOwnedByCurrentUser && onDeleteClick != null) {
-                    IconButton(
-                        onClick = { showDeleteDialog = true },
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Post",
-                            tint = Color.Gray
-                        )
-                    }
-                }
-            }
-
-            if (showDeleteDialog) {
-                CustomConfirmationDialog(
-                    message = stringResource(R.string.areYouSurePost),
-                    onDismiss = { showDeleteDialog = false },
-                    onConfirm = {
-                        showDeleteDialog = false
-                        onDeleteClick?.invoke()  // call delete lambda without arguments
-                    }
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Post",
+                    tint = Color.Gray
                 )
             }
         }
+    }
+
+    // Delete confirmation dialog
+    if (showDeleteDialog) {
+        CustomConfirmationDialog(
+            message = stringResource(R.string.areYouSurePost),
+            onDismiss = { onShowDeleteDialog(false) },
+            onConfirm = {
+                onShowDeleteDialog(false)
+                onDeleteClick?.invoke()
+            }
+        )
+    }
+}
+
+// Helper function extracted for better readability
+private fun formatPostDate(createdAt: String): String {
+    return try {
+        val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+        val date = parser.parse(createdAt)
+        val formatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        formatter.format(date ?: Date())
+    } catch (e: Exception) {
+        "Unknown date"
     }
 }
