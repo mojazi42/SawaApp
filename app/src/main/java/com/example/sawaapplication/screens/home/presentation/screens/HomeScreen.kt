@@ -138,6 +138,11 @@ fun PostsTab(viewModel: HomeViewModel, navController: NavController) {
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.align(Alignment.Center)
             )
+            posts.isEmpty() -> Text(
+                text = stringResource(R.string.no_posts_available),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.align(Alignment.Center)
+            )
 
             else ->
                 LazyColumn(
