@@ -109,16 +109,13 @@ fun CommunityScreen(
     navController: NavHostController
 ) {
 
-
+    val context = LocalContext.current
 
     // State Management
-    val context = LocalContext.current
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var selectedTab by remember { mutableIntStateOf(0) }
     var dialogState by remember { mutableStateOf(DialogState()) }
 
-
-    // Collect States - Fixed: Use proper StateFlow collection
     // Collect States
     val posts by communityPostsViewModel.communityPosts.collectAsState()
     val events by eventViewModel.events.collectAsState()
@@ -152,7 +149,7 @@ fun CommunityScreen(
         }
     }
 
-    // Enhanced Event Handlers with membership validation
+    // Handle delete result
     LaunchedEffect(deleteResult) {
         deleteResult?.let { result ->
             if (result.isSuccess) {
@@ -164,7 +161,7 @@ fun CommunityScreen(
         }
     }
 
-    // Event Handlers
+    // Enhanced Event Handlers with membership validation
     val eventHandlers = CommunityEventHandlers(
         onLeaveCommunity = {
             joinCommunityViewModel.leaveCommunity(communityId, currentUserId)
@@ -288,27 +285,29 @@ fun CommunityScreen(
             when (selectedTab) {
                 0 -> {
                     // Posts Tab
-                    // In your CommunityScreen.kt, replace the PostCard call with this:
-
-// Posts Tab
-                    items(uiState.posts) { post ->
+                    items(uiState.posts) { singlePost ->
                         PostCard(
-                            post = post,
+                            post = singlePost,
                             currentUserId = currentUserId,
-                            canLike = uiState.isUserJoined, // ✅ Only allow likes if user joined community
+                            canLike = uiState.isUserJoined, // Only allow likes if user joined community
                             onImageClick = { imageUrl ->
                                 val encoded = URLEncoder.encode(imageUrl, "utf-8")
                                 onClick(encoded)
                             },
-                            onLikeClick = { postToLike ->  // ✅ Fixed: Use proper parameter name
-                                if (uiState.isUserJoined) { // ✅ Additional safety check
-                                    communityPostsViewModel.likePost(postToLike.id) // ✅ Fixed: Use postToLike.id
+                            onLikeClick = {
+                                if (uiState.isUserJoined) { // Additional safety check
+                                    communityPostsViewModel.likePost(it.id)
                                 }
+                            },
+                            onDeleteClick = {
+                                communityPostsViewModel.deletePost(
+                                    singlePost.id,
+                                    communityId = communityId
+                                )
                             },
                             navController = navController
                         )
                     }
-
                 }
 
                 1 -> {
@@ -320,7 +319,7 @@ fun CommunityScreen(
                             currentUserId = currentUserId,
                             navController = navController,
                             communityId = communityId,
-                            isUserJoined = uiState.isUserJoined, // ✅ Pass membership status
+                            isUserJoined = uiState.isUserJoined, // Pass membership status
                             onJoinEvent = {
                                 eventHandlers.onJoinEvent(event.id)
                                 // Record event join only if successful
@@ -762,7 +761,7 @@ private fun CommunityFAB(
 // Enhanced EventCard with membership validation
 @Composable
 private fun EnhancedCommunityEventCard(
-    event: com.example.sawaapplication.screens.event.domain.model.Event,
+    event: Event,
     communityName: String,
     currentUserId: String,
     navController: NavHostController,
@@ -792,7 +791,7 @@ private fun EnhancedCommunityEventCard(
         date = formattedDate,
         joined = isUserJoinedEvent,
         isEditable = event.createdBy == currentUserId,
-        canJoinEvents = isUserJoined, // NEW: Pass membership status to control button state
+        canJoinEvents = isUserJoined, // Pass membership status to control button state
         onEditClick = onEditEvent,
         onDeleteClick = onDeleteEvent,
         onJoinClick = {

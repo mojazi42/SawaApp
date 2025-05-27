@@ -44,6 +44,8 @@ import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import com.example.sawaapplication.ui.theme.black
+import com.example.sawaapplication.ui.theme.white
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -95,12 +97,16 @@ fun PostCard(
                 onImageClick = onImageClick
             )
 
-            // Likes section
-            LikesSection(
+            // Likes and actions section
+            LikesAndActionsSection(
                 post = post,
                 isLiked = isLiked,
                 canLike = canLike,
-                onLikeClick = onLikeClick
+                isOwnedByCurrentUser = isOwnedByCurrentUser,
+                onLikeClick = onLikeClick,
+                onDeleteClick = onDeleteClick,
+                showDeleteDialog = showDeleteDialog,
+                onShowDeleteDialog = { showDeleteDialog = it }
             )
         }
     }
@@ -121,6 +127,7 @@ private fun UserHeaderSection(
             AsyncImage(
                 model = post.userAvatarUrl,
                 contentDescription = "User Profile Image",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(integerResource(R.integer.asyncImageSize).dp)
                     .clip(CircleShape)
@@ -186,53 +193,87 @@ private fun PostContentSection(
 }
 
 @Composable
-private fun LikesSection(
+private fun LikesAndActionsSection(
     post: PostUiModel,
     isLiked: Boolean,
     canLike: Boolean,
-    onLikeClick: (PostUiModel) -> Unit
+    isOwnedByCurrentUser: Boolean,
+    onLikeClick: (PostUiModel) -> Unit,
+    onDeleteClick: (() -> Unit)?,
+    showDeleteDialog: Boolean,
+    onShowDeleteDialog: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        if (canLike) {
-            // Show like button for community members
-            IconButton(onClick = { onLikeClick(post) }) {
-                Icon(
-                    imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = if (isLiked) "Unlike" else "Like",
-                    tint = if (isLiked) Color.Red else Color.Gray
-                )
+        // Left side: Like functionality
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (canLike) {
+                // Show like button for community members
+                IconButton(onClick = { onLikeClick(post) }) {
+                    Icon(
+                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = if (isLiked) "Unlike" else "Like",
+                        tint = if (isLiked) Color.Red else Color.Gray
+                    )
+                }
+            } else {
+                // Show locked icon for non-members
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Join community to like",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Join to like",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
             }
-        } else {
-            // Show locked icon for non-members
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 12.dp)
+
+            Spacer(Modifier.width(4.dp))
+
+            // Always show like count
+            Text(
+                text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        // Right side: Delete button (if user owns the post)
+        if (isOwnedByCurrentUser && onDeleteClick != null) {
+            IconButton(
+                onClick = { onShowDeleteDialog(true) },
+                modifier = Modifier.size(32.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "Join community to like",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "Join to like",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Post",
+                    tint = Color.Gray
                 )
             }
         }
+    }
 
-        Spacer(Modifier.width(4.dp))
-
-        // Always show like count
-        Text(
-            text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface
+    // Delete confirmation dialog
+    if (showDeleteDialog) {
+        CustomConfirmationDialog(
+            message = stringResource(R.string.areYouSurePost),
+            onDismiss = { onShowDeleteDialog(false) },
+            onConfirm = {
+                onShowDeleteDialog(false)
+                onDeleteClick?.invoke()
+            }
         )
     }
 }

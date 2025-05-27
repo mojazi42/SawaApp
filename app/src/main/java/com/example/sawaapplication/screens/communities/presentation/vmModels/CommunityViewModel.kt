@@ -659,12 +659,12 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
+    fun clearError() {
+        _error.value = null
+    }
+
     override fun onCleared() {
         job?.cancel()
         super.onCleared()
-    }
-
-    fun clearError() {
-        _error.value = null
     }
 }
