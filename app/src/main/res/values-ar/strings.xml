@@ -173,4 +173,8 @@
     <string name="Communities">المجتمعات</string>
     <string name="Chats">المحادثات</string>
 
+    <string name="no_joined_communities">لم تنضم إلى أي مجتمعات.</string>
+    <string name="no_posts_available">لا توجد منشورات متاحة.</string>
+
+
 </resources>
