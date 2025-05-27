@@ -217,7 +217,7 @@ fun ChatScreen(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No messages yet.", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.noMessagesYet), style = MaterialTheme.typography.bodyLarge)
                 }// challenge is challenge is challenge ;)
             } else {
                 LazyColumn(

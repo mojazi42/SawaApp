@@ -35,12 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.chat.presentation.vmModels.ChatViewModel
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
@@ -97,7 +99,7 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
                     ) {
                         AsyncImage(
                             model = communityImage,
-                            contentDescription = "Community",
+                            contentDescription = stringResource(R.string.community),
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(CircleShape),

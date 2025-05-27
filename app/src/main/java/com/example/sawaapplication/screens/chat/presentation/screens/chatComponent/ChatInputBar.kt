@@ -25,8 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
 
 @Composable
@@ -76,7 +78,7 @@ fun ChatInputBar(
                 value = messageText,
                 onValueChange = onMessageChange,
                 modifier = Modifier.weight(1f),
-                label = "Type your message"
+                label = stringResource(R.string.typeYourMessage)
             )
 
             Spacer(Modifier.width(8.dp))
