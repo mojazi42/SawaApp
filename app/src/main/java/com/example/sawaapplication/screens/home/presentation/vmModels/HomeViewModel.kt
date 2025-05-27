@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sawaapplication.screens.event.domain.model.Event
 import com.example.sawaapplication.screens.event.domain.useCases.GetAllEventInCommunity
+import com.example.sawaapplication.screens.home.domain.model.EventFilterType
 import com.example.sawaapplication.screens.home.domain.useCases.DeletePostUseCase
 import com.example.sawaapplication.screens.home.domain.useCases.FetchAllPostsUseCase
 import com.example.sawaapplication.screens.home.domain.useCases.FetchCommunityNamesUseCase
@@ -228,10 +229,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun resetCancelButton() {
-        _hasCancelEvents.value = false
-    }
-
     fun loadEvents(communityId: String) {
         viewModelScope.launch {
             val result = getAllEventInCommunity(communityId)
@@ -253,7 +250,7 @@ class HomeViewModel @Inject constructor(
         get() {
             val now = System.currentTimeMillis()
             return when (selectedFilter.value) {
-                EventFilterType.Fineshed ->
+                EventFilterType.Finished ->
                     joinedEvents.value.filter { (it.time?.toDate()?.time ?: 0L) < now }
 
                 EventFilterType.Still ->
@@ -265,9 +262,4 @@ class HomeViewModel @Inject constructor(
         }
 }
 
-sealed class EventFilterType {
-    object DEFAULT : EventFilterType()
-    object Fineshed : EventFilterType()
-    object Still : EventFilterType()
-}
 
