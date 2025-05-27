@@ -228,5 +228,6 @@
     <string name="Default">الافتراضي</string>
     <string name="mostPopular">الأشهر</string>
     <string name="mostRecent">الأحدث</string>
+    <string name="joinToLike">إنضم لإضافة الاعجاب</string>
 
 </resources>

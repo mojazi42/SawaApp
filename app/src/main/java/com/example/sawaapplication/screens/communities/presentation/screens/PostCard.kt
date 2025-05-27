@@ -232,7 +232,7 @@ private fun LikesAndActionsSection(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Join to like",
+                        text = stringResource(R.string.joinToLike),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )

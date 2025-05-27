@@ -229,5 +229,6 @@
     <string name="Default">Default</string>
     <string name="mostPopular">Most Popular</string>
     <string name="mostRecent">Most Recent</string>
+    <string name="joinToLike">Join to like</string>
 
 </resources>
