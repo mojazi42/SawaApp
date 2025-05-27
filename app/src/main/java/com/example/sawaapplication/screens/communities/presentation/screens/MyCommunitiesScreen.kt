@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -65,31 +66,41 @@ fun MyCommunitiesScreen(
                 .fillMaxSize()
 
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
-                verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
-                horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
-                modifier = Modifier.padding(vertical = integerResource(id = R.integer.largerSpace).dp)
-            ) {
-                items(filteredCommunities) { community ->
-                    MyCommunitiesCard(
-                        community = community,
-                        onClick = {
-                            // Added debug log to confirm the community ID being navigated to
-                            Log.d("DEBUG", "Navigating to community id: ${community.id}")
-                            // Navigate to the CommunityScreen using the community ID
-                            navController.navigate("community_screen/${community.id}")
-                        }
-                    )
+            if (loading) {
+            } else if (filteredCommunities.isEmpty()) {
+                // Show "no communities" message
+                androidx.compose.material3.Text(
+                    text = stringResource(R.string.no_joined_communities),
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
+                    verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+                    horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+                    modifier = Modifier.padding(vertical = integerResource(id = R.integer.largerSpace).dp)
+                ) {
+                    items(filteredCommunities) { community ->
+                        MyCommunitiesCard(
+                            community = community,
+                            onClick = {
+                                // Added debug log to confirm the community ID being navigated to
+                                Log.d("DEBUG", "Navigating to community id: ${community.id}")
+                                // Navigate to the CommunityScreen using the community ID
+                                navController.navigate("community_screen/${community.id}")
+                            }
+                        )
+                    }
                 }
+                FloatingButton(
+                    onClick = { navController.navigate(Screen.NewCommunity.route) },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(integerResource(R.integer.mediumSpace).dp)
+                )
             }
-            FloatingButton(
-                onClick = { navController.navigate(Screen.NewCommunity.route) },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(integerResource(R.integer.mediumSpace).dp)
-            )
         }
     }
 }

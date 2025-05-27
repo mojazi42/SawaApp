@@ -173,4 +173,8 @@
     <string name="Communities">Communities</string>
     <string name="Chats">Chats</string>
 
+    <string name="no_joined_communities">You have not joined any communities.</string>
+    <string name="no_posts_available">No posts available.</string>
+
+
 </resources>
