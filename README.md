@@ -1,5 +1,7 @@
 # Sawa — Communities App
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f613b081-c6c7-4eb4-8c14-02b23766c9ef" width="100%" />
+</p>
 
 ## Overview
 **Sawa** in Arabic means together, and it's a community-based mobile application designed to help users connect, create events, and share their interests through interactive communities.
