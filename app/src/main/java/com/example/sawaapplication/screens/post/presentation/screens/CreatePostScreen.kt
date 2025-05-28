@@ -176,7 +176,9 @@ fun CreatePostScreen(
                 },
                 enabled = !isLoading && (content.isNotBlank() || imageUri != null)
             ) {
-                Text(stringResource(R.string.post))
+                Text(stringResource(R.string.post),
+                    color = MaterialTheme.colorScheme.background
+                )
             }
         }
 

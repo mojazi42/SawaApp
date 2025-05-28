@@ -123,7 +123,7 @@ fun EventCard(
                 } else {
                     Toast.makeText(
                         context,
-                        "You need to join the community until you can join the event",
+                         R.string.lockedEvent,
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -400,12 +400,12 @@ fun JoinButton(
     ) {
         Text(
             text = when {
-                isLocked   -> "🔒 Locked"
-                isExpired  -> "Finished"
-                isEventFull-> "Full"
-                isCancelVisible -> "Leave"
-                joined     -> "Joined"
-                else       -> "Join"
+                isLocked   -> "🔒 " + stringResource(id= R.string.locked)
+                isExpired  -> stringResource(id= R.string.finish)
+                isEventFull-> stringResource(id= R.string.full)
+                isCancelVisible -> stringResource(id= R.string.leave)
+                joined     -> stringResource(id= R.string.joined)
+                else       -> stringResource(id= R.string.join)
             },
             style = MaterialTheme.typography.labelSmall
         )

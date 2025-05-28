@@ -84,6 +84,8 @@
     <string name="areYouSureCommunity">هل أنت متأكد من رغبتك في مغادرة المجتمع؟</string>
     <string name="deleteEventSuccess">تم حذف الحدث نهائيًا بنجاح</string>
     <string name="deleteEventFailed">فشل حذف الحدث، حاول مجددًا</string>
+    <string name="lockedEvent">"يجب عليك الانضمام إلى المجتمع حتى تتمكن من الانضمام إلى الحدث"</string>
+
 
     <!-- Chats Screen-->
     <string name="chats">المحادثات</string>
@@ -209,6 +211,8 @@
     <string name="finish">انتهى</string>
     <string name="full">اكتمل</string>
     <string name="expired">منتهي</string>
+    <string name="locked">مقفل</string>
+
 
     <!-- Arabic (values-ar/strings.xml) -->
     <string name="badge_attendance_3_days">حضور ٣ أيام</string>

@@ -218,7 +218,10 @@ fun CreateNewEventScreen(
                     }
                 }
             ) {
-                Text(text = if (isEditMode) stringResource(R.string.ok) else stringResource(R.string.create))
+                Text(
+                    text = if (isEditMode) stringResource(R.string.ok) else stringResource(R.string.create),
+                    color = MaterialTheme.colorScheme.background
+                )
             }
         }
 

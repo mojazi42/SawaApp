@@ -27,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -125,17 +126,37 @@ fun CreateCommunityScreen(navController: NavController) {
                 onClick = {
                     when {
                         viewModel.name.isBlank() -> {
-                            Toast.makeText(context, context.getString(R.string.nameRequired), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.nameRequired),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         viewModel.description.isBlank() -> {
-                            Toast.makeText(context, context.getString(R.string.descriptionRequired), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.descriptionRequired),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         viewModel.category.isBlank() -> {
-                            Toast.makeText(context, context.getString(R.string.categoryRequired), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.categoryRequired),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         viewModel.imageUri == null -> {
-                            Toast.makeText(context, context.getString(R.string.uploadImage), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.uploadImage),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         else -> {
                             viewModel.createCommunity(
                                 name = viewModel.name,
@@ -148,7 +169,10 @@ fun CreateCommunityScreen(navController: NavController) {
                     }
                 }
             ) {
-                Text(stringResource(R.string.create))
+                Text(
+                    stringResource(R.string.create), color = MaterialTheme.colorScheme.background
+
+                )
             }
         }
 
@@ -237,7 +261,7 @@ fun CreateCommunityScreen(navController: NavController) {
         }
 
         CommunityTypeDropdown(
-            selectedText=selectedText,
+            selectedText = selectedText,
             onTypeSelected = {
                 selectedTypeIndex = it
                 viewModel.category = communityTypes[it]

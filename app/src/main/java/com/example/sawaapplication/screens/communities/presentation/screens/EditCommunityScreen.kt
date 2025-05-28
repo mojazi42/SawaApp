@@ -266,7 +266,7 @@ fun EditCommunityScreen(
                     .height(integerResource(R.integer.descriptionBoxHeight).dp),
                 maxLines = 5,
                 shape = RoundedCornerShape(16.dp),
-                )
+            )
 
             Spacer(Modifier.height(16.dp))
 
@@ -321,7 +321,10 @@ fun EditCommunityScreen(
                         .width(140.dp)
 
                 ) {
-                    Text(stringResource(R.string.update))
+                    Text(
+                        stringResource(R.string.update),
+                        color = MaterialTheme.colorScheme.background
+                    )
                 }
 
             }
