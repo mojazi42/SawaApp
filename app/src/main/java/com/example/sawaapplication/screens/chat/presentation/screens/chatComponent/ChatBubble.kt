@@ -20,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.chat.domain.model.Message
 import com.example.sawaapplication.ui.theme.black
 import java.text.SimpleDateFormat
@@ -80,7 +82,6 @@ fun ChatBubble(
                             .padding(horizontal = 4.dp)
                     )
                 }
-
                 Column(
                     horizontalAlignment = if (isCurrentUser) Alignment.Start else Alignment.End,
                     modifier = Modifier
@@ -119,7 +120,7 @@ fun ChatBubble(
                         )
                     }
                     Text(
-                        text = if (unreadCount == 0) "Read by all" else "Not read by $unreadCount",
+                        text = if (unreadCount == 0) stringResource(R.string.readByAll) else "${stringResource(R.string.notReadBy)} $unreadCount",
                         fontSize = 10.sp,
                         color = if (isCurrentUser) MaterialTheme.colorScheme.background else Color.DarkGray,
                         modifier = Modifier.padding(top = 2.dp)

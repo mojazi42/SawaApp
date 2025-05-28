@@ -216,6 +216,7 @@ fun CreateCommunityScreen(navController: NavController) {
                 R.string.artCreativity,
                 R.string.booksLiterature,
                 R.string.funny,
+                R.string.education,
                 R.string.gaming,
                 R.string.healthWellness,
                 R.string.moviesTVShows,

@@ -52,7 +52,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
-import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.ui.theme.errorColor
@@ -81,6 +80,7 @@ fun EditCommunityScreen(
             R.string.artCreativity,
             R.string.booksLiterature,
             R.string.funny,
+            R.string.education,
             R.string.gaming,
             R.string.healthWellness,
             R.string.moviesTVShows,

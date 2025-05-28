@@ -85,6 +85,7 @@
     <string name="healthWellness">Health and Wellness</string>
     <string name="artCreativity">Art and Creativity</string>
     <string name="funny">Fun</string>
+    <string name="education">Education</string>
     <string name="other">Other</string>
 
     <!--CommunityScreen-->
@@ -215,5 +216,24 @@
 
     <string name="open_settings_permission">Please allow photo access in settings</string>
 
+
+    <!--Chat Bubble-->
+    <string name="readByAll">Read by all</string>
+    <string name="notReadBy">Not read by</string>
+    <string name="typeYourMessage">Type your message</string>
+
+    <!--Chat Screen-->
+    <string name="noMessagesYet">No Messages Yet</string>
+
+    <string name="community">Community</string>
+
+    <string name="addPost">Add Post</string>
+    <string name="addEvent">Add Event</string>
+    <string name="add">Add</string>
+    <string name="noTimeSet">No time set</string>
+    <string name="Default">Default</string>
+    <string name="mostPopular">Most Popular</string>
+    <string name="mostRecent">Most Recent</string>
+    <string name="joinToLike">Join to like</string>
 
 </resources>
