@@ -36,20 +36,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.domain.model.Community
 
 @Composable
 fun CommunityCard(
     communityName: String,
-    communityMember : Int,
+    communityMember: Int,
     communityImage: Painter,
     communityCategory: String,
-    joinButton : @Composable () -> Unit,
+    joinButton: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,18 +85,22 @@ fun CommunityCard(
                 Spacer(modifier = Modifier.width(6.dp))
 
                 Text(
-                    text = "${communityMember} Members",
+                    text = "${communityMember} " + stringResource(id = R.string.members),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Light
                 )
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
+
                     text = communityCategory,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.1f), shape = RoundedCornerShape(4.dp))
+                        .background(
+                            MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(4.dp)
+                        )
                         .padding(horizontal = 4.dp, vertical = 2.dp)
 
                 )
@@ -129,9 +136,8 @@ fun JoinButton(
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
-            text = if (isJoined) "Joined" else "Join",
+            text = if (isJoined) stringResource(id = R.string.joined) else stringResource(id = R.string.join),
             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium)
         )
     }
 }
-

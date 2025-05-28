@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,7 +61,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommunityScreen
+fun CreateCommunityScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: CommunityViewModel = hiltViewModel()
     val success by viewModel.success.collectAsState()
@@ -124,17 +126,37 @@ fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommuni
                 onClick = {
                     when {
                         viewModel.name.isBlank() -> {
-                            Toast.makeText(context, context.getString(R.string.nameRequired), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.nameRequired),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         viewModel.description.isBlank() -> {
-                            Toast.makeText(context, context.getString(R.string.descriptionRequired), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.descriptionRequired),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         viewModel.category.isBlank() -> {
-                            Toast.makeText(context, context.getString(R.string.categoryRequired), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.categoryRequired),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         viewModel.imageUri == null -> {
-                            Toast.makeText(context, context.getString(R.string.uploadImage), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.uploadImage),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
                         else -> {
                             viewModel.createCommunity(
                                 name = viewModel.name,
@@ -147,7 +169,10 @@ fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommuni
                     }
                 }
             ) {
-                Text(stringResource(R.string.create))
+                Text(
+                    stringResource(R.string.create), color = MaterialTheme.colorScheme.background
+
+                )
             }
         }
 
@@ -191,8 +216,10 @@ fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommuni
             value = viewModel.name,
             onValueChange = { viewModel.name = it },
             label = { Text(stringResource(R.string.communityName)) },
-            modifier = Modifier.fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+
+            )
 
         // Description Input
         OutlinedTextField(
@@ -202,8 +229,10 @@ fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommuni
             modifier = Modifier
                 .fillMaxWidth()
                 .height(integerResource(R.integer.descriptionBoxHeight).dp),
-            maxLines = 5
-        )
+            maxLines = 5,
+            shape = RoundedCornerShape(16.dp),
+
+            )
 
         // Select Community Type
         val communityTypes = remember {
@@ -232,7 +261,7 @@ fun NewCommunity(navController: NavController) { //CHANGE THIS TO "CreateCommuni
         }
 
         CommunityTypeDropdown(
-            selectedText=selectedText,
+            selectedText = selectedText,
             onTypeSelected = {
                 selectedTypeIndex = it
                 viewModel.category = communityTypes[it]

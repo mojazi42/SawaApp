@@ -13,6 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,7 +37,7 @@ import com.example.sawaapplication.screens.communities.presentation.vmModels.Com
 import com.example.sawaapplication.ui.screenComponent.FloatingButton
 import com.example.sawaapplication.ui.screenComponent.SearchField
 import com.google.firebase.auth.FirebaseAuth
-
+import androidx.compose.material3.Icon
 
 @Composable
 fun MyCommunitiesScreen(
@@ -40,7 +46,6 @@ fun MyCommunitiesScreen(
 ) {
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-    // Observe the state of communities and loading
     val communities by viewModel.createdCommunities.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -48,11 +53,11 @@ fun MyCommunitiesScreen(
     val searchText by viewModel.searchText.collectAsState()
     val filteredCommunities by viewModel.filteredCreatedCommunities.collectAsState()
 
-    // Fetch the communities when the screen is loaded
     LaunchedEffect(Unit) {
         viewModel.fetchCreatedCommunities(currentUserId)
     }
-    Column {
+
+    Column(modifier = Modifier.fillMaxSize()) {
         SearchField(
             value = searchText,
             onValueChange = viewModel::onSearchTextChange,
@@ -61,46 +66,52 @@ fun MyCommunitiesScreen(
                 .padding(horizontal = integerResource(R.integer.padding).dp)
         )
         Spacer(Modifier.height(integerResource(R.integer.mediumSpace).dp))
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
 
-        ) {
-            if (loading) {
-            } else if (filteredCommunities.isEmpty()) {
-                // Show "no communities" message
-                androidx.compose.material3.Text(
-                    text = stringResource(R.string.no_joined_communities),
-                    style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
-                    verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
-                    horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
-                    modifier = Modifier.padding(vertical = integerResource(id = R.integer.largerSpace).dp)
-                ) {
-                    items(filteredCommunities) { community ->
-                        MyCommunitiesCard(
-                            community = community,
-                            onClick = {
-                                // Added debug log to confirm the community ID being navigated to
-                                Log.d("DEBUG", "Navigating to community id: ${community.id}")
-                                // Navigate to the CommunityScreen using the community ID
-                                navController.navigate("community_screen/${community.id}")
-                            }
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
+                }
+
+                filteredCommunities.isEmpty() -> {
+                    Text(
+                        text = stringResource(R.string.no_joined_communities),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                else -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(integerResource(id = R.integer.smallerSpace).dp),
+                        verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.extraSmallSpace).dp),
+                        horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        items(filteredCommunities) { community ->
+                            MyCommunitiesCard(
+                                community = community,
+                                onClick = {
+                                    Log.d("DEBUG", "Navigating to community id: ${community.id}")
+                                    navController.navigate("community_screen/${community.id}")
+                                }
+                            )
+                        }
+                    }
+                        FloatingButton(
+                            onClick = { navController.navigate(Screen.CreateCommunityScreen.route) },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(integerResource(R.integer.mediumSpace).dp)
                         )
                     }
                 }
-                FloatingButton(
-                    onClick = { navController.navigate(Screen.NewCommunity.route) },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(integerResource(R.integer.mediumSpace).dp)
-                )
             }
         }
     }
-}

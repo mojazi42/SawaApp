@@ -667,11 +667,13 @@ private fun JoinCommunityButton(onJoinCommunity: () -> Unit) {
         ),
         elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
     ) {
-        Icon(Icons.Default.PersonAdd, contentDescription = null)
+        Icon(Icons.Default.PersonAdd, contentDescription = null,tint = MaterialTheme.colorScheme.background)
         Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
         Text(
             stringResource(R.string.joinCommunity),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.background
+
         )
     }
 }

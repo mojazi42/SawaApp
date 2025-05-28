@@ -24,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -175,7 +176,9 @@ fun CreatePostScreen(
                 },
                 enabled = !isLoading && (content.isNotBlank() || imageUri != null)
             ) {
-                Text(stringResource(R.string.post))
+                Text(stringResource(R.string.post),
+                    color = MaterialTheme.colorScheme.background
+                )
             }
         }
 
@@ -198,7 +201,7 @@ fun CreatePostScreen(
             Text(
                 text = communityName,
                 modifier = Modifier.padding(start = 12.dp),
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onPrimary,
             )
         }
 

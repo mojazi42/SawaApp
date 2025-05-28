@@ -98,6 +98,7 @@
     <string name="areYouSureCommunity">Are you sure you want to leave this community?</string>
     <string name="deleteEventSuccess">Event deleted successfully!</string>
     <string name="deleteEventFailed">Failed to delete event, try again</string>
+    <string name="lockedEvent">"You need to join the community until you can join the event"</string>
 
     <!-- Chats Screen-->
     <string name="chats">Chats</string>
@@ -192,6 +193,7 @@
     <string name="finish">Finished</string>
     <string name="full">Full</string>
     <string name="expired">Expired</string>
+    <string name="locked">Locked</string>
     <!-- Badges -->
     <string name="badge_attendance_3_days">3 Days Attendance</string>
     <string name="badge_attendance_7_days">7 Days Attendance</string>
@@ -210,6 +212,11 @@
     <string name="delete">Delete</string>
     <string name="no_joined_communities">You have not joined any communities.</string>
     <string name="no_posts_available">No posts available.</string>
+
+    <string name="photo_permission_title">Photo Permission</string>
+    <string name="photo_permission_desc">We need access to your photos so you can upload a community image.</string>
+
+    <string name="open_settings_permission">Please allow photo access in settings</string>
 
 
     <!--Chat Bubble-->
