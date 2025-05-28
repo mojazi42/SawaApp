@@ -91,7 +91,7 @@ class ProfileViewModel @Inject constructor(
         _currentUserId.value = id
     }
 
-    private fun getUserData() {
+    fun getUserData() {
         val user = firebaseAuth.currentUser
         _userName.value = user?.displayName
         _userEmail.value = user?.email

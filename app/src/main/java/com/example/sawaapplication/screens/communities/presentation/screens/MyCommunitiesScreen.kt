@@ -104,14 +104,14 @@ fun MyCommunitiesScreen(
                             )
                         }
                     }
-                        FloatingButton(
-                            onClick = { navController.navigate(Screen.CreateCommunityScreen.route) },
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(integerResource(R.integer.mediumSpace).dp)
-                        )
                     }
                 }
+            FloatingButton(
+                onClick = { navController.navigate(Screen.CreateCommunityScreen.route) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(integerResource(R.integer.mediumSpace).dp)
+            )
             }
         }
     }

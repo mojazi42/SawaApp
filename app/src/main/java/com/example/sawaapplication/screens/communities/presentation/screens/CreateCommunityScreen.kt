@@ -218,6 +218,7 @@ fun CreateCommunityScreen(navController: NavController) {
             label = { Text(stringResource(R.string.communityName)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
+            singleLine = true
 
             )
 
@@ -228,7 +229,7 @@ fun CreateCommunityScreen(navController: NavController) {
             label = { Text(stringResource(R.string.newCommDescription)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(integerResource(R.integer.descriptionBoxHeight).dp),
+                .height(190.dp),
             maxLines = 5,
             shape = RoundedCornerShape(16.dp),
 

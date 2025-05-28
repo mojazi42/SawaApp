@@ -207,7 +207,8 @@ fun EditProfileScreen(
             maxLines = 5,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
+                .height(120.dp),
+            singleLine = false
         )
 
         Spacer(modifier = Modifier.height(12.dp))

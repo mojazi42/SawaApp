@@ -93,6 +93,7 @@ fun ProfileScreen(
     LaunchedEffect(userId, selectedTabIndex) {
         profileViewModel.loadCurrentUserId()
         profileViewModel.loadBadges(userId)
+        profileViewModel.getUserData()
         if (selectedTabIndex == 0) {
             homeViewModel.fetchPostsByUser(userId)
         } else {
