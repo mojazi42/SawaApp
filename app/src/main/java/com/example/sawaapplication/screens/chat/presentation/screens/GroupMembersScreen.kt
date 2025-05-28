@@ -113,7 +113,7 @@ fun GroupMembersScreen(communityId: String, navController: NavController) {
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = "${members.size}" + stringResource(id = R.string.members),
+                                text = "${members.size} " + stringResource(id = R.string.members),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
