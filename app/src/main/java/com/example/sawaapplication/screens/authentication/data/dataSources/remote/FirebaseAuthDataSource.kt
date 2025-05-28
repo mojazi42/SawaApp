@@ -17,7 +17,6 @@ class FirebaseAuthDataSource @Inject constructor(
         firebaseAuth.createUserWithEmailAndPassword(email, password).await()
         val user = firebaseAuth.currentUser
         user?.let {
-            val playerId = OneSignal.User.pushSubscription.id
             val userData = mapOf(
                 "uid" to it.uid,
                 "email" to email,
@@ -25,8 +24,7 @@ class FirebaseAuthDataSource @Inject constructor(
                 "createdAt" to FieldValue.serverTimestamp(),
                 "aboutMe" to "",
                 "image" to "",
-                "updatedAt" to "",
-                "oneSignalPlayerId" to playerId
+                "updatedAt" to ""
             )
             FirebaseFirestore.getInstance()
                 .collection("User")
