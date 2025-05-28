@@ -190,7 +190,16 @@ class HomeRemoteDataSource @Inject constructor(
             }
         }
 
-        return Pair(postsList, docIdMap)
+         val sortedPosts = postsList.sortedByDescending { post ->
+             try {
+                 val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+                 dateFormat.parse(post.createdAt)
+             } catch (e: Exception) {
+                 Log.e("PostRepository", "Error parsing date: ${post.createdAt}")
+                 null
+             }
+         }
+         return Pair(sortedPosts, docIdMap)
     }
 
     suspend fun fetchLikedPostsByUser(userId: String): Pair<List<Post>, Map<Post, String>> {
@@ -219,7 +228,16 @@ class HomeRemoteDataSource @Inject constructor(
             }
         }
 
-        return postsList to docIdMap
+        val sortedPosts = postsList.sortedByDescending { post ->
+            try {
+                val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+                dateFormat.parse(post.createdAt)
+            } catch (e: Exception) {
+                Log.e("PostRepository", "Error parsing date: ${post.createdAt}")
+                null
+            }
+        }
+        return sortedPosts to docIdMap
     }
     suspend fun deletePost(post: Post, docId: String) {
         val postRef = firestore
