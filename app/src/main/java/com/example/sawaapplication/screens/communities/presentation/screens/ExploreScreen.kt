@@ -55,6 +55,7 @@ fun ExploreScreen(
         R.string.artCreativity,
         R.string.booksLiterature,
         R.string.funny,
+        R.string.education,
         R.string.gaming,
         R.string.healthWellness,
         R.string.moviesTVShows,
@@ -106,9 +107,9 @@ fun ExploreScreen(
             items(allFilters.size) { index ->
                 val filter = allFilters[index]
                 val label = when (filter) {
-                    is CommunityFilterType.DEFAULT -> "Default"
-                    is CommunityFilterType.MOST_POPULAR -> "Popular"
-                    is CommunityFilterType.MOST_RECENT -> "Recent"
+                    is CommunityFilterType.DEFAULT -> stringResource(R.string.Default)
+                    is CommunityFilterType.MOST_POPULAR -> stringResource(R.string.mostPopular)
+                    is CommunityFilterType.MOST_RECENT -> stringResource(R.string.mostRecent)
                     is CommunityFilterType.Category -> filter.categoryName
                 }
 
