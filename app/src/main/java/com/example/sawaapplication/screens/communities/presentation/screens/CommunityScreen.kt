@@ -424,7 +424,6 @@ private fun CommunityHeader(
     onJoinCommunity: () -> Unit,
     onShowLeaveCommunityDialog: () -> Unit
 ) {
-    Spacer(Modifier.height(16.dp))
 
     // Community Image with Edit Button
     CommunityImageSection(
@@ -735,7 +734,7 @@ private fun CommunityFAB(
                 }
                 navController.navigate(route)
             },
-            modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
+            modifier = Modifier.padding(bottom = 40.dp).size(integerResource(R.integer.floatingActionButtonSize).dp),
             shape = CircleShape,
             containerColor = PrimaryOrange,
             contentColor = white,

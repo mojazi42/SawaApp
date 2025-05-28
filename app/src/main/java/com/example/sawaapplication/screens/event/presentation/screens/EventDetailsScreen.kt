@@ -185,9 +185,9 @@ fun EventDetailScreen(
                         .height(48.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(stringResource(R.string.viewLocation))
+                    Text(stringResource(R.string.viewLocation),color=MaterialTheme.colorScheme.background)
                     Spacer(Modifier.width(8.dp))
-                    Icon(Icons.Default.Map, contentDescription = null)
+                    Icon(Icons.Default.Map, contentDescription = null,tint= MaterialTheme.colorScheme.background)
 
                 }
 
@@ -204,7 +204,7 @@ fun EventDetailScreen(
             ) {
                 Text(
                     text =community?.name ?: stringResource(R.string.loading),
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(horizontal = 16.dp),

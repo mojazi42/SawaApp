@@ -251,8 +251,9 @@ fun EditCommunityScreen(
                 label = { Text(stringResource(R.string.communityName)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
+                singleLine = true
 
-                )
+            )
 
             Spacer(Modifier.height(16.dp))
 
