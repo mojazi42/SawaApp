@@ -23,8 +23,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.outlined.AddLocation
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -148,7 +150,7 @@ fun EventDetailScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     InfoColumn(
-                        icon = Icons.Outlined.AddLocation,
+                        icon = Icons.Filled.LocationOn,
                         text = context.getCityNameFromGeoPoint(event.location)
                     )
                 }
@@ -183,9 +185,10 @@ fun EventDetailScreen(
                         .height(48.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Default.Map, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.viewLocation))
+                    Spacer(Modifier.width(8.dp))
+                    Icon(Icons.Default.Map, contentDescription = null)
+
                 }
 
                 Spacer(Modifier.height(48.dp))
@@ -238,6 +241,18 @@ fun InfoColumn(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+
+        icon?.let {
+            Icon(imageVector = it, contentDescription = null, modifier = Modifier.size(18.dp))
+        }
+        iconRes?.let {
+            Icon(
+                painter = painterResource(id = it),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium,
@@ -249,16 +264,6 @@ fun InfoColumn(
             else
                 Modifier
         )
-        icon?.let {
-            Icon(imageVector = it, contentDescription = null, modifier = Modifier.size(18.dp))
-        }
-        iconRes?.let {
-            Icon(
-                painter = painterResource(id = it),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-        }
     }
 }
 fun formatEventDate(rawDate: String): String {

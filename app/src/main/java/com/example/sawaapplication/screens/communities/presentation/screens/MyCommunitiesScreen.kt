@@ -92,7 +92,6 @@ fun MyCommunitiesScreen(
                         verticalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.extraSmallSpace).dp),
                         horizontalArrangement = Arrangement.spacedBy(integerResource(id = R.integer.smallerSpace).dp),
                         modifier = Modifier
-                            .padding(bottom = integerResource(id = R.integer.largerSpace).dp)
                             .fillMaxSize()
                     ) {
                         items(filteredCommunities) { community ->
@@ -105,15 +104,14 @@ fun MyCommunitiesScreen(
                             )
                         }
                     }
-
-                    FloatingButton(
-                        onClick = { navController.navigate(Screen.CreateCommunityScreen.route) },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(integerResource(R.integer.mediumSpace).dp)
-                    )
+                        FloatingButton(
+                            onClick = { navController.navigate(Screen.CreateCommunityScreen.route) },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(integerResource(R.integer.mediumSpace).dp)
+                        )
+                    }
                 }
             }
         }
     }
-}

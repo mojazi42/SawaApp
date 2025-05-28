@@ -8,15 +8,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -41,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,6 +55,7 @@ import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
+import com.example.sawaapplication.ui.theme.errorColor
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -60,7 +66,7 @@ fun EditCommunityScreen(
     navController: NavController,
     communityId: String,
     viewModel: CommunityViewModel = hiltViewModel()
-){
+) {
     val context = LocalContext.current
     val communityDetail by viewModel.communityDetail.collectAsState()
     var name by remember { mutableStateOf("") }
@@ -113,8 +119,17 @@ fun EditCommunityScreen(
     LaunchedEffect(success) {
         if (success) {
             when (actionType) {
-                "update" -> Toast.makeText(context, R.string.updateCommunityToast, Toast.LENGTH_SHORT).show()
-                "delete" -> Toast.makeText(context, R.string.deleteCommunityToast, Toast.LENGTH_SHORT).show()
+                "update" -> Toast.makeText(
+                    context,
+                    R.string.updateCommunityToast,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                "delete" -> Toast.makeText(
+                    context,
+                    R.string.deleteCommunityToast,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             if (actionType == "delete") {
@@ -148,22 +163,26 @@ fun EditCommunityScreen(
     if (showPhotoPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPhotoPermissionDialog = false },
-            title = { Text(stringResource(R.string.photoPermissionTitle)) },/** STRING */
-            text = { Text(stringResource(R.string.photoPermissionTextC)) },/** STRING */
+            title = { Text(stringResource(R.string.photoPermissionTitle)) },
+            /** STRING */
+            text = { Text(stringResource(R.string.photoPermissionTextC)) },
+            /** STRING */
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.markPhotoPermissionRequested()
                     photoPermissionState.launchPermissionRequest()
                     showPhotoPermissionDialog = false
                 }) {
-                    Text(stringResource(R.string.allow))/** STRING */
+                    Text(stringResource(R.string.allow))
+                    /** STRING */
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showPhotoPermissionDialog = false
                 }) {
-                    Text(stringResource(R.string.deny))/** STRING */
+                    Text(stringResource(R.string.deny))
+                    /** STRING */
                 }
             }
         )
@@ -174,8 +193,10 @@ fun EditCommunityScreen(
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+    ) {
+
         item {
+            Spacer(Modifier.height(46.dp))
             // Image
             Box(
                 modifier = Modifier
@@ -190,7 +211,8 @@ fun EditCommunityScreen(
                             } else {
                                 Toast.makeText(
                                     context,
-                                    text,/** STRING */
+                                    text,
+                                    /** STRING */
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
@@ -227,8 +249,10 @@ fun EditCommunityScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text(stringResource(R.string.communityName)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+
+                )
 
             Spacer(Modifier.height(16.dp))
 
@@ -237,8 +261,12 @@ fun EditCommunityScreen(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text(stringResource(R.string.description)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(integerResource(R.integer.descriptionBoxHeight).dp),
+                maxLines = 5,
+                shape = RoundedCornerShape(16.dp),
+                )
 
             Spacer(Modifier.height(16.dp))
 
@@ -264,30 +292,39 @@ fun EditCommunityScreen(
             }
 
             Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    viewModel.updateCommunity(communityId, name, description, category, imageUri)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.update))
+                TextButton(
+                    onClick = { navController.popBackStack() },
+                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                    modifier = Modifier
+                        .height(46.dp)
+                        .width(140.dp)
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                Button(
+                    onClick = {
+                        viewModel.updateCommunity(
+                            communityId,
+                            name,
+                            description,
+                            category,
+                            imageUri
+                        )
+                    },
+                    modifier = Modifier
+                        .height(46.dp)
+                        .width(140.dp)
+
+                ) {
+                    Text(stringResource(R.string.update))
+                }
+
             }
-
-            Spacer(Modifier.height(16.dp))
-
-            TextButton(
-                onClick = { navController.popBackStack() },
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-                modifier =  Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Text(stringResource(R.string.cancel))
-            }
-
             Spacer(Modifier.height(32.dp))
 
             Button(
@@ -296,8 +333,8 @@ fun EditCommunityScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    .height(46.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = errorColor)
             ) {
                 Text(stringResource(R.string.deleteCommunity), color = Color.White)
             }

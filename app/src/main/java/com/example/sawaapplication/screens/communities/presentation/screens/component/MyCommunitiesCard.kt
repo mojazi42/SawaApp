@@ -93,13 +93,13 @@ fun MyCommunitiesCard(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .padding(top = 4.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(MaterialTheme.colorScheme.tertiaryContainer)
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
+                    .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.1f), shape = RoundedCornerShape(4.dp))
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
 
+            )
             community.description.takeIf { it.isNotBlank() }?.let { description ->
                 Spacer(Modifier.height(6.dp))
                 Text(

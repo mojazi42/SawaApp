@@ -90,7 +90,7 @@ fun CommunityCard(
 
                 Text(
                     text = communityCategory,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.1f), shape = RoundedCornerShape(4.dp))

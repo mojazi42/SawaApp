@@ -1,12 +1,10 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
 import android.Manifest
-import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,14 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.AddLocation
-import androidx.compose.material.icons.outlined.Image
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,13 +27,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -64,13 +52,11 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.sawaapplication.R
 import com.example.sawaapplication.screens.communities.presentation.vmModels.CommunityViewModel
-import com.example.sawaapplication.screens.event.presentation.screens.InfoColumn
-import com.example.sawaapplication.screens.event.presentation.screens.formatEventDate
 import com.example.sawaapplication.ui.screenComponent.CustomTextField
-import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -206,8 +192,10 @@ fun CreateCommunityScreen(navController: NavController) {
             value = viewModel.name,
             onValueChange = { viewModel.name = it },
             label = { Text(stringResource(R.string.communityName)) },
-            modifier = Modifier.fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+
+            )
 
         // Description Input
         OutlinedTextField(
@@ -217,8 +205,10 @@ fun CreateCommunityScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(integerResource(R.integer.descriptionBoxHeight).dp),
-            maxLines = 5
-        )
+            maxLines = 5,
+            shape = RoundedCornerShape(16.dp),
+
+            )
 
         // Select Community Type
         val communityTypes = remember {
@@ -274,7 +264,6 @@ fun CommunityTypeDropdown(
     communityTypes: List<String>
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -313,9 +302,4 @@ fun CommunityTypeDropdown(
             }
         }
     }
-
-}
-
-fun Context.showToast(@StringRes messageRes: Int, duration: Int = Toast.LENGTH_SHORT) {
-    Toast.makeText(this, getString(messageRes), duration).show()
 }

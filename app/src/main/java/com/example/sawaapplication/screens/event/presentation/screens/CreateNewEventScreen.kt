@@ -190,7 +190,7 @@ fun CreateNewEventScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(integerResource(R.integer.padding).dp)
+            .padding(8.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(integerResource(R.integer.verticalArrangement).dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -222,7 +222,7 @@ fun CreateNewEventScreen(
             }
         }
 
-        Spacer(Modifier.height(integerResource(R.integer.mediumSpace).dp))
+        Spacer(Modifier.height(integerResource(R.integer.smallerSpace).dp))
 
         // Title
         Text(
@@ -232,7 +232,7 @@ fun CreateNewEventScreen(
         )
 
         Column(
-            modifier = Modifier.padding(integerResource(R.integer.newEventTextSize).dp),
+            modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val askPhotoPermissionFromSettings =
