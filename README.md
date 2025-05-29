@@ -50,34 +50,46 @@ The app also includes:
 2. Open the project in Android Studio.
 3. Run the app on an emulator or physical device.
 
-## Usage (Screenshots/Demo)
+## Screenshots
+
 <table>
+  <!-- Section: User Profile -->
+  <tr><td colspan="4" align="center" style="padding-top: 46px; background-color: #f0f0f0;"><strong>User Profile</strong></td></tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/5b64241c-4f53-4379-be41-e1a8f88e03f3" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/6251af43-aa32-4a02-ade7-b3e5240fa859" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/76726685-8d03-4abd-b87c-42e6b42b37a4" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/276a3e7a-1292-44de-a1c1-2f338413d3a1" width="100%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/5b64241c-4f53-4379-be41-e1a8f88e03f3" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/6251af43-aa32-4a02-ade7-b3e5240fa859" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/76726685-8d03-4abd-b87c-42e6b42b37a4" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/276a3e7a-1292-44de-a1c1-2f338413d3a1" width="95%"></td>
   </tr>
+
+  <!-- Section: Posts and Events -->
+  <tr><td colspan="4" align="center" style="padding-top: 46px; background-color: #f0f0f0;"><strong>Posts and Events in Home Page</strong></td></tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/02c12d5e-3cc8-4242-be39-01cfaeb362ca" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/abe7ec7f-98d2-4c41-a60e-0491bb99453a" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/ccb9a43d-6d03-462a-bdbc-49d1295bcec6" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/e3a92b64-3b4d-4355-8f7c-b3de47792c05" width="100%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/02c12d5e-3cc8-4242-be39-01cfaeb362ca" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/abe7ec7f-98d2-4c41-a60e-0491bb99453a" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/ccb9a43d-6d03-462a-bdbc-49d1295bcec6" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/e3a92b64-3b4d-4355-8f7c-b3de47792c05" width="95%"></td>
   </tr>
+
+  <!-- Section: Communities -->
+  <tr><td colspan="4" align="center" style="padding-top: 46px; background-color: #f0f0f0;"><strong>My Communities and Explore Communities</strong></td></tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/92db47f9-8798-4029-84c3-a0c5d23fc934" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/08b8a11e-95b5-4289-900a-5f258d2cbc4d" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/6f12f5bb-f460-4749-8e1a-ef2b76fb6b93" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/124d60cd-b456-4b63-ae52-578ff2b1f32b" width="100%"></td>
-    
+    <td align="center"><img src="https://github.com/user-attachments/assets/c855a304-9c59-4a85-a6c5-d71d3e6f2540" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/86a8d1f9-e521-4fbe-bb02-e5695c283ded" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/617e0cc3-1759-4c92-ba54-08c529222931" width="95%"></td>
+    <td></td> <!-- Filler cell to keep row even -->
   </tr>
+
+  <!-- Section: Chat -->
+  <tr><td colspan="4" align="center" style="padding-top: 46px; background-color: #f0f0f0;"><strong>Communities Chat</strong></td></tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/c855a304-9c59-4a85-a6c5-d71d3e6f2540" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/617e0cc3-1759-4c92-ba54-08c529222931" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/4f03ff73-8d5a-49bf-82fa-88e70f596c3a" width="100%"></td>
-    <td><img src="https://github.com/user-attachments/assets/2f76452c-a3e8-4df5-8bb5-5e9b3648c246" width="100%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/92db47f9-8798-4029-84c3-a0c5d23fc934" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/08b8a11e-95b5-4289-900a-5f258d2cbc4d" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/6f12f5bb-f460-4749-8e1a-ef2b76fb6b93" width="95%"></td>
+    <td align="center"><img src="https://github.com/user-attachments/assets/4f03ff73-8d5a-49bf-82fa-88e70f596c3a" width="95%"></td>
   </tr>
 </table>
+
 
 ## Credits
 ### Developers
