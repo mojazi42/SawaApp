@@ -27,31 +27,7 @@ The app also includes:
 - Search & Filters — Find communities by name or category, filter by recent/popular
 - Notifications & Reminders — Get alerts before and after events
 
-## Technical Stack
-
-| Technology             | Usage                             |
-|------------------------|-----------------------------------|
-| **Framework**          | Android Studio                    |
-| **Language**           | Kotlin                            |
-| **UI Toolkit**         | Jetpack Compose                   |
-| **Architecture**       | MVVM (Model-View-ViewModel)       |
-| **Authentication**     | Firebase Authentication           |
-| **Database**           | Firebase Firestore & Storage      |
-| **Notifications**      | OneSignal                         |
-| **Dependency Injection** | Hilt                            |
-| **Design**             | Figma                             |
-| **Collaboration**      | GitHub, Jira                      |
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Ahado00/SawaApplication.git
-2. Open the project in Android Studio.
-3. Run the app on an emulator or physical device.
-
 ## Screenshots
-
 <table>
   <!-- Section: User Profile -->
   <tr><td colspan="4" align="center" style="padding-top: 46px; background-color: #f0f0f0;"><strong>User Profile</strong></td></tr>
@@ -90,10 +66,39 @@ The app also includes:
   </tr>
 </table>
 
+## Technical Stack
+
+| Technology             | Usage                             |
+|------------------------|-----------------------------------|
+| **Framework**          | Android Studio                    |
+| **Language**           | Kotlin                            |
+| **UI Toolkit**         | Jetpack Compose                   |
+| **Architecture**       | MVVM (Model-View-ViewModel)       |
+| **Authentication**     | Firebase Authentication           |
+| **Database**           | Firebase Firestore & Storage      |
+| **Notifications**      | OneSignal                         |
+| **Dependency Injection** | Hilt                            |
+| **Design**             | Figma                             |
+| **Collaboration**      | GitHub, Jira                      |
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Ahado00/SawaApplication.git
+2. Open the project in Android Studio.
+3. Run the app on an emulator or physical device.
+
+## Contributions
+You are more than welcome to contribute:
+1. Fork the repository
+2. Create a new branch
+3. Make your changes
+4. Submit a pull request
+- Or open an issue for bugs or feature suggestions
 
 ## Credits
 ### Developers
-
 | Developers             | Accounts                          |
 |------------------------|-----------------------------------|
 | Abdulah Aljohani       | [GitHub](https://github.com/AbdallahLearn) and [LinkedIn](https://www.linkedin.com/in/abdullahjhn/)|
@@ -106,17 +111,7 @@ The app also includes:
 | Shouq Albdrani           | [GitHub](https://github.com/shouqalbdrani) and [LinkedIn](https://www.linkedin.com/in/shouq-albdrani-b71488273/)|
 
 ### Supervisors
-
 | Supervisors            | Accounts                          |
 |------------------------|-----------------------------------|
 | Mr. ‏Muhammad Rehan     | [GitHub](https://github.com/irehaan) and [LinkedIn](https://www.linkedin.com/in/muhammad-rehan-113226200/)        |
 | Mr. Daniyal Nasir      | [GitHub](https://github.com/daniyalnasir/daniyalnasir/) and [LinkedIn](https://www.linkedin.com/in/syeddaniyalnasir/)        |
-
-
-## Contributions
-You are more than welcome to contribute:
-1. Fork the repository
-2. Create a new branch
-3. Make your changes
-4. Submit a pull request
-- Or open an issue for bugs or feature suggestions
