@@ -1,5 +1,6 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -96,6 +97,7 @@ private data class DialogState(
     val selectedEventId: String? = null
 )
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
@@ -104,7 +106,6 @@ fun CommunityScreen(
     eventViewModel: EventViewModel = hiltViewModel(),
     communityPostsViewModel: CommunityPostsViewModel = hiltViewModel(),
     joinCommunityViewModel: ExploreCommunityViewModel = hiltViewModel(),
-    onBackPressed: () -> Unit,
     onClick: (String) -> Unit,
     navController: NavHostController
 ) {
@@ -239,9 +240,6 @@ fun CommunityScreen(
     )
 
     Scaffold(
-        topBar = {
-            CommunityTopBar(onBackPressed = { navController.popBackStack() })
-        },
         floatingActionButton = {
             CommunityFAB(
                 selectedTab = selectedTab,
@@ -252,11 +250,10 @@ fun CommunityScreen(
         },
         floatingActionButtonPosition = FabPosition.End,
         contentWindowInsets = WindowInsets(0)
-    ) { innerPadding ->
-
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding,
+
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -427,7 +424,6 @@ private fun CommunityHeader(
     onJoinCommunity: () -> Unit,
     onShowLeaveCommunityDialog: () -> Unit
 ) {
-    Spacer(Modifier.height(16.dp))
 
     // Community Image with Edit Button
     CommunityImageSection(
@@ -505,7 +501,7 @@ private fun CommunityInfoSection(
         )
 
         Text(
-            text = "${community.members.size} Members",
+            text = "${community.members.size} ${stringResource(R.string.members)}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -670,11 +666,13 @@ private fun JoinCommunityButton(onJoinCommunity: () -> Unit) {
         ),
         elevation = ButtonDefaults.buttonElevation(integerResource(R.integer.buttonElevation).dp)
     ) {
-        Icon(Icons.Default.PersonAdd, contentDescription = null)
+        Icon(Icons.Default.PersonAdd, contentDescription = null,tint = MaterialTheme.colorScheme.background)
         Spacer(Modifier.width(integerResource(R.integer.itemSpacerH3ed).dp))
         Text(
             stringResource(R.string.joinCommunity),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.background
+
         )
     }
 }
@@ -736,7 +734,7 @@ private fun CommunityFAB(
                 }
                 navController.navigate(route)
             },
-            modifier = Modifier.size(integerResource(R.integer.floatingActionButtonSize).dp),
+            modifier = Modifier.padding(bottom = 40.dp).size(integerResource(R.integer.floatingActionButtonSize).dp),
             shape = CircleShape,
             containerColor = PrimaryOrange,
             contentColor = white,
@@ -749,9 +747,9 @@ private fun CommunityFAB(
                     else -> Icons.Default.Edit
                 },
                 contentDescription = when (selectedTab) {
-                    0 -> "Add Post"
-                    1 -> "Add Event"
-                    else -> "Add"
+                    0 -> stringResource(R.string.addPost)
+                    1 -> stringResource(R.string.addEvent)
+                    else -> stringResource(R.string.add)
                 }
             )
         }
@@ -773,7 +771,7 @@ private fun EnhancedCommunityEventCard(
     onDeleteEvent: () -> Unit
 ) {
     val context = LocalContext.current
-    val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: "No time set"
+    val timeFormatted = event.time?.let { formatTimestampToTimeString(it) } ?: stringResource(R.string.noTimeSet)
     val formattedDate = formatDateString(event.date)
 
     // Check if user is already joined to this event
@@ -804,9 +802,11 @@ private fun EnhancedCommunityEventCard(
                         Toast.LENGTH_LONG
                     ).show()
                 }
+
                 isUserJoinedEvent -> {
                     onLeaveEvent()
                 }
+
                 else -> {
                     onJoinEvent()
                 }
@@ -815,7 +815,11 @@ private fun EnhancedCommunityEventCard(
         showCancelButton = true,
         modifier = Modifier.padding(4.dp),
         eventTimestamp = event.time,
-        onClick = { navController.navigate("event_detail/$communityId/${event.id}") }
+        onClick = { navController.navigate("event_detail/$communityId/${event.id}") },
+        onCommunityClick = { communityId ->
+            navController.navigate("community_screen/$communityId")
+        },
+        communityId = communityId
     )
 }
 

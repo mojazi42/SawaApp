@@ -16,13 +16,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.outlined.AddLocation
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerResource
@@ -55,7 +62,10 @@ import com.example.sawaapplication.utils.getCityNameFromGeoPoint
 import com.google.common.collect.Iterables.size
 import java.text.SimpleDateFormat
 import java.util.Locale
-
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -67,53 +77,38 @@ fun EventDetailScreen(
 ) {
     val communityViewModel: CommunityViewModel = hiltViewModel()
     val community by communityViewModel.communityDetail.collectAsState()
+    val context = LocalContext.current
+    val layoutDirection = LocalLayoutDirection.current
+    val isRtl = layoutDirection == LayoutDirection.Rtl
+    val event = viewModel.getEventById(eventId)
+
     LaunchedEffect(Unit) {
         viewModel.loadEvents(communityId)
         communityViewModel.fetchCommunityDetail(communityId)
     }
 
-    val event = viewModel.getEventById(eventId)
-    val context = LocalContext.current
-    val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
-    val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
 
-    if (event == null) {
-        return
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        // Fixed header box (stays at the top)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(integerResource(R.integer.screenTopSpace).dp)
-                .background(MaterialTheme.colorScheme.background)
-                .align(Alignment.TopCenter),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = community?.name ?: stringResource(R.string.loading),
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 1,
-                modifier = Modifier.padding(horizontal = integerResource(R.integer.smallerSpace).dp)
-            )
+        if (event == null || community == null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+            return
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(integerResource(R.integer.paddingEventScreen).dp)
-                .verticalScroll(state = rememberScrollState())
-        ) {
 
-            Spacer(Modifier.height(integerResource(R.integer.hugeSpace).dp))
+        Box(modifier = Modifier.fillMaxSize()) {
 
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(horizontal = integerResource(R.integer.paddingEventScreen).dp)
+                    .verticalScroll(rememberScrollState())
             ) {
+                Spacer(Modifier.height(integerResource(R.integer.screenTopSpace).dp + 8.dp))
+
                 AsyncImage(
                     model = event.imageUri,
                     contentDescription = null,
@@ -123,135 +118,161 @@ fun EventDetailScreen(
                         .clip(RoundedCornerShape(integerResource(R.integer.round).dp)),
                     contentScale = ContentScale.Crop
                 )
+
+                Spacer(Modifier.height(16.dp))
+
+                // Date & Members Row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    InfoColumn(
+                        icon = Icons.Default.CalendarToday,
+                        text = formatEventDate(event.date),
+                        modifier = Modifier.weight(1f)
+                    )
+                    InfoColumn(
+                        iconRes = R.drawable.members,
+                        text = "${event.joinedUsers.size}",
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+
+                // Location
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    InfoColumn(
+                        icon = Icons.Filled.LocationOn,
+                        text = context.getCityNameFromGeoPoint(event.location)
+                    )
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Text(
+                    text = event.title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+
+                Text(
+                    text = event.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                Spacer(Modifier.height(48.dp))
+
+                Button(
+                    onClick = {
+                        val geoUri = Uri.parse("google.navigation:q=${event.latitude},${event.longitude}")
+                        val intent = Intent(Intent.ACTION_VIEW, geoUri).apply {
+                            setPackage("com.google.android.apps.maps")
+                        }
+                        startActivity(context, intent, null)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(stringResource(R.string.viewLocation),color=MaterialTheme.colorScheme.background)
+                    Spacer(Modifier.width(8.dp))
+                    Icon(Icons.Default.Map, contentDescription = null,tint= MaterialTheme.colorScheme.background)
+
+                }
+
+                Spacer(Modifier.height(48.dp))
             }
 
-            Spacer(Modifier.height(integerResource(R.integer.smallerSpace).dp))
-            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
-            val outputFormat = SimpleDateFormat("d MMMM yy  h:mma", Locale.getDefault())
-
-            val formattedDate = try {
-                val date = inputFormat.parse(event.date)
-                outputFormat.format(date!!)
-            } catch (e: Exception) {
-                event.date
-            }
-
-            Row(
+            // Header
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                .padding(horizontal = integerResource(R.integer.paddingEventScreen).dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .height(integerResource(R.integer.screenTopSpace).dp)
+                    .background(MaterialTheme.colorScheme.background)
+                    .align(Alignment.TopCenter)
             ) {
-                // Date section
                 Text(
-                    text = formattedDate,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Start
-                )
-
-                // Members section
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = size(event.joinedUsers).toString(),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(Modifier.width(integerResource(R.integer.extraSmallSpace).dp))
-                    Icon(
-                        painter = painterResource(R.drawable.members),
-                        contentDescription = "members icon",
-                        modifier = Modifier.size(integerResource(R.integer.membersIconSize).dp)
-                    )
-                }
-
-                // Location section
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(
-                        text = context.getCityNameFromGeoPoint(event.location),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(Modifier.width(integerResource(R.integer.extraSmallSpace).dp))
-                    Icon(
-                        imageVector = Icons.Outlined.AddLocation,
-                        contentDescription = "location icon",
-                        modifier = Modifier.size(integerResource(R.integer.mediumSpace).dp)
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(integerResource(R.integer.extraLargeSpace).dp))
-
-            Text(
-                text = event.title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = integerResource(R.integer.paddingEventScreen).dp)
-            )
-            Text(
-                text = event.description,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = integerResource(R.integer.paddingEventScreen).dp)
-            )
-
-            Spacer(modifier = Modifier.height(integerResource(R.integer.hugeSpace).dp))
-
-            Button(
-                onClick = {
-                    val geoUri =
-                        Uri.parse("google.navigation:q=${event.latitude},${event.longitude}")
-                    val intent = Intent(Intent.ACTION_VIEW, geoUri).apply {
-                        setPackage("com.google.android.apps.maps")
-                    }
-                    startActivity(context, intent, null)
-                },
-                modifier = Modifier
-                    .width(230.dp)
-                    .height(40.dp)
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                Text(stringResource(R.string.viewLocation), color = Color.White)
-            }
-        }
-
-        // Fixed header box (stays at the top)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(integerResource(R.integer.screenTopSpace).dp)
-                .background(MaterialTheme.colorScheme.background)
-                .align(Alignment.TopCenter),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = community?.name ?: stringResource(R.string.loading),
-                style = MaterialTheme.typography.headlineMedium,
-                maxLines = 1,
-                modifier = Modifier.padding(horizontal = integerResource(R.integer.smallerSpace).dp)
-            )
-
-            IconButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
+                    text =community?.name ?: stringResource(R.string.loading),
+                    style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
-                        .size(integerResource(R.integer.backIconSize).dp)
-                        .graphicsLayer {
-                            scaleX = if (isRtl) -1f else 1f
-                        }
+                        .align(Alignment.Center)
+                        .padding(horizontal = 16.dp),
+                    maxLines = 1
                 )
+
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .graphicsLayer { scaleX = if (isRtl) -1f else 1f }
+                    )
+                }
             }
         }
+    }
+
+@Composable
+fun InfoColumn(
+    icon: ImageVector? = null,
+    iconRes: Int? = null,
+    text: String,
+    maxTextWidth: Dp = Dp.Unspecified,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+
+        icon?.let {
+            Icon(imageVector = it, contentDescription = null, modifier = Modifier.size(18.dp))
+        }
+        iconRes?.let {
+            Icon(
+                painter = painterResource(id = it),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = if (maxTextWidth != Dp.Unspecified)
+                Modifier.widthIn(max = maxTextWidth)
+            else
+                Modifier
+        )
+    }
+}
+fun formatEventDate(rawDate: String): String {
+    return try {
+        val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+        val outputFormat = SimpleDateFormat("d MMM yyyy • h:mm a", Locale.getDefault())
+        val date = inputFormat.parse(rawDate)
+        outputFormat.format(date!!)
+    } catch (e: Exception) {
+        rawDate
     }
 }

@@ -57,34 +57,26 @@ fun PostCard(
     userImage: String,
     onClick: () -> Unit,
     onLikeClick: (Post) -> Unit,
-    onUserImageClick: () -> Unit,
     onDeleteClick: (Post) -> Unit,
     navController: NavController,
     modifier: Modifier = Modifier,
     onCommunityClick: ((String) -> Unit)? = null
-
 ) {
-    // State to track if the post is liked
-
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
     var isLiked by remember(post.likedBy) {
         mutableStateOf(currentUserId != null && currentUserId in post.likedBy)
     }
     val isOwnedByCurrentUser = currentUserId == post.userId
     var showDeleteDialog by remember { mutableStateOf(false) }
-
-    // Set icon color based on like state
     val likeIconColor = if (isLiked) Color.Red else Color.Gray
 
     val formattedDate = remember(post.createdAt) {
-        try {
+        runCatching {
             val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
             val date = parser.parse(post.createdAt)
-            val formatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-            formatter.format(date ?: Date())
-        } catch (e: Exception) {
-            "Unknown date"
-        }
+            SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+                .format(date ?: Date())
+        }.getOrDefault("Unknown date")
     }
 
     Card(
@@ -101,136 +93,148 @@ fun PostCard(
                 shape = RoundedCornerShape(integerResource(R.integer.cardRoundedCornerShape).dp)
             )
     ) {
-        Column(modifier = Modifier.padding(integerResource(R.integer.padding).dp)) {
-
-            Box(
+        Column {
+            Column(
                 modifier = Modifier
-                    .padding(start = integerResource(R.integer.smallerSpace).dp)
-                    .border(
-                        width = integerResource(R.integer.cardBorder).dp,
-                        color = Color.Gray,
-                        shape = RoundedCornerShape(integerResource(R.integer.boxRoundedCornerShape).dp)
-                    )
-                    .padding(
-                        horizontal = integerResource(R.integer.smallerSpace).dp,
-                        vertical = integerResource(R.integer.extraSmallSpace).dp
-                    )
+                    .fillMaxWidth()
+                    .padding(integerResource(id = R.integer.smallSpace).dp),
+                horizontalAlignment = Alignment.Start
             ) {
-                Text(
-                    text = communityName,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray,
-                    modifier = Modifier.clickable {
-                        if (onCommunityClick != null) {
-                            onCommunityClick(communityId)
+                // Community tag
+                Box(
+                    modifier = Modifier
+                        .padding(start = integerResource(R.integer.smallerSpace).dp)
+                        .border(
+                            width = integerResource(R.integer.cardBorder).dp,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                            shape = RoundedCornerShape(integerResource(R.integer.boxRoundedCornerShape).dp)
+                        )
+                        .padding(
+                            horizontal = integerResource(R.integer.smallerSpace).dp,
+                            vertical = integerResource(R.integer.extraSmallSpace).dp
+                        )
+                ) {
+                    Text(
+                        text = communityName,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onTertiary,
+                        modifier = Modifier.clickable {
+                            onCommunityClick?.invoke(communityId)
                         }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(integerResource(R.integer.smallerSpace).dp))
+
+                // User info row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (userImage.isNotBlank()) {
+                        AsyncImage(
+                            model = userImage,
+                            contentDescription = "User Profile Image",
+                            modifier = Modifier
+                                .size(integerResource(R.integer.asyncImageSize).dp)
+                                .clip(CircleShape)
+                                .clickable {
+                                    if (post.userId == currentUserId) {
+                                        navController.navigate(Screen.Profile.route)
+                                    } else {
+                                        navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
+                                    }
+                                },
+                            contentScale = ContentScale.Crop
+                        )
                     }
-                )
-            }
 
-            Spacer(modifier = Modifier.height(integerResource(R.integer.smallerSpace).dp))
+                    Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
 
-            // Row with user image + name + date
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (userImage.isNotBlank()) {
-                    AsyncImage(
-                        model = userImage,
-                        contentDescription = "User Profile Image",
-                        modifier = Modifier
-                            .size(integerResource(R.integer.asyncImageSize).dp)
-                            .clip(CircleShape)
-                            .clickable {
-                                if(post.userId == currentUserId){
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = userName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.clickable {
+                                if (post.userId == currentUserId) {
                                     navController.navigate(Screen.Profile.route)
-                                }else{
+                                } else {
                                     navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
                                 }
-                            },
-                        contentScale = ContentScale.Crop,
-
-                    )
-                }
-                Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = userName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clickable {
-                            if(post.userId == currentUserId){
-                                navController.navigate(Screen.Profile.route)
-                            }else{
-                                navController.navigate(Screen.UserAccount.createRoute(userId = post.userId))
-                            }                        }
-                    )
-                    Text(
-                        text = "${stringResource(R.string.postedOn)} $formattedDate",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
-
-            // Post content
-            Text(
-                text = post.content,
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            // Post image (optional)
-            if (post.imageUri.isNotBlank()) {
-                Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
-                AsyncImage(
-                    model = post.imageUri,
-                    contentDescription = "Post Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(integerResource(R.integer.postAsyncImageSize).dp)
-                        .clip(RoundedCornerShape(integerResource(R.integer.postImageRoundedCornerShape).dp))
-                )
-            }
-
-            Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
-
-            // Likes count
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${post.likes} ${stringResource(R.string.like)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-
-                    IconButton(onClick = {
-                        isLiked = !isLiked
-                        onLikeClick(post)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "Like",
-                            tint = likeIconColor
+                            }
+                        )
+                        Text(
+                            text = formattedDate,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray
                         )
                     }
                 }
 
-                // Show delete button if post belongs to current user
+                Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
+
+                // Post content
+                Text(
+                    text = post.content,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(start = integerResource(id = R.integer.smallerSpace).dp)
+                )
+
+                // Optional post image
+                if (post.imageUri.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(integerResource(R.integer.smallSpace).dp))
+                    AsyncImage(
+                        model = post.imageUri,
+                        contentDescription = "Post Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(integerResource(R.integer.postAsyncImageSize).dp)
+                            .clip(RoundedCornerShape(integerResource(R.integer.postImageRoundedCornerShape).dp))
+                    )
+                }
+            }
+
+            // Likes
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = integerResource(R.integer.smallSpace).dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Like",
+                        tint = likeIconColor,
+                        modifier = Modifier
+                            .size(integerResource(R.integer.iconSize).dp)
+                            .clickable {
+                                isLiked = !isLiked
+                                onLikeClick(post)
+                            }
+                    )
+
+                    Spacer(modifier = Modifier.width(integerResource(R.integer.smallerSpace).dp))
+
+                    Text(
+                        text = "${post.likes} ${stringResource(R.string.like)}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 if (isOwnedByCurrentUser) {
                     IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete Post",
-                            tint = Color.Gray
+                            tint = Color.Gray,
+                            modifier = Modifier
+                                .size(integerResource(R.integer.iconSize).dp)
                         )
                     }
                 }

@@ -44,8 +44,6 @@ import com.example.sawaapplication.R
 import com.example.sawaapplication.navigation.Screen
 import com.example.sawaapplication.screens.post.domain.model.PostUiModel
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
-import com.example.sawaapplication.ui.theme.black
-import com.example.sawaapplication.ui.theme.white
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -71,6 +69,7 @@ fun PostCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = integerResource(R.integer.cardHorizontalPadding).dp)
             .border(
                 width = 1.dp,
                 color = Color.White,
@@ -203,6 +202,7 @@ private fun LikesAndActionsSection(
     showDeleteDialog: Boolean,
     onShowDeleteDialog: (Boolean) -> Unit
 ) {
+    // Likes section
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -233,7 +233,7 @@ private fun LikesAndActionsSection(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Join to like",
+                        text = stringResource(R.string.joinToLike),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -244,7 +244,7 @@ private fun LikesAndActionsSection(
 
             // Always show like count
             Text(
-                text = if (post.likes == 1) "1 Like" else "${post.likes} Likes",
+                text = if (post.likes == 1) "1 ${stringResource(R.string.like)}" else "${post.likes} ${stringResource(R.string.likes)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )

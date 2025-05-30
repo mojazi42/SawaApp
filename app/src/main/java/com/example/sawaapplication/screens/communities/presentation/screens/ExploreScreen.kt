@@ -1,21 +1,20 @@
 package com.example.sawaapplication.screens.communities.presentation.screens
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,27 +39,23 @@ import com.example.sawaapplication.screens.communities.presentation.vmModels.Exp
 import com.example.sawaapplication.ui.screenComponent.CustomConfirmationDialog
 import com.example.sawaapplication.ui.screenComponent.SearchField
 
-
 @Composable
 fun ExploreScreen(
     navController: NavController,
     viewModel: ExploreCommunityViewModel = hiltViewModel()
 ) {
-
     val searchText = viewModel.searchText
     val filteredList = viewModel.filteredCommunities
-    var isFilterMenuExpanded by remember { mutableStateOf(false) }
-
     val listState = rememberLazyListState()
     var scrollToTopTrigger by remember { mutableStateOf(0) }
-
-    var showConfirmationDialog by remember { mutableStateOf(false) }
     var selectedCommunityId by remember { mutableStateOf<String?>(null) }
+    var showConfirmationDialog by remember { mutableStateOf(false) }
 
     val categoryStrings = listOf(
         R.string.artCreativity,
         R.string.booksLiterature,
         R.string.funny,
+        R.string.education,
         R.string.gaming,
         R.string.healthWellness,
         R.string.moviesTVShows,
@@ -74,66 +72,77 @@ fun ExploreScreen(
         CommunityFilterType.MOST_RECENT
     ) + categoryStrings.map { CommunityFilterType.Category(it) }
 
-    // Scroll to top when scrollToTopTrigger changes
+    // Scroll to top when filter changes
     LaunchedEffect(scrollToTopTrigger) {
         listState.animateScrollToItem(0)
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(integerResource(R.integer.paddingEventScreen).dp)
     ) {
+        // Search bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             SearchField(
                 value = searchText,
                 onValueChange = viewModel::onSearchTextChange,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
+        }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Box {
-                IconButton(onClick = { isFilterMenuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter"
-                    )
+        // Filter pills (Chips)
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(allFilters.size) { index ->
+                val filter = allFilters[index]
+                val label = when (filter) {
+                    is CommunityFilterType.DEFAULT -> stringResource(R.string.Default)
+                    is CommunityFilterType.MOST_POPULAR -> stringResource(R.string.mostPopular)
+                    is CommunityFilterType.MOST_RECENT -> stringResource(R.string.mostRecent)
+                    is CommunityFilterType.Category -> filter.categoryName
                 }
 
-                DropdownMenu(
-                    expanded = isFilterMenuExpanded,
-                    onDismissRequest = { isFilterMenuExpanded = false },
+                val selected = viewModel.selectedFilter == filter
 
-                    // to control visible items number
-                    modifier = Modifier.heightIn(max = (4 * integerResource(R.integer.itemHeight)).dp)
-
-                ) {
-                    allFilters.forEach { filter ->
-                        val label = when (filter) {
-                            is CommunityFilterType.DEFAULT -> "Default"
-                            is CommunityFilterType.MOST_POPULAR -> "Most Popular"
-                            is CommunityFilterType.MOST_RECENT -> "Most Recent"
-                            is CommunityFilterType.Category -> filter.categoryName
-                        }
-
-                        DropdownMenuItem(
-                            text = { Text(label) },
-                            onClick = {
-                                viewModel.selectedFilter = filter
-                                scrollToTopTrigger++
-                                isFilterMenuExpanded = false
-                            }
-                        )
-                    }
-                }
+                FilterChip(
+                    selected = selected,
+                    onClick = {
+                        viewModel.selectedFilter = filter
+                        scrollToTopTrigger++
+                    },
+                    label = { Text(label) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        labelColor = MaterialTheme.colorScheme.onTertiary,
+                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                        selectedLabelColor = White,
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = false,
+                        borderColor = if (selected)
+                            Color.Transparent
+                        else
+                            MaterialTheme.colorScheme.onTertiary,
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
             }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Community List
         ExploreCommunityCardList(
             communities = filteredList,
             currentUserId = viewModel.currentUserId,

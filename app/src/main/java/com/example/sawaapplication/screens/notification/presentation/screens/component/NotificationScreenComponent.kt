@@ -25,7 +25,6 @@ fun NotificationCard(
     action: String,
     profileImage: Painter? = null,
     postImage: Painter? = null,
-    onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -37,7 +36,6 @@ fun NotificationCard(
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
-            .clickable { onClick() }
             .padding(integerResource(R.integer.smallerSpace).dp)
     ) {
         Row(

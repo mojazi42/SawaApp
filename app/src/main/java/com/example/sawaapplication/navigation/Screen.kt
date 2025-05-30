@@ -15,7 +15,7 @@ sealed class Screen(val route: String) {
     @Serializable data object Notification : Screen("notification")
     @Serializable data object Community : Screen("community")
     @Serializable data object Profile : Screen("profile")
-    @Serializable data object NewCommunity : Screen("new_community")
+    @Serializable data object CreateCommunityScreen : Screen("new_community")
     @Serializable data object NewPost : Screen("")
     @Serializable data object EditProfile : Screen("editProfile")
     @Serializable data object Chats : Screen("chats/{communityId}")

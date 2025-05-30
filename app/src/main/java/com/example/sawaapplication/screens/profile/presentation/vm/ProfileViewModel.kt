@@ -91,7 +91,7 @@ class ProfileViewModel @Inject constructor(
         _currentUserId.value = id
     }
 
-    private fun getUserData() {
+    fun getUserData() {
         val user = firebaseAuth.currentUser
         _userName.value = user?.displayName
         _userEmail.value = user?.email
@@ -187,5 +187,9 @@ class ProfileViewModel @Inject constructor(
             _viewedDefinitions.value = getBadgeDefinitionsUseCase()
             _viewedAwarded.value     = getAwardedBadges(userId)
         }
+    }
+    fun refreshUserData() {
+        loadCurrentUserId()
+        getUserData()
     }
 }
