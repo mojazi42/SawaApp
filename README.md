@@ -85,7 +85,7 @@ The app also includes:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Ahado00/SawaApplication.git
+   git clone https://github.com/mojazi42/SawaApp.git
 2. Open the project in Android Studio.
 3. Run the app on an emulator or physical device.
 
